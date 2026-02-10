@@ -1,0 +1,661 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+// Schema.org
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/prace-naukowe/#service",
+      "name": "Skład prac naukowych w LaTeX",
+      "description": "Profesjonalny skład prac naukowych w systemie LaTeX: artykuły, rozprawy doktorskie, prace magisterskie, licencjackie, habilitacyjne. Zgodność z wymaganiami uczelni i wydawnictw.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Skład prac naukowych LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy prac naukowych",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład pracy doktorskiej" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład pracy magisterskiej" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład pracy licencjackiej" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład artykułu naukowego" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład rozprawy habilitacyjnej" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Prace naukowe", "item": "https://sklad-tekstu.pl/uslugi/prace-naukowe/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy złożycie pracę magisterską zgodnie z wymaganiami mojej uczelni?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tak. Przed rozpoczęciem składu analizujemy wymagania formalne Twojej uczelni (marginesy, fonty, numeracja, strona tytułowa, układ rozdziałów) i konfigurujemy klasę dokumentu tak, aby PDF spełniał je w 100%."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład pracy doktorskiej w LaTeX?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Koszt zależy od objętości i złożoności (liczba wzorów, tabel, rysunków). Wycena jest bezpłatna — wyślij materiały i wymagania, a w ciągu 24h otrzymasz szczegółową kalkulację."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "W jakim standardzie sformatujecie bibliografię?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "W dowolnym. Obsługujemy wszystkie popularne style bibliograficzne: APA, IEEE, Chicago, Vancouver, Harvard, natbib, a także style wymagane przez konkretne czasopisma i wydawnictwa. Wystarczy podać wymagany standard."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy składacie artykuły do konkretnych czasopism (Springer, Elsevier, IEEE)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tak. Pracujemy z szablonami wydawnictw: Springer (svjour3, llncs), Elsevier (elsarticle), IEEE (IEEEtran), ACM, Nature, MDPI i wielu innych. Dostosowujemy Twój artykuł do wymagań konkretnego czasopisma."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę potem samodzielnie wprowadzać poprawki recenzentów?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tak. Dostarczamy czytelne, dobrze skomentowane pliki źródłowe .tex. Jeśli znasz podstawy LaTeX, samodzielne poprawki będą proste. Możemy też przygotować wersję z pakietem changes do śledzenia zmian."
+          }
+        }
+      ]
+    }
+  ]
+};
+
+// Types of scientific works
+const workTypes = [
+  {
+    title: 'Rozprawy doktorskie',
+    desc: 'Najważniejszy dokument w karierze naukowej — musi być perfekcyjny pod każdym względem. Składamy rozprawy z pełnym aparatem naukowym: rozbudowaną bibliografią, przypisami, aneksami, spisami oznaczeń i skrótów. Konfigurujemy układ zgodny z wymaganiami rady dyscypliny.',
+    tags: ['report', 'biblatex', 'nomencl', 'appendix'],
+    pages: '100–300 stron'
+  },
+  {
+    title: 'Prace magisterskie',
+    desc: 'Precyzyjny skład, który robi wrażenie na komisji. Strona tytułowa, oświadczenia, abstrakt, rozdziały, bibliografia — wszystko sformatowane zgodnie z wytycznymi Twojej uczelni. Automatyczna numeracja rozdziałów, wzorów, rysunków i tabel z cross-referencjami.',
+    tags: ['report', 'bibtex', 'hyperref', 'polski'],
+    pages: '60–120 stron'
+  },
+  {
+    title: 'Prace licencjackie i inżynierskie',
+    desc: 'Nawet krótszy dokument zasługuje na profesjonalny skład. Czytelna struktura, poprawna typografia, spójna numeracja i estetyczna prezentacja wyników. Idealne, gdy chcesz wyróżnić się formą na tle prac pisanych w Wordzie.',
+    tags: ['report', 'bibtex', 'listings', 'graphicx'],
+    pages: '30–80 stron'
+  },
+  {
+    title: 'Artykuły naukowe (journal papers)',
+    desc: 'Skład artykułów w szablonach wydawnictw: Springer (svjour3, llncs), Elsevier (elsarticle), IEEE (IEEEtran), ACM, MDPI, Nature i innych. Dbamy o zgodność z wymaganiami submission guidelines — marginesy, fonty, formatowanie referencji, abstrakt, słowa kluczowe.',
+    tags: ['IEEEtran', 'elsarticle', 'svjour3', 'REVTeX'],
+    pages: '8–30 stron'
+  },
+  {
+    title: 'Referaty konferencyjne (proceedings)',
+    desc: 'Artykuły do materiałów konferencyjnych w wymaganych szablonach LaTeX. Krótkie terminy, ścisłe limity stron, specyficzne wymagania formatowania — znamy tę presję i działamy szybko. Springer LNCS, ACM SIG, IEEE Conference — mamy doświadczenie z każdym.',
+    tags: ['llncs', 'acmart', 'IEEEconf', 'camera-ready'],
+    pages: '4–16 stron'
+  },
+  {
+    title: 'Rozprawy habilitacyjne i monografie',
+    desc: 'Publikacje wymagające najwyższego poziomu typograficznego — składane z myślą o ocenie recenzentów i komisji habilitacyjnej. Rozbudowany aparat naukowy, wielopoziomowa bibliografia, indeksy, aneksy. Zgodność z wymaganiami wydawnictw punktowanych z listy MEiN.',
+    tags: ['book', 'biblatex', 'imakeidx', 'glossaries'],
+    pages: '150–400 stron'
+  }
+];
+
+// What we handle
+const elements = [
+  { icon: '∑', title: 'Wzory i równania', desc: 'Dowolna złożoność: równania wieloliniowe, macierze, całki, systemy równań z numeracją i cross-referencjami. Pakiety amsmath, mathtools, physics.' },
+  { icon: '📚', title: 'Bibliografia', desc: 'BibTeX/BibLaTeX z automatycznym formatowaniem w standardach APA, IEEE, Chicago, Vancouver, Harvard, natbib. Cytowania w tekście z natbib lub biblatex-chem.' },
+  { icon: '📐', title: 'Rysunki i wykresy', desc: 'Wektorowe diagramy TikZ, wykresy PGFPlots, schematy obwodów circuitikz, struktury chemiczne chemfig. Ilustracje rastrowe w pełnej rozdzielczości.' },
+  { icon: '▦', title: 'Tabele danych', desc: 'Profesjonalne tabele booktabs z nagłówkami wielopoziomowymi, łączonymi komórkami, automatycznym łamaniem na strony (longtable) i kolorowaniem (xcolor).' },
+  { icon: '💻', title: 'Kod źródłowy', desc: 'Listingi kodu z kolorowaniem składni (listings, minted), numeracją linii i automatycznym łamaniem. Pseudokod w pakietach algorithm2e i algorithmicx.' },
+  { icon: '§', title: 'Aparat naukowy', desc: 'Spisy treści, rysunków, tabel i oznaczeń. Indeksy rzeczowe i osobowe. Glosariusze i listy skrótów (glossaries). Cross-referencje do wszystkiego.' }
+];
+
+// Standards and templates
+const templates = [
+  { publisher: 'Springer', classes: 'svjour3, llncs, svmono', desc: 'Artykuły i monografie w wydawnictwie Springer Nature' },
+  { publisher: 'Elsevier', classes: 'elsarticle', desc: 'Artykuły w czasopismach Elsevier (ponad 2500 tytułów)' },
+  { publisher: 'IEEE', classes: 'IEEEtran, IEEEconf', desc: 'Publikacje IEEE — journal i conference papers' },
+  { publisher: 'ACM', classes: 'acmart', desc: 'Artykuły Association for Computing Machinery' },
+  { publisher: 'APS / AIP', classes: 'REVTeX', desc: 'Physical Review, Journal of Applied Physics i pokrewne' },
+  { publisher: 'MDPI', classes: 'mdpi', desc: 'Artykuły w czasopismach open-access MDPI' },
+  { publisher: 'Uczelnie PL', classes: 'custom class', desc: 'Szablony zgodne z wymaganiami polskich uczelni' },
+  { publisher: 'Wydawnictwa PL', classes: 'book / memoir', desc: 'Monografie dla wydawnictw z listy MEiN' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały i wymagania', desc: 'Wyślij tekst pracy w dowolnym formacie oraz wymagania formalne (wytyczne uczelni, szablon wydawnictwa, styl bibliografii). Im precyzyjniejsze wymagania, tym trafniejsza wycena i szybsza realizacja.', time: '5 min' },
+  { num: '02', title: 'Wycena', desc: 'W ciągu 24 godzin otrzymasz wycenę z rozbiciem na elementy: tekst podstawowy, wzory, tabele, rysunki, bibliografia, indeksy. Podajemy konkretny termin realizacji. Wycena jest bezpłatna.', time: '24 godz.' },
+  { num: '03', title: 'Konfiguracja klasy dokumentu', desc: 'Konfigurujemy klasę dokumentu zgodnie z wymaganiami (marginesy, fonty, numeracja, strona tytułowa, układ nagłówków). Przygotowujemy makietę z próbnym rozdziałem do akceptacji.', time: '1–2 dni' },
+  { num: '04', title: 'Skład właściwy', desc: 'Składamy kompletną pracę: tekst, wzory, tabele, rysunki, bibliografię, spisy. Przesyłamy PDF-y z postępem prac — możesz sprawdzać efekty na bieżąco.', time: '3 dni – 3 tyg.' },
+  { num: '05', title: 'Korekta i poprawki', desc: 'Wprowadzamy wszystkie poprawki — typograficzne, layoutowe, merytoryczne (np. zmiana kolejności rozdziałów, dodanie wzorów). Tyle rund korekt, ile potrzeba.', time: 'do uzgodnienia' },
+  { num: '06', title: 'Finalizacja', desc: 'Gotowy PDF do druku lub submisji. Na życzenie: pliki źródłowe .tex z instrukcją kompilacji, wersja z pakietem changes do śledzenia zmian dla recenzentów, wersja z hiperłączami do czytania online.', time: '1 dzień' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czy złożycie pracę zgodnie z wymaganiami mojej uczelni?', a: 'Tak. Przed składem analizujemy wytyczne formalne Twojej uczelni: marginesy, kroje pisma, interlinia, układ strony tytułowej, format oświadczeń, numeracja rozdziałów, styl bibliografii. Konfigurujemy klasę dokumentu tak, aby PDF spełniał każde wymaganie. Jeśli uczelnia udostępnia własny szablon LaTeX — pracujemy na nim.' },
+  { q: 'Ile kosztuje skład pracy doktorskiej?', a: 'Koszt zależy od objętości i złożoności materiału. Typowa rozprawa doktorska (150–250 stron z umiarkowaną liczbą wzorów) to koszt rzędu 2000–5000 zł netto. Prace z bardzo gęstą matematyką, dużą liczbą tabel lub rysunków TikZ — odpowiednio więcej. Wycena jest bezpłatna — wyślij materiały, a podamy dokładną kwotę.' },
+  { q: 'W jakim standardzie sformatujecie bibliografię?', a: 'W dowolnym. Obsługujemy: APA (7th edition), IEEE, Chicago (notes-bibliography i author-date), Vancouver, Harvard, natbib (plainnat, abbrvnat, unsrtnat), a także style wymagane przez konkretne czasopisma i wydawnictwa (np. Springer\'s sn-basic, Elsevier\'s elsarticle-num). Wystarczy wskazać wymagany standard.' },
+  { q: 'Składacie artykuły do konkretnych czasopism?', a: 'Tak. Pracujemy z szablonami: Springer (svjour3, llncs, svmono), Elsevier (elsarticle), IEEE (IEEEtran), ACM (acmart), APS/AIP (REVTeX), MDPI, Nature, PLOS ONE i wielu innych. Dostosowujemy Twój artykuł do submission guidelines konkretnego tytułu — format, limity, styl referencji, abstract structure.' },
+  { q: 'Czy mogę potem samodzielnie edytować pliki .tex?', a: 'Tak. Dostarczamy czytelne, dobrze zorganizowane pliki źródłowe z komentarzami. Struktura: jeden plik główny + osobne pliki rozdziałów + plik bibliografii (.bib). Dodajemy instrukcję kompilacji i listę wymaganych pakietów. Jeśli znasz podstawy LaTeX, samodzielne poprawki (literówki, dodanie akapitu, aktualizacja danych) będą proste.' },
+  { q: 'Jak szybko złożycie krótki artykuł konferencyjny?', a: 'Artykuł 8–16 stron w gotowym szablonie (np. LNCS, IEEEtran) składamy zwykle w 2–5 dni roboczych. Przy pilnych deadline\'ach konferencyjnych oferujemy tryb ekspresowy — nawet 24–48 godzin. Skontaktuj się z wyprzedzeniem, żebyśmy mogli zarezerwować termin.' },
+  { q: 'Czy składacie prace w języku angielskim?', a: 'Tak. Większość artykułów naukowych składamy właśnie w języku angielskim. LaTeX doskonale obsługuje angielską typografię, dzielenie wyrazów i konwencje (em-dash, en-dash, cudzysłowy, ligatures). Składamy też prace dwujęzyczne (np. abstrakt PL + EN).' },
+  { q: 'Czy pomożecie z formatowaniem pod submission?', a: 'Tak. Przygotowujemy kompletny pakiet do submisji: PDF, pliki źródłowe .tex, plik bibliografii .bib, rysunki w wymaganych formatach (EPS, PDF, TIFF). Na życzenie przygotowujemy też cover letter, response to reviewers (z pakietem changes) i highlighted manuscript z zaznaczonymi zmianami.' }
+];
+---
+
+<BaseLayout
+  title="Skład prac naukowych w LaTeX — artykuły, doktoraty, prace magisterskie"
+  description="Profesjonalny skład prac naukowych w LaTeX: rozprawy doktorskie, prace magisterskie i licencjackie, artykuły naukowe, referaty konferencyjne. Zgodność z wymaganiami uczelni i wydawnictw. Szablony Springer, Elsevier, IEEE."
+  keywords="skład pracy doktorskiej latex, skład pracy magisterskiej, skład artykułu naukowego latex, praca doktorska latex, praca magisterska latex, skład prac naukowych, latex praca dyplomowa, IEEE latex, Springer latex, Elsevier latex"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>Prace naukowe</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.2</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">prac naukowych</span><br>w&nbsp;systemie LaTeX
+      </h1>
+      <p class="hero__subtitle">
+        Rozprawy doktorskie, prace magisterskie, artykuły naukowe, referaty konferencyjne —<br>
+        złożone zgodnie z&nbsp;wymaganiami uczelni i&nbsp;wydawnictw
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">article</span>
+        <span class="hero__tag">report</span>
+        <span class="hero__tag">IEEEtran</span>
+        <span class="hero__tag">elsarticle</span>
+        <span class="hero__tag">biblatex</span>
+        <span class="hero__tag">amsmath</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij pracę do wyceny <span>→</span></a>
+        <a href="#typy-prac" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Praca naukowa to&nbsp;Twoja wizytówka — niech wygląda profesjonalnie</h2>
+          <p>
+            Rozprawa doktorska, artykuł w&nbsp;prestiżowym czasopiśmie, referat na konferencję międzynarodową
+            — to dokumenty, które czytają recenzenci, komisje habilitacyjne, potencjalni pracodawcy. Forma
+            ma&nbsp;znaczenie. Praca złożona w&nbsp;LaTeX komunikuje: „autor wie, co robi" — bo&nbsp;to
+            system, którego używają naukowcy na najlepszych uniwersytetach świata.
+          </p>
+          <p>
+            LaTeX zapewnia idealną typografię wzorów matematycznych, automatyczną numerację i&nbsp;cross-referencje,
+            profesjonalną bibliografię w&nbsp;dowolnym standardzie i&nbsp;PDF, który wygląda identycznie na
+            każdym komputerze. To nie jest kwestia estetyki — to kwestia wiarygodności.
+          </p>
+          <p>
+            Składamy prace w&nbsp;szablonach największych wydawnictw naukowych na świecie: Springer,
+            Elsevier, IEEE, ACM, Nature, MDPI. A&nbsp;jeśli Twoja uczelnia ma&nbsp;własne wymagania
+            formalne — skonfigurujemy klasę dokumentu tak, aby spełniała je w&nbsp;100%.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-label">Obsługiwane wydawnictwa</span>
+            <div class="intro__sidebar-logos">
+              <span>Springer</span>
+              <span>Elsevier</span>
+              <span>IEEE</span>
+              <span>ACM</span>
+              <span>MDPI</span>
+              <span>Nature</span>
+              <span>Wiley</span>
+              <span>APS</span>
+            </div>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-label">Style bibliografii</span>
+            <div class="intro__sidebar-logos">
+              <span>APA 7</span>
+              <span>IEEE</span>
+              <span>Chicago</span>
+              <span>Vancouver</span>
+              <span>Harvard</span>
+              <span>natbib</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES OF WORKS -->
+  <section class="types" id="typy-prac" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.1"
+          title="Rodzaje prac naukowych"
+          subtitle="Każdy typ pracy naukowej ma swoją specyfikę — inne wymagania formalne, inną strukturę, inny aparat naukowy. Mamy doświadczenie w składzie każdego z nich."
+        />
+      </div>
+      <div class="types__grid">
+        {workTypes.map((t) => (
+          <div class="types__card reveal">
+            <h3 class="types__card-title">{t.title}</h3>
+            <span class="types__card-pages">{t.pages}</span>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ELEMENTS -->
+  <section class="elements" aria-labelledby="elements-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.2"
+          title="Co składamy w&nbsp;Twojej pracy"
+          subtitle="Pełen aparat naukowy — od wzorów przez bibliografię po indeksy. Każdy element złożony z typograficzną precyzją."
+        />
+      </div>
+      <div class="elements__grid">
+        {elements.map((e) => (
+          <div class="elements__card reveal">
+            <span class="elements__icon" aria-hidden="true">{e.icon}</span>
+            <h3>{e.title}</h3>
+            <p>{e.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- TEMPLATES TABLE -->
+  <section class="templates" aria-labelledby="templates-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.3"
+          title="Szablony wydawnictw, z&nbsp;którymi pracujemy"
+          subtitle="Składamy artykuły i monografie w oficjalnych szablonach LaTeX największych wydawnictw naukowych na świecie."
+          inverted
+        />
+      </div>
+      <div class="templates__table reveal">
+        <div class="templates__header">
+          <span>Wydawnictwo</span>
+          <span>Klasy LaTeX</span>
+          <span>Zastosowanie</span>
+        </div>
+        {templates.map((t) => (
+          <div class="templates__row">
+            <span class="templates__publisher">{t.publisher}</span>
+            <span class="templates__classes">{t.classes}</span>
+            <span class="templates__desc">{t.desc}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE PAGE -->
+  <section class="sample" aria-label="Przykładowa strona artykułu naukowego">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.4"
+          title="Jak wygląda artykuł złożony w&nbsp;LaTeX"
+          subtitle="Symulacja pierwszej strony artykułu w stylu IEEE — zwróć uwagę na dwukolumnowy układ, typografię wzorów i format referencji."
+        />
+      </div>
+    </div>
+    <div class="sample__preview reveal">
+      <div class="sample__page">
+        <div class="sample__page-header-ieee">
+          <span class="sample__journal">IEEE Transactions on Signal Processing</span>
+        </div>
+        <h4 class="sample__paper-title">Adaptive Filtering with Sparse Bayesian<br>Learning in Non-Stationary Environments</h4>
+        <div class="sample__authors">J. Kowalski, A. Nowak, M. Wiśniewska</div>
+        <div class="sample__abstract">
+          <strong>Abstract</strong> — We propose a novel adaptive filtering algorithm based on sparse Bayesian learning (SBL) that achieves superior performance in non-stationary environments. The proposed method exploits temporal correlations...
+        </div>
+        <div class="sample__ieee-cols">
+          <div class="sample__col">
+            <h5>I. Introduction</h5>
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line short"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+            </div>
+            <h5>II. System Model</h5>
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+            </div>
+            <div class="sample__formula-ieee">
+              <em>y</em>[<em>n</em>] = <strong>w</strong><sup>T</sup><strong>x</strong>[<em>n</em>] + <em>v</em>[<em>n</em>]
+              <span class="sample__eq-num">(1)</span>
+            </div>
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line short"></div>
+            </div>
+          </div>
+          <div class="sample__col">
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line short"></div>
+            </div>
+            <div class="sample__formula-ieee">
+              <em>p</em>(<strong>w</strong>|<em>α</em>) = ∏<sub><em>i</em></sub> 𝒩(<em>w<sub>i</sub></em>|0, <em>α<sub>i</sub></em><sup>−1</sup>)
+              <span class="sample__eq-num">(2)</span>
+            </div>
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line short"></div>
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+            </div>
+            <h5>III. Proposed Algorithm</h5>
+            <div class="sample__fake-text">
+              <div class="sample__fake-line"></div>
+              <div class="sample__fake-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.5"
+          title="Proces składu pracy naukowej"
+          subtitle="Od przesłania materiałów do gotowego PDF — przejrzyste etapy z konkretnymi terminami."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.2.6"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania, które dostajemy od doktorantów, magistrantów i autorów artykułów naukowych."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html="\\begin{submission}" />
+        <h2 id="cta-title">Wyślij pracę — wycenimy skład w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to&nbsp;praca magisterska, rozprawa doktorska, artykuł do&nbsp;Springera
+          czy referat na konferencję — przygotujemy szczegółową wycenę z&nbsp;konkretnym terminem
+          realizacji. Wystarczy przesłać materiały i&nbsp;wymagania formalne. Wycena jest bezpłatna.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">
+          Wyślij materiały <span class="cta__button-arrow">→</span>
+        </a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true" set:html="\\end{submission}" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o składzie prac naukowych LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład prac naukowych w&nbsp;LaTeX — profesjonalna typografia dla&nbsp;nauki</h2>
+        <p>
+          Profesjonalny <strong>skład prac naukowych</strong> to nie luksus — to standard, jakiego oczekują
+          recenzenci, komisje i&nbsp;wydawnictwa. System LaTeX, używany przez naukowców na uniwersytetach
+          MIT, Stanford, Cambridge czy ETH Zurich, zapewnia typografię na poziomie nieosiągalnym
+          w&nbsp;edytorach WYSIWYG. <strong>Skład pracy doktorskiej w&nbsp;LaTeX</strong>, <strong>skład
+          pracy magisterskiej</strong> czy <strong>skład artykułu naukowego</strong> — to usługi, które
+          pozwalają autorowi skupić się na treści, podczas gdy my&nbsp;dbamy o&nbsp;perfekcyjną formę.
+        </p>
+        <h3>Skład pracy doktorskiej i&nbsp;habilitacyjnej</h3>
+        <p>
+          Rozprawa doktorska to najważniejszy dokument w&nbsp;karierze naukowej. <strong>Skład pracy
+          doktorskiej w&nbsp;LaTeX</strong> zapewnia: profesjonalną typografię wzorów, automatyczną numerację
+          i&nbsp;cross-referencje, bibliografię w&nbsp;wymaganym standardzie, spisy treści, rysunków, tabel
+          i&nbsp;oznaczeń generowane automatycznie, a&nbsp;także PDF spełniający wymagania formalne rady
+          dyscypliny. Na życzenie dostarczamy pliki źródłowe .tex do samodzielnej edycji.
+        </p>
+        <h3>Skład artykułów naukowych do&nbsp;czasopism</h3>
+        <p>
+          Składamy <strong>artykuły naukowe w&nbsp;szablonach LaTeX</strong> największych wydawnictw:
+          Springer (svjour3, llncs), Elsevier (elsarticle), IEEE (IEEEtran), ACM (acmart), MDPI, Nature
+          i&nbsp;wielu innych. Dbamy o&nbsp;zgodność z&nbsp;submission guidelines konkretnego czasopisma.
+          Przygotowujemy kompletny pakiet do submisji: PDF, pliki .tex, bibliografię .bib, rysunki
+          w&nbsp;wymaganych formatach.
+        </p>
+        <h3>Skład prac magisterskich i&nbsp;licencjackich</h3>
+        <p>
+          <strong>Skład pracy magisterskiej w&nbsp;LaTeX</strong> to inwestycja, która się opłaca — praca
+          wygląda profesjonalnie, wyróżnia się na tle prac pisanych w&nbsp;Wordzie i&nbsp;pokazuje
+          kompetencje techniczne autora. Konfigurujemy klasę dokumentu zgodnie z&nbsp;wymaganiami Twojej
+          uczelni. Cały proces jest szybki (1–2 tygodnie) i&nbsp;bezproblemowy.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 2fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-6); }
+  .intro__sidebar-block { padding: var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); display: block; margin-bottom: var(--space-3); }
+  .intro__sidebar-logos { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .intro__sidebar-logos span { font-family: var(--font-mono); font-size: 0.68rem; padding: 0.2rem 0.5rem; background: var(--paper); border: 1px solid var(--rule-light); color: var(--ink-muted); border-radius: var(--radius-sm); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-1); }
+  .types__card-pages { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); display: block; margin-bottom: var(--space-3); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ ELEMENTS ═════ */
+  .elements { padding: var(--space-20) 0; }
+  .elements__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .elements__card { padding: var(--space-8) var(--space-6); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .elements__card:hover { background: var(--white); box-shadow: var(--shadow-md); border-color: var(--rule); }
+  .elements__icon { display: block; font-size: 1.6rem; margin-bottom: var(--space-4); color: var(--accent); }
+  .elements__card h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .elements__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ TEMPLATES ═════ */
+  .templates { padding: var(--space-20) 0; background: var(--ink); color: var(--paper); }
+  .templates__table { border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); overflow: hidden; }
+  .templates__header { display: grid; grid-template-columns: 140px 180px 1fr; background: rgba(255,255,255,0.06); padding: var(--space-3) var(--space-5); font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .templates__row { display: grid; grid-template-columns: 140px 180px 1fr; padding: var(--space-3) var(--space-5); border-top: 0.5px solid rgba(255,255,255,0.06); font-size: var(--fs-sm); align-items: center; }
+  .templates__publisher { font-weight: var(--fw-medium); color: var(--paper); }
+  .templates__classes { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-light); }
+  .templates__desc { color: rgba(250,248,244,0.6); font-size: var(--fs-sm); }
+  @media (max-width: 768px) {
+    .templates__header { display: none; }
+    .templates__row { grid-template-columns: 1fr; gap: var(--space-1); padding: var(--space-4) var(--space-5); }
+    .templates__desc { font-size: var(--fs-xs); }
+  }
+
+  /* ═════ SAMPLE IEEE ═════ */
+  .sample { padding: var(--space-20) 0; }
+  .sample__preview { max-width: 650px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample__page { background: var(--white); padding: var(--space-8) var(--space-6); box-shadow: var(--shadow-xl); border-radius: var(--radius-sm); font-size: 0.78rem; line-height: 1.5; color: var(--ink); }
+  .sample__page-header-ieee { text-align: center; padding-bottom: var(--space-3); margin-bottom: var(--space-4); border-bottom: 0.5px solid var(--rule-light); }
+  .sample__journal { font-family: var(--font-serif); font-size: var(--fs-xs); font-style: italic; color: var(--ink-faint); }
+  .sample__paper-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: var(--fw-bold); text-align: center; margin-bottom: var(--space-2); line-height: 1.3; }
+  .sample__authors { text-align: center; font-family: var(--font-serif); font-size: var(--fs-sm); font-style: italic; color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .sample__abstract { font-size: 0.78rem; line-height: 1.6; color: var(--ink-light); margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); background: var(--paper); border-left: 2px solid var(--accent); font-style: italic; }
+  .sample__abstract strong { font-style: normal; color: var(--ink); }
+  .sample__ieee-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  @media (max-width: 480px) { .sample__ieee-cols { grid-template-columns: 1fr; } }
+  .sample__col h5 { font-family: var(--font-display); font-size: 0.82rem; font-weight: var(--fw-bold); text-transform: uppercase; margin-bottom: var(--space-2); margin-top: var(--space-3); letter-spacing: 0.02em; }
+  .sample__col h5:first-child { margin-top: 0; }
+  .sample__fake-text { display: flex; flex-direction: column; gap: 3px; margin-bottom: var(--space-2); }
+  .sample__fake-line { height: 2.5px; background: var(--paper-dark); border-radius: 1px; width: 100%; }
+  .sample__fake-line.short { width: 70%; }
+  .sample__formula-ieee { text-align: center; padding: var(--space-2) 0; font-family: var(--font-serif); font-style: italic; font-size: 0.82rem; color: var(--ink); position: relative; margin: var(--space-2) 0; }
+  .sample__eq-num { position: absolute; right: 0; font-style: normal; color: var(--ink-muted); font-size: 0.75rem; }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); letter-spacing: 0.04em; }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO CONTENT ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

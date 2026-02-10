@@ -1,0 +1,716 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/prezentacje-postery/#service",
+      "name": "Skład prezentacji Beamer i posterów naukowych w LaTeX",
+      "description": "Profesjonalny skład prezentacji naukowych w Beamer, posterów konferencyjnych, slajdów wykładowych i materiałów konferencyjnych w systemie LaTeX. Wzory matematyczne, wykresy PGFPlots, diagramy TikZ.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Skład prezentacji i posterów LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy prezentacji i posterów",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład prezentacji Beamer" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład posterów konferencyjnych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład slajdów wykładowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład materiałów konferencyjnych" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Prezentacje i postery", "item": "https://sklad-tekstu.pl/uslugi/prezentacje-postery/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czym różni się prezentacja Beamer od PowerPointa?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Beamer to klasa dokumentu LaTeX do tworzenia prezentacji w PDF. W przeciwieństwie do PowerPointa, Beamer renderuje wzory matematyczne w pełnej jakości LaTeX, generuje slajdy jako wektorowy PDF (ostre w każdej rozdzielczości), obsługuje automatyczną numerację, bibliografię i cross-referencje. Idealny do prezentacji naukowych, technicznych i wykładów." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład prezentacji Beamer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od liczby slajdów i złożoności (wzory, wykresy, diagramy TikZ, animacje overlay). Typowa prezentacja konferencyjna 20-30 slajdów — od 500 zł. Wycena jest bezpłatna." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład posteru naukowego?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Poster A0/A1 z wykresami, tabelami i wzorami — od 400 zł netto. Koszt zależy od złożoności elementów graficznych i ilości danych do wizualizacji. Wycena jest bezpłatna." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę samodzielnie modyfikować slajdy?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Dostarczamy pliki źródłowe .tex z czytelną strukturą. Dodanie slajdu, zmiana tekstu czy aktualizacja wykresu to proste edycje. Szablon (kolory, fonty, układ) pozostaje spójny automatycznie." }
+        }
+      ]
+    }
+  ]
+};
+
+// Types
+const materialTypes = [
+  {
+    title: 'Prezentacje konferencyjne',
+    desc: 'Slajdy na wystąpienia konferencyjne, obrony prac i seminaria. Precyzyjne wzory, wykresy z danych, diagramy algorytmów, animacje overlay (stopniowe odsłanianie treści). Format 16:9 lub 4:3, spójny z identyfikacją uczelni lub konferencji.',
+    tags: ['beamer', '16:9', 'overlay', 'pgfplots'],
+    icon: '🎤'
+  },
+  {
+    title: 'Postery naukowe',
+    desc: 'Wielkoformatowe postery na sesje posterowe konferencji naukowych. Format A0 (841×1189 mm) lub A1, kolumnowy układ, duże wykresy i tabele, czytelna typografia widoczna z 2 metrów. Wektorowy PDF — idealny druk w każdej skali.',
+    tags: ['beamerposter', 'tikzposter', 'A0', 'wektor'],
+    icon: '📐'
+  },
+  {
+    title: 'Slajdy wykładowe',
+    desc: 'Kompletne zestawy slajdów na cały semestr: podział na wykłady, spójna numeracja, nawigacja między tematami, automatyczny spis treści na początku każdego wykładu. Handouty z notatkami do druku (2/4/6 slajdów na stronę).',
+    tags: ['beamer', 'handout', 'semestralny', 'TOC'],
+    icon: '🎓'
+  },
+  {
+    title: 'Prezentacje firmowe i techniczne',
+    desc: 'Slajdy do prezentacji produktów, wyników badań, analiz technicznych i raportów. Szablony w kolorach firmowych, z logo, spójne z identyfikacją wizualną. Wykresy z danych CSV, tabele, schematy blokowe, timeline\'y projektów.',
+    tags: ['beamer', 'corporate', 'pgfplots', 'branding'],
+    icon: '💼'
+  },
+  {
+    title: 'Materiały konferencyjne',
+    desc: 'Kompletne pakiety konferencyjne: program, abstrakty, book of abstracts, certyfikaty, identyfikatory. Automatyczne generowanie z bazy danych uczestników i zgłoszonych referatów. Spójny styl graficzny całego eventu.',
+    tags: ['datatool', 'CSV', 'batch', 'program'],
+    icon: '📋'
+  },
+  {
+    title: 'Plakaty i infografiki',
+    desc: 'Materiały informacyjne w formacie plakatowym: infografiki naukowe, schematy procesów, mapy koncepcyjne, diagramy podsumowujące badania. Wektorowe elementy TikZ, precyzyjne pozycjonowanie, przygotowanie do druku wielkoformatowego.',
+    tags: ['tikz', 'standalone', 'infografika', 'A2'],
+    icon: '🖼'
+  }
+];
+
+// Beamer vs PowerPoint
+const comparisons = [
+  { feature: 'Wzory matematyczne', pptx: 'Edytor równań — ograniczony, niespójny rendering, eksport często rozjechany', beamer: 'Pełna moc LaTeX — dowolna złożoność, perfekcyjna typografia, identyczna na każdym urządzeniu' },
+  { feature: 'Wykresy z danych', pptx: 'Wklejone z Excela jako obraz — pikselowe przy powiększeniu, ręczna aktualizacja', beamer: 'PGFPlots generowane z CSV — wektorowe, automatyczna aktualizacja, spójne z fontem prezentacji' },
+  { feature: 'Spójność stylu', pptx: 'Master slide łatwo nadpisać, formatowanie lubi się „rozjeżdżać" po kilku edycjach', beamer: 'Motyw (theme) kontroluje wszystko — niemożliwe do przypadkowego złamania' },
+  { feature: 'Numeracja i referencje', pptx: 'Ręczna — „patrz slajd 12" wymaga śledzenia po każdej zmianie kolejności', beamer: 'Automatyczna — \\ref{slajd:wyniki} zawsze wskazuje na właściwy slajd' },
+  { feature: 'Format wyjściowy', pptx: '.pptx — rendering zależy od wersji Office i systemu operacyjnego', beamer: 'PDF wektorowy — identyczny na każdym urządzeniu, w każdej rozdzielczości' },
+  { feature: 'Bibliografia', pptx: 'Ręczna — kopiujesz tekst referencji na ostatni slajd', beamer: 'Automatyczna z BibTeX — ten sam plik .bib co w artykule, formatowanie wg stylu' }
+];
+
+// Poster elements
+const posterElements = [
+  { title: 'Układ kolumnowy', desc: 'Standardowy układ 3 lub 4 kolumn z przejrzystą hierarchią: tytuł, autorzy, afiliacja → sekcje z treścią → wnioski, referencje. Automatyczne rozmieszczenie bloków z pakietem beamerposter lub tikzposter.' },
+  { title: 'Wykresy i wizualizacje', desc: 'Wektorowe wykresy PGFPlots w dużej skali — ostre i czytelne z 2 metrów. Wykresy słupkowe, liniowe, heat mapy, box ploty. Spójna paleta kolorów z resztą posteru.' },
+  { title: 'Wzory w dużej skali', desc: 'Kluczowe równania w powiększonej czcionce, czytelne na A0. Bloki z definicjami, twierdzeniami i wnioskami w kolorowych ramkach, wyróżnione na tle reszty treści.' },
+  { title: 'Tabele danych', desc: 'Profesjonalne tabele booktabs z powiększonym fontem, kolorowanymi nagłówkami i przejrzystym odstępem między wierszami. Czytelne z dystansu sesji posterowej.' },
+  { title: 'Diagramy i schematy', desc: 'Flowcharty procedur, schematy eksperymentów, architektury systemów, diagramy wyników — w wektorowym TikZ, ostre w każdej skali druku.' },
+  { title: 'QR kody i kontakt', desc: 'QR kod z linkiem do pełnego artykułu, repozytorium kodu lub profilu ORCID. Dane kontaktowe autora, afiliacja, logo uczelni i grantodawcy w spójnym layoucie.' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały i brief', desc: 'Wyślij treść prezentacji lub posteru (Word, PDF, notatki), dane do wykresów, wymagania konferencji (szablon, format, limit slajdów/wymiary) i identyfikację wizualną (logo, kolory). Jeśli masz istniejące slajdy do przeprojektowania — też ją przyjmiemy.', time: '1 dzień' },
+  { num: '02', title: 'Wycena', desc: 'W ciągu 24h: wycena z rozbiciem na elementy (szablon, slajdy/sekcje, wykresy, diagramy) + propozycja motywu graficznego. Bezpłatnie.', time: '24 godz.' },
+  { num: '03', title: 'Makieta', desc: 'Projektujemy motyw: strona tytułowa, układ treści, styl ramek i bloków, paleta kolorów, typografia. Składamy próbne slajdy/sekcje do akceptacji.', time: '1–3 dni' },
+  { num: '04', title: 'Skład', desc: 'Składamy kompletną prezentację lub poster: tekst, wzory, wykresy, diagramy, animacje overlay. Przesyłamy PDF z postępem prac.', time: '2–7 dni' },
+  { num: '05', title: 'Korekta i finalizacja', desc: 'Wprowadzamy poprawki, dopracowujemy detale. Na końcu: PDF prezentacji (16:9/4:3), PDF handout (do druku), dla posterów — PDF gotowy do druku wielkoformatowego. Pliki .tex na życzenie.', time: '1–2 dni' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czym różni się Beamer od PowerPointa?', a: 'Beamer to klasa dokumentu LaTeX generująca prezentacje jako wektorowe PDF. Kluczowe różnice: wzory matematyczne w pełnej jakości LaTeX (nie edytor równań), wykresy z danych CSV (nie wklejone obrazy z Excela), automatyczna numeracja i cross-referencje, identyczny rendering na każdym urządzeniu (bo PDF, nie .pptx). Beamer jest standardem w prezentacjach naukowych na konferencjach matematycznych, fizycznych i informatycznych.' },
+  { q: 'Ile kosztuje skład prezentacji Beamer?', a: 'Typowa prezentacja konferencyjna (20–30 slajdów, kilka wykresów, wzory) — od 500 zł netto. Rozbudowany zestaw slajdów wykładowych na cały semestr (100+ slajdów, dziesiątki wykresów i diagramów) — wycena indywidualna. Koszt zależy głównie od złożoności elementów graficznych (wykresy PGFPlots, diagramy TikZ), nie od samej liczby slajdów z tekstem.' },
+  { q: 'Ile kosztuje skład posteru naukowego?', a: 'Poster A0 lub A1 z wykresami, tabelami i wzorami — od 400 zł netto. Poster z rozbudowanymi diagramami TikZ i wieloma wizualizacjami danych — odpowiednio więcej. Wycena jest bezpłatna — wyślij materiały i wymagania konferencji.' },
+  { q: 'Czy Beamer obsługuje animacje?', a: 'Tak, ale inaczej niż PowerPoint. Beamer używa overlay — stopniowe odsłanianie elementów na slajdzie (punkt po punkcie, krok algorytmu po kroku, fragment wykresu po fragmencie). Każdy „krok" to osobna strona PDF, co daje efekt animacji w trybie prezentacji. Nie obsługuje animacji wideo ani przejść 3D, ale dla prezentacji naukowych overlay jest idealny.' },
+  { q: 'Czy mogę użyć szablonu mojej uczelni lub konferencji?', a: 'Tak. Jeśli uczelnia lub konferencja udostępnia szablon Beamer (.sty) — pracujemy na nim. Jeśli istnieje tylko szablon PowerPoint — odtwarzamy go w Beamer (kolory, logo, układ, fonty). Możemy też zaprojektować dedykowany motyw od zera, spójny z identyfikacją wizualną.' },
+  { q: 'Czy zrobicie handouty do druku?', a: 'Tak. Z jednego pliku źródłowego generujemy: prezentację (pełny ekran, z overlay), handout bez animacji (1 slajd = 1 strona), handout do druku (2, 4 lub 6 slajdów na stronę A4, z liniami na notatki). Wszystkie wersje z jednego polecenia kompilacji.' },
+  { q: 'Czy poster będzie gotowy do druku wielkoformatowego?', a: 'Tak. PDF wektorowy — tekst, wykresy, diagramy są ostre w każdej skali. Zdjęcia rastrowe osadzamy w rozdzielczości min. 150 DPI w docelowym rozmiarze A0/A1. Plik gotowy do wysłania do drukarni wielkoformatowej bez dodatkowej konwersji.' },
+  { q: 'Jak szybko złożycie prezentację na konferencję za tydzień?', a: 'Prezentację 20–30 slajdów z umiarkowaną liczbą wykresów — w 3–5 dni roboczych. Przy pilnych terminach — tryb ekspresowy, nawet 24–48 godzin. Poster — 2–3 dni. Skontaktuj się z wyprzedzeniem, żebyśmy mogli zarezerwować termin.' }
+];
+---
+
+<BaseLayout
+  title="Skład prezentacji Beamer i posterów naukowych w LaTeX"
+  description="Profesjonalny skład prezentacji naukowych w Beamer, posterów konferencyjnych A0/A1, slajdów wykładowych i materiałów konferencyjnych w LaTeX. Wzory matematyczne, wykresy PGFPlots, diagramy TikZ."
+  keywords="prezentacja beamer latex, poster naukowy latex, slajdy beamer, poster konferencyjny latex, prezentacja naukowa latex, beamer skład, poster A0 latex, slajdy wykładowe latex, beamer vs powerpoint"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>Prezentacje i&nbsp;postery</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.7</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">prezentacji</span><br>i&nbsp;posterów naukowych
+      </h1>
+      <p class="hero__subtitle">
+        Prezentacje Beamer, postery konferencyjne, slajdy wykładowe —<br>
+        z&nbsp;perfekcyjnymi wzorami, wykresami i&nbsp;diagramami
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">beamer</span>
+        <span class="hero__tag">beamerposter</span>
+        <span class="hero__tag">pgfplots</span>
+        <span class="hero__tag">tikz</span>
+        <span class="hero__tag">amsmath</span>
+        <span class="hero__tag">overlay</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij materiały do wyceny <span>→</span></a>
+        <a href="#typy" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Twoja prezentacja — w&nbsp;jakości Twojego artykułu</h2>
+          <p>
+            Napisałeś artykuł w&nbsp;LaTeX z&nbsp;perfekcyjnymi wzorami, profesjonalnymi wykresami
+            i&nbsp;precyzyjną bibliografią. A&nbsp;potem przenosisz wyniki do&nbsp;PowerPointa —
+            i&nbsp;wzory zamieniają się w&nbsp;rozmazane obrazki, wykresy tracą ostrość, a&nbsp;bibliografia
+            to ręcznie wklejony tekst na ostatnim slajdzie.
+          </p>
+          <p>
+            Beamer rozwiązuje ten problem systemowo. To klasa dokumentu LaTeX, która generuje
+            prezentacje jako wektorowy PDF. Wzory renderowane tym samym silnikiem co w&nbsp;artykule.
+            Wykresy PGFPlots z&nbsp;tych samych danych CSV. Bibliografia z&nbsp;tego samego pliku
+            .bib. Slajd wygląda identycznie na Twoim laptopie, projektorze w&nbsp;sali konferencyjnej
+            i&nbsp;wydruku handoutu.
+          </p>
+          <p>
+            Składamy prezentacje na konferencje naukowe, obrony doktoratów, seminaria, wykłady
+            akademickie i&nbsp;prezentacje firmowe. A&nbsp;do&nbsp;tego postery konferencyjne A0/A1
+            — wektorowe, ostre, gotowe do druku wielkoformatowego.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">PDF</span>
+            <span class="intro__sidebar-label">wektorowy — identyczny wszędzie</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">.bib</span>
+            <span class="intro__sidebar-label">ta sama bibliografia co w artykule</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">A0</span>
+            <span class="intro__sidebar-label">postery do druku wielkoformatowego</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section class="types" id="typy" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.1"
+          title="Rodzaje materiałów"
+          subtitle="Od 20-minutowej prezentacji konferencyjnej po kompletny zestaw slajdów na cały semestr — i postery na sesje posterowe."
+        />
+      </div>
+      <div class="types__grid">
+        {materialTypes.map((t) => (
+          <div class="types__card reveal">
+            <span class="types__card-icon" aria-hidden="true">{t.icon}</span>
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE SLIDE -->
+  <section class="sample-slide" aria-label="Przykładowy slajd Beamer">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.2"
+          title="Jak wygląda slajd Beamer"
+          subtitle="Symulacja typowego slajdu z prezentacji konferencyjnej — twierdzenie matematyczne, dowód i wykres danych. Zwróć uwagę na typografię wzorów."
+          inverted
+        />
+      </div>
+    </div>
+    <div class="sample-slide__preview reveal">
+      <div class="sample-slide__frame">
+        <!-- Title bar -->
+        <div class="sample-slide__titlebar">
+          <span class="sample-slide__nav">Sparse Bayesian Learning › Convergence Analysis</span>
+          <span class="sample-slide__slidenum">14 / 28</span>
+        </div>
+
+        <h4 class="sample-slide__heading">Convergence of the SBL Algorithm</h4>
+
+        <!-- Theorem block -->
+        <div class="sample-slide__block sample-slide__block--theorem">
+          <div class="sample-slide__block-title">Twierdzenie 3.2 (Zbieżność)</div>
+          <p>Niech <em>α</em><sup>(<em>t</em>)</sup> oznacza wektor hiperparametrów w&nbsp;iteracji <em>t</em>. Wówczas ciąg &#123;<em>L</em>(<em>α</em><sup>(<em>t</em>)</sup>)&#125; jest monotoniczny i&nbsp;zbieżny:</p>
+          <div class="sample-slide__formula">
+            <em>L</em>(<em>α</em><sup>(<em>t</em>+1)</sup>) ≥ <em>L</em>(<em>α</em><sup>(<em>t</em>)</sup>)&emsp;∀<em>t</em> ≥ 0
+          </div>
+        </div>
+
+        <!-- Chart area -->
+        <div class="sample-slide__chart">
+          <div class="sample-slide__chart-title">Zbieżność log-likelihood</div>
+          <div class="sample-slide__chart-area">
+            <div class="sample-slide__chart-line"></div>
+          </div>
+          <div class="sample-slide__chart-labels">
+            <span>0</span><span>iteracja <em>t</em></span><span>50</span>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="sample-slide__footer">
+          <span>J. Kowalski (Politechnika Warszawska)</span>
+          <span>ICASSP 2025</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEAMER VS PPTX -->
+  <section class="comparison" aria-labelledby="comparison-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.3"
+          title="Beamer vs PowerPoint"
+          subtitle="PowerPoint wystarczy do prezentacji biznesowej z bullet pointami. Gdy na slajdach pojawiają się wzory, dane i diagramy — Beamer wygrywa w każdej kategorii."
+        />
+      </div>
+      <div class="comparison__table reveal">
+        <div class="comparison__header">
+          <div class="comparison__col-label comparison__col-label--feature">Element</div>
+          <div class="comparison__col-label comparison__col-label--pptx">PowerPoint</div>
+          <div class="comparison__col-label comparison__col-label--beamer">Beamer</div>
+        </div>
+        {comparisons.map((c) => (
+          <div class="comparison__row">
+            <div class="comparison__cell comparison__cell--feature">{c.feature}</div>
+            <div class="comparison__cell comparison__cell--pptx">
+              <span class="comparison__marker comparison__marker--pptx" aria-hidden="true">✕</span>
+              {c.pptx}
+            </div>
+            <div class="comparison__cell comparison__cell--beamer">
+              <span class="comparison__marker comparison__marker--beamer" aria-hidden="true">✓</span>
+              {c.beamer}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- POSTER ELEMENTS -->
+  <section class="poster-elements" aria-labelledby="poster-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.4"
+          title="Anatomia posteru naukowego"
+          subtitle="Poster konferencyjny to jedno spojrzenie — czytelny z 2 metrów, atrakcyjny z 5, informacyjny z 50 cm. Oto elementy, o które dbamy."
+        />
+      </div>
+      <div class="poster-elements__grid">
+        {posterElements.map((e) => (
+          <div class="poster-elements__card reveal">
+            <h3>{e.title}</h3>
+            <p>{e.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE POSTER -->
+  <section class="sample-poster" aria-label="Przykładowy miniaturowy poster naukowy">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.5"
+          title="Jak wygląda poster w&nbsp;LaTeX"
+          subtitle="Miniatura posteru konferencyjnego A0 — trzykolumnowy układ z nagłówkiem, sekcjami badawczymi, wykresem i wnioskami."
+          inverted
+        />
+      </div>
+    </div>
+    <div class="sample-poster__preview reveal">
+      <div class="sample-poster__frame">
+        <!-- Header -->
+        <div class="sample-poster__header">
+          <h4>Adaptive Sparse Bayesian Learning for Non-Stationary Signal Recovery</h4>
+          <div class="sample-poster__authors">J. Kowalski¹, A. Nowak², M. Wiśniewska¹</div>
+          <div class="sample-poster__affil">¹Politechnika Warszawska &emsp; ²Uniwersytet Jagielloński</div>
+        </div>
+
+        <!-- 3-column body -->
+        <div class="sample-poster__body">
+          <div class="sample-poster__col">
+            <div class="sample-poster__section">
+              <div class="sample-poster__section-title">1. Introduction</div>
+              <div class="sample-poster__fake-text">
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line short"></div>
+              </div>
+            </div>
+            <div class="sample-poster__section">
+              <div class="sample-poster__section-title">2. System Model</div>
+              <div class="sample-poster__formula">
+                <em>y</em> = <strong>Φw</strong> + <em>v</em>
+              </div>
+              <div class="sample-poster__fake-text">
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line short"></div>
+              </div>
+            </div>
+          </div>
+          <div class="sample-poster__col">
+            <div class="sample-poster__section">
+              <div class="sample-poster__section-title">3. Proposed Method</div>
+              <div class="sample-poster__fake-text">
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line"></div>
+              </div>
+              <div class="sample-poster__diagram">
+                <span>diagram TikZ</span>
+              </div>
+              <div class="sample-poster__fake-text">
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line short"></div>
+              </div>
+            </div>
+          </div>
+          <div class="sample-poster__col">
+            <div class="sample-poster__section">
+              <div class="sample-poster__section-title">4. Results</div>
+              <div class="sample-poster__chart-placeholder">
+                <span>wykres PGFPlots</span>
+              </div>
+            </div>
+            <div class="sample-poster__section">
+              <div class="sample-poster__section-title">5. Conclusions</div>
+              <div class="sample-poster__fake-text">
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line"></div>
+                <div class="sample-poster__line short"></div>
+              </div>
+            </div>
+            <div class="sample-poster__qr">
+              <div class="sample-poster__qr-box">QR</div>
+              <span>Pełny artykuł: arXiv:2501.xxxxx</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.6"
+          title="Proces realizacji"
+          subtitle="Od materiałów do gotowego PDF — szybko, bo deadline konferencyjny nie czeka."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.7.7"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania od doktorantów, wykładowców i organizatorów konferencji."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true">\begin&lbrace;prezentacja&rbrace;</div>
+        <h2 id="cta-title">Wyślij materiały — wycenimy prezentację lub poster w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to prezentacja na ICASSP, poster na sesję posterową, komplet slajdów
+          na semestr czy materiały na konferencję — przygotujemy wycenę z&nbsp;konkretnym terminem.
+          Wystarczy przesłać treść i&nbsp;wymagania. Bezpłatnie.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">Wyślij materiały <span class="cta__button-arrow">→</span></a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true">\end&lbrace;prezentacja&rbrace;</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o składzie prezentacji i posterów w LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład prezentacji Beamer i&nbsp;posterów naukowych w&nbsp;LaTeX</h2>
+        <p>
+          Profesjonalny <strong>skład prezentacji w&nbsp;Beamer</strong> to gwarancja, że Twoje
+          slajdy naukowe będą wyglądać tak samo dobrze jak Twój artykuł. System Beamer — klasa
+          dokumentu LaTeX do prezentacji — renderuje wzory matematyczne, wykresy PGFPlots i&nbsp;diagramy
+          TikZ w&nbsp;pełnej jakości wektorowej. Rezultat: PDF, który wygląda identycznie na każdym
+          urządzeniu.
+        </p>
+        <h3>Prezentacje konferencyjne Beamer</h3>
+        <p>
+          <strong>Prezentacja Beamer</strong> to standard na konferencjach matematycznych, fizycznych
+          i&nbsp;informatycznych. Wzory renderowane silnikiem LaTeX (nie edytorem równań), wykresy
+          generowane z&nbsp;danych CSV (nie wklejone z&nbsp;Excela), bibliografia z&nbsp;tego samego
+          pliku .bib co artykuł. Animacje overlay pozwalają na stopniowe odsłanianie treści
+          — krok algorytmu po kroku, punkt po punkcie.
+        </p>
+        <h3>Postery konferencyjne A0/A1</h3>
+        <p>
+          <strong>Poster naukowy w&nbsp;LaTeX</strong> (beamerposter, tikzposter) to wektorowy PDF
+          gotowy do druku wielkoformatowego. Tekst, wykresy, diagramy i&nbsp;wzory ostre w&nbsp;każdej
+          skali — od A4 po A0. Trzykolumnowy układ z&nbsp;przejrzystą hierarchią, kolorowymi blokami
+          sekcji i&nbsp;QR kodem z&nbsp;linkiem do artykułu. Czytelny z&nbsp;2 metrów, informacyjny
+          z&nbsp;bliska.
+        </p>
+        <h3>Slajdy wykładowe na cały semestr</h3>
+        <p>
+          <strong>Slajdy wykładowe Beamer</strong> to kompletny zestaw materiałów dydaktycznych:
+          podział na wykłady, spójna numeracja, nawigacja między tematami, automatyczny spis treści.
+          Z&nbsp;jednego pliku źródłowego generujesz: prezentację z&nbsp;animacjami, handout bez
+          animacji, wersję do druku (2/4/6 slajdów na stronę z&nbsp;liniami na notatki).
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 1fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-4); }
+  .intro__sidebar-block { padding: var(--space-5) var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); text-align: center; }
+  .intro__sidebar-value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-bold); color: var(--accent); display: block; line-height: 1; margin-bottom: var(--space-1); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-icon { font-size: 1.6rem; display: block; margin-bottom: var(--space-3); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-2); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ SAMPLE SLIDE ═════ */
+  .sample-slide { padding: var(--space-20) 0; background: var(--ink); }
+  .sample-slide__preview { max-width: 680px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample-slide__frame { background: var(--white); border-radius: var(--radius-sm); overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.3); aspect-ratio: 16/9; display: flex; flex-direction: column; padding: 0; }
+  .sample-slide__titlebar { display: flex; justify-content: space-between; padding: var(--space-2) var(--space-4); background: #1a365d; color: rgba(255,255,255,0.7); font-family: var(--font-mono); font-size: 0.5rem; }
+  .sample-slide__heading { font-family: var(--font-display); font-size: clamp(0.82rem, 2vw, 1.05rem); font-weight: var(--fw-bold); color: #1a365d; padding: var(--space-3) var(--space-5) var(--space-2); }
+  .sample-slide__block { margin: 0 var(--space-5) var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); border-left: 3px solid; }
+  .sample-slide__block--theorem { background: rgba(44,82,130,0.06); border-color: #2c5282; }
+  .sample-slide__block-title { font-family: var(--font-display); font-size: 0.68rem; font-weight: var(--fw-bold); color: #2c5282; margin-bottom: 3px; }
+  .sample-slide__block p { font-size: 0.62rem; line-height: 1.6; color: var(--ink-light); }
+  .sample-slide__formula { text-align: center; font-family: var(--font-serif); font-style: italic; font-size: 0.72rem; color: var(--ink); padding: var(--space-1) 0; }
+  .sample-slide__chart { margin: 0 var(--space-5); flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .sample-slide__chart-title { font-family: var(--font-serif); font-size: 0.55rem; font-style: italic; color: var(--ink-muted); text-align: center; margin-bottom: 3px; }
+  .sample-slide__chart-area { flex: 1; background: var(--paper); border: 0.5px solid var(--rule-light); border-radius: var(--radius-sm); position: relative; overflow: hidden; min-height: 40px; }
+  .sample-slide__chart-line { position: absolute; bottom: 15%; left: 8%; width: 84%; height: 0; border-bottom: 2px solid var(--accent); clip-path: polygon(0% 100%, 10% 70%, 20% 50%, 35% 30%, 50% 18%, 65% 12%, 80% 8%, 100% 5%); background: linear-gradient(to top, rgba(139,26,26,0.08), transparent); height: 100%; }
+  .sample-slide__chart-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.45rem; color: var(--ink-faint); padding: 2px var(--space-2); }
+  .sample-slide__footer { display: flex; justify-content: space-between; padding: var(--space-2) var(--space-4); background: #1a365d; color: rgba(255,255,255,0.5); font-family: var(--font-serif); font-size: 0.45rem; font-style: italic; margin-top: auto; }
+
+  /* ═════ COMPARISON ═════ */
+  .comparison { padding: var(--space-20) 0; }
+  .comparison__table { border: 1px solid var(--rule); border-radius: var(--radius-sm); overflow: hidden; }
+  .comparison__header { display: grid; grid-template-columns: 150px 1fr 1fr; background: var(--ink); }
+  .comparison__col-label { padding: var(--space-3) var(--space-4); font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; }
+  .comparison__col-label--feature { color: var(--paper); }
+  .comparison__col-label--pptx { color: var(--ink-faint); background: #2a2a2a; }
+  .comparison__col-label--beamer { color: var(--paper); background: var(--accent); }
+  .comparison__row { display: grid; grid-template-columns: 150px 1fr 1fr; border-bottom: 0.5px solid var(--rule-light); }
+  .comparison__row:last-child { border-bottom: none; }
+  .comparison__cell { padding: var(--space-3) var(--space-4); font-size: var(--fs-sm); line-height: var(--lh-relaxed); }
+  .comparison__cell--feature { font-family: var(--font-display); font-weight: var(--fw-medium); color: var(--ink); background: var(--paper-warm); font-size: 0.82rem; display: flex; align-items: center; }
+  .comparison__cell--pptx { background: #faf7f7; color: var(--ink-muted); display: flex; gap: var(--space-2); align-items: flex-start; }
+  .comparison__cell--beamer { background: var(--white); color: var(--ink-light); display: flex; gap: var(--space-2); align-items: flex-start; }
+  .comparison__marker { flex-shrink: 0; font-weight: var(--fw-bold); margin-top: 2px; }
+  .comparison__marker--pptx { color: #c0392b; }
+  .comparison__marker--beamer { color: var(--success); }
+  @media (max-width: 768px) {
+    .comparison__header, .comparison__row { grid-template-columns: 1fr; }
+    .comparison__col-label--feature, .comparison__col-label--pptx { display: none; }
+    .comparison__cell--feature { font-size: var(--fs-sm); padding-bottom: 0; border-bottom: none; }
+  }
+
+  /* ═════ POSTER ELEMENTS ═════ */
+  .poster-elements { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .poster-elements__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .poster-elements__card { padding: var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .poster-elements__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .poster-elements__card h3 { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .poster-elements__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ SAMPLE POSTER ═════ */
+  .sample-poster { padding: var(--space-20) 0; background: var(--ink); }
+  .sample-poster__preview { max-width: 700px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample-poster__frame { background: var(--white); border-radius: var(--radius-sm); overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.3); padding: var(--space-4); }
+  .sample-poster__header { text-align: center; padding: var(--space-3) var(--space-4); background: #1a365d; border-radius: var(--radius-sm); margin-bottom: var(--space-3); }
+  .sample-poster__header h4 { font-family: var(--font-display); font-size: clamp(0.72rem, 1.5vw, 0.92rem); font-weight: var(--fw-bold); color: var(--paper); line-height: 1.3; margin-bottom: 3px; }
+  .sample-poster__authors { font-family: var(--font-serif); font-size: 0.6rem; color: rgba(255,255,255,0.8); }
+  .sample-poster__affil { font-family: var(--font-serif); font-size: 0.5rem; font-style: italic; color: rgba(255,255,255,0.5); }
+  .sample-poster__body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-2); }
+  @media (max-width: 500px) { .sample-poster__body { grid-template-columns: 1fr; } }
+  .sample-poster__col { display: flex; flex-direction: column; gap: var(--space-2); }
+  .sample-poster__section { background: var(--paper); padding: var(--space-2); border: 0.5px solid var(--rule-light); border-radius: var(--radius-sm); }
+  .sample-poster__section-title { font-family: var(--font-display); font-size: 0.62rem; font-weight: var(--fw-bold); color: #1a365d; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1.5px solid var(--accent); }
+  .sample-poster__fake-text { display: flex; flex-direction: column; gap: 2px; }
+  .sample-poster__line { height: 2px; background: var(--paper-dark); border-radius: 1px; }
+  .sample-poster__line.short { width: 65%; }
+  .sample-poster__formula { text-align: center; font-family: var(--font-serif); font-style: italic; font-size: 0.65rem; padding: var(--space-1) 0; color: var(--ink); }
+  .sample-poster__diagram { background: var(--paper-warm); height: 50px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); margin: 4px 0; font-family: var(--font-mono); font-size: 0.4rem; color: var(--rule); text-transform: uppercase; letter-spacing: 0.1em; }
+  .sample-poster__chart-placeholder { background: var(--paper-warm); height: 65px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.4rem; color: var(--rule); text-transform: uppercase; letter-spacing: 0.1em; }
+  .sample-poster__qr { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); background: var(--paper); border: 0.5px solid var(--rule-light); border-radius: var(--radius-sm); }
+  .sample-poster__qr-box { width: 28px; height: 28px; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.4rem; border-radius: 2px; flex-shrink: 0; }
+  .sample-poster__qr span { font-family: var(--font-mono); font-size: 0.45rem; color: var(--ink-faint); }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

@@ -1,0 +1,736 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/instrukcje-procedury/#service",
+      "name": "Skład instrukcji i procedur w LaTeX",
+      "description": "Profesjonalny skład instrukcji obsługi, procedur operacyjnych, dokumentacji ISO, podręczników serwisowych i regulaminów w systemie LaTeX. Cross-referencje, hiperłącza, wersjonowanie.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Skład instrukcji i procedur LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy instrukcji i procedur",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład instrukcji obsługi" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład procedur operacyjnych (SOP)" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład dokumentacji ISO" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład podręczników serwisowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład regulaminów i polityk" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Instrukcje i procedury", "item": "https://sklad-tekstu.pl/uslugi/instrukcje-procedury/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy LaTeX nadaje się do instrukcji obsługi?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. LaTeX doskonale sprawdza się w dokumentacji technicznej wymagającej precyzyjnych cross-referencji, spójnej numeracji procedur, hiperłączy nawigacyjnych i wersjonowania. Wiele firm technologicznych i producentów urządzeń używa LaTeX do instrukcji, szczególnie gdy dokumentacja istnieje w wielu wersjach językowych." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy możecie złożyć dokumentację zgodną z ISO 9001?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Konfigurujemy szablon dokumentu zgodny z wymaganiami systemu zarządzania jakością: numeracja dokumentów, wersjonowanie, historia zmian, nagłówki z metadanymi (nr dokumentu, wersja, data, autor, zatwierdzający), kontrolowane rozmieszczenie treści." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład instrukcji obsługi?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od objętości, złożoności (schematy, tabele, ostrzeżenia, wielojęzyczność) i wymaganego terminu. Wycena jest bezpłatna — wyślij materiały, a w ciągu 24h otrzymasz szczegółową kalkulację." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy instrukcja będzie dostępna w wersji online z nawigacją?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Wersja ekranowa PDF zawiera klikalny spis treści, hiperłącza wewnętrzne (cross-referencje do rozdziałów, rysunków, tabel), zakładki i miniaturki stron. Na życzenie generujemy też wersję HTML z pełną nawigacją." }
+        }
+      ]
+    }
+  ]
+};
+
+// Document types
+const docTypes = [
+  {
+    title: 'Instrukcje obsługi',
+    desc: 'Kompletne instrukcje użytkowania urządzeń, maszyn, oprogramowania i systemów. Procedury krok-po-kroku, schematy podłączeń, tabele parametrów, ostrzeżenia bezpieczeństwa, sekcje troubleshooting. Zgodność z dyrektywą maszynową 2006/42/WE i normami IEC 82079.',
+    tags: ['manual', 'hyperref', 'tcolorbox', 'warnings'],
+    icon: '📘'
+  },
+  {
+    title: 'Procedury operacyjne (SOP)',
+    desc: 'Standardowe procedury operacyjne dla przemysłu, laboratoriów, medycyny i administracji. Precyzyjna struktura: cel, zakres, odpowiedzialności, przebieg krok po kroku, dokumenty powiązane. Numeracja dokumentów, historia zmian, kontrola wersji.',
+    tags: ['procedure', 'versioning', 'changelog', 'flowchart'],
+    icon: '📋'
+  },
+  {
+    title: 'Dokumentacja ISO',
+    desc: 'Dokumenty systemu zarządzania jakością: księgi jakości, procedury systemowe, instrukcje robocze, formularze. Zgodność z ISO 9001, ISO 14001, ISO 45001, ISO 27001. Kontrolowany układ z metadanymi: nr dokumentu, wersja, data wydania, autor, zatwierdzający.',
+    tags: ['ISO', 'QMS', 'controlled', 'audit'],
+    icon: '✅'
+  },
+  {
+    title: 'Podręczniki serwisowe',
+    desc: 'Dokumentacja techniczna dla serwisantów i techników: procedury diagnostyczne, schematy elektryczne, tabele momentów dokręcania, procedury kalibracji, listy części zamiennych. Rozbudowane cross-referencje i indeksy.',
+    tags: ['service', 'circuitikz', 'parts-list', 'diagnostic'],
+    icon: '🔧'
+  },
+  {
+    title: 'Regulaminy i polityki',
+    desc: 'Dokumenty korporacyjne: regulaminy pracy, polityki bezpieczeństwa, procedury compliance, kodeksy etyki, umowy ramowe. Precyzyjna numeracja paragrafów i ustępów, cross-referencje, słownik pojęć, klauzule prawne.',
+    tags: ['article', 'enumerate', 'glossary', 'legal'],
+    icon: '⚖️'
+  },
+  {
+    title: 'Dokumentacja procesowa',
+    desc: 'Opisy procesów biznesowych i technologicznych: mapy procesów, diagramy BPMN, opisy ról i odpowiedzialności, metryki, KPI. Diagramy TikZ z automatyczną numeracją i referencjami do opisów tekstowych.',
+    tags: ['tikz', 'BPMN', 'flowchart', 'process-map'],
+    icon: '🔄'
+  }
+];
+
+// Key features for instructions
+const features = [
+  { icon: '🔗', title: 'Cross-referencje', desc: 'Każdy element dokumentu — rozdział, rysunek, tabela, krok procedury, ostrzeżenie — ma unikalny identyfikator. Odwołania (\"patrz Rozdział 4.2\", \"zgodnie z Rysunkiem 3.1\") aktualizują się automatycznie. Zmiana numeracji rozdziałów? Wszystkie referencje przenumerowują się same.' },
+  { icon: '⚠️', title: 'Ostrzeżenia i piktogramy', desc: 'Wystandaryzowane bloki ostrzeżeń zgodne z normami ANSI Z535 i ISO 3864: NIEBEZPIECZEŃSTWO (czerwony), OSTRZEŻENIE (pomarańczowy), UWAGA (żółty), INFORMACJA (niebieski). Kolorowe ramki tcolorbox z ikonami, spójne w całym dokumencie.' },
+  { icon: '📑', title: 'Nawigacja i hiperłącza', desc: 'Klikalny spis treści, hiperłącza wewnętrzne, zakładki PDF, miniaturki stron. W wersji drukowanej: nagłówki z nazwą rozdziału, numeracja stron, zakładki boczne (thumb indexes). Użytkownik znajduje informację w sekundy.' },
+  { icon: '🔢', title: 'Numeracja wielopoziomowa', desc: 'Hierarchiczna numeracja: rozdziały, podrozdziały, kroki procedur, podkroki. Zagnieżdżone listy numerowane z automatyczną kontynuacją. Numeracja rysunków, tabel i ostrzeżeń per rozdział (np. Rysunek 4.1, Tabela 4.2).' },
+  { icon: '📐', title: 'Schematy i diagramy', desc: 'Wektorowe diagramy TikZ: flowcharty procedur, schematy elektryczne (circuitikz), diagramy blokowe, schematy montażowe, drzewa decyzyjne troubleshooting. Rysunki ostre w każdej skali, z automatyczną numeracją i podpisami.' },
+  { icon: '🔄', title: 'Wersjonowanie i historia zmian', desc: 'Tabela historii zmian na stronie tytułowej (wersja, data, autor, opis zmian). Pakiet changes do śledzenia zmian w tekście (dodane/usunięte/zmodyfikowane fragmenty). Pliki .tex w Git — pełna historia, porównywanie wersji, przywracanie.' }
+];
+
+// Comparison: unstructured vs LaTeX
+const comparisons = [
+  { before: 'Krok 3 mówi \"patrz krok 7\" — ale krok 7 już nie istnieje, bo go usunęliśmy w zeszłym miesiącu', after: 'Cross-referencje aktualizują się automatycznie — jeśli krok 7 nie istnieje, kompilacja zgłosi błąd' },
+  { before: 'Trzecia wersja instrukcji — nikt nie wie, co się zmieniło między v2 a v3', after: 'Tabela historii zmian generowana automatycznie, diff w Git pokazuje każdą zmianę' },
+  { before: 'Technik na hali drukuje instrukcję i format się rozjeżdża na jego drukarce', after: 'Identyczny PDF na każdym urządzeniu — wydruk wygląda tak samo na każdej drukarce' },
+  { before: 'Instrukcja w 5 językach — 5 osobnych plików, każdy aktualizowany niezależnie', after: 'Jeden szablon, tłumaczenia w osobnych plikach — zmiana struktury propaguje się do wszystkich języków' },
+  { before: 'Ostrzeżenia „UWAGA" raz w czerwonej ramce, raz w żółtej, raz w ogóle bez ramki', after: 'Zdefiniowane style ostrzeżeń (DANGER/WARNING/CAUTION/NOTE) — zawsze spójne, zgodne z ANSI Z535' },
+  { before: '\"Rysunek 12\" w tekście, ale rysunków jest tylko 10 — nikt tego nie wyłapał', after: 'Kompilator LaTeX sygnalizuje każdą zepsutą referencję — niemożliwe do przeoczenia' }
+];
+
+// Industries
+const industries = [
+  { name: 'Przemysł i produkcja', desc: 'Instrukcje obsługi maszyn, procedury BHP, karty technologiczne, instrukcje stanowiskowe, dokumentacja CE' },
+  { name: 'IT i software', desc: 'Dokumentacja użytkownika, podręczniki administratora, przewodniki wdrożeniowe, runbooki, playbooki DevOps' },
+  { name: 'Medycyna i farmacja', desc: 'SOP laboratoryjne, instrukcje obsługi aparatury medycznej, procedury GMP/GLP, dokumentacja walidacji' },
+  { name: 'Energetyka', desc: 'Procedury eksploatacyjne, instrukcje ruchowe, karty przełączeń, procedury awaryjne, dokumentacja LOTO' },
+  { name: 'Lotnictwo i kosmonautyka', desc: 'Podręczniki serwisowe (AMM), karty naprawcze, procedury kontrolne, dokumentacja zgodności z EASA/FAA' },
+  { name: 'Chemia i petrochemia', desc: 'Karty procesowe, procedury bezpieczeństwa, instrukcje reagowania na wycieki, dokumentacja SEVESO' },
+  { name: 'Telekomunikacja', desc: 'Dokumentacja sieci, procedury konfiguracji, podręczniki NOC/SOC, instrukcje wdrożeniowe' },
+  { name: 'Administracja i finanse', desc: 'Regulaminy, polityki compliance, procedury AML/KYC, instrukcje operacyjne, dokumentacja RODO' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały i wymagania', desc: 'Wyślij treść instrukcji w dowolnym formacie, schematy, zdjęcia, logo i wymagania (normy, format, język, system numeracji dokumentów). Jeśli masz istniejącą dokumentację do przeprojektowania — też ją przyjmiemy.', time: '1 dzień' },
+  { num: '02', title: 'Wycena i analiza', desc: 'W ciągu 24h: wycena z rozbiciem na elementy + analiza struktury dokumentu (hierarchia rozdziałów, typy bloków, system ostrzeżeń, potrzebne schematy). Bezpłatnie.', time: '24 godz.' },
+  { num: '03', title: 'Szablon i makieta', desc: 'Projektujemy szablon: strona tytułowa z metadanymi, układ nagłówków, style ostrzeżeń, format kroków procedury, tabela historii zmian. Składamy próbny rozdział do akceptacji.', time: '2–4 dni' },
+  { num: '04', title: 'Skład właściwy', desc: 'Składamy kompletny dokument: tekst, schematy, tabele, ostrzeżenia, cross-referencje, indeksy, glosariusz. Przesyłamy PDF z postępem — możesz sprawdzać na bieżąco.', time: '3 dni – 3 tyg.' },
+  { num: '05', title: 'Weryfikacja i finalizacja', desc: 'Sprawdzasz gotowy PDF, zgłaszasz poprawki. Na końcu: PDF drukarski, PDF ekranowy z nawigacją, opcjonalnie pliki .tex + instrukcja edycji do samodzielnych aktualizacji w przyszłości.', time: '2–5 dni' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czy LaTeX nadaje się do instrukcji obsługi, a nie tylko do nauki?', a: 'Tak. LaTeX to system składu dokumentów dowolnego typu. W instrukcjach jego przewagi są szczególnie widoczne: automatyczne cross-referencje (\"patrz Rozdział 4.2\" zawsze wskazuje na właściwy rozdział), spójne ostrzeżenia (DANGER/WARNING/CAUTION w identycznym formacie na każdej stronie), hiperłącza nawigacyjne, wersjonowanie w Git. Firmy takie jak producenci urządzeń medycznych, lotniczych i przemysłowych regularnie używają LaTeX do dokumentacji technicznej.' },
+  { q: 'Czy możecie złożyć dokumentację zgodną z ISO 9001 / ISO 14001?', a: 'Tak. Konfigurujemy szablon z nagłówkiem kontrolnym (nr dokumentu, wersja, data wydania/rewizji, autor, sprawdzający, zatwierdzający), tabelą historii zmian, kontrolowaną stopką, precyzyjną numeracją rozdziałów i cross-referencjami. Szablon spełnia wymagania systemów zarządzania jakością ISO 9001, ISO 14001, ISO 45001, ISO 27001 i innych.' },
+  { q: 'Ile kosztuje skład instrukcji obsługi?', a: 'Koszt zależy od objętości, złożoności (schematy, tabele, ostrzeżenia, wielojęzyczność) i wymaganych elementów (indeks, glosariusz, troubleshooting). Typowa instrukcja 30–50 stron — od 1500 zł netto. Rozbudowana dokumentacja 200+ stron ze schematami TikZ — wycena indywidualna. Wycena jest bezpłatna.' },
+  { q: 'Czy mogę samodzielnie aktualizować instrukcję?', a: 'Tak. Dostarczamy pliki .tex z czytelną, modularną strukturą (osobne pliki rozdziałów), szablony ostrzeżeń, instrukcję kompilacji i listę pakietów. Aktualizacja: edytuj tekst, przekompiluj. Cross-referencje, spis treści, indeks — wszystko zaktualizuje się automatycznie.' },
+  { q: 'Czy zrobicie instrukcję w kilku językach?', a: 'Tak. Tłumaczenia przechowujesz w osobnych plikach. Pakiet babel obsługuje reguły typograficzne każdego języka. Zmiana struktury (dodanie rozdziału, przesunięcie sekcji) propaguje się do wszystkich wersji językowych. Z jednego szablonu generujesz PL, EN, DE, FR, ES itd.' },
+  { q: 'Czy ostrzeżenia będą zgodne z normami ANSI Z535 / ISO 3864?', a: 'Tak. Definiujemy wystandaryzowane bloki ostrzeżeń z odpowiednimi kolorami, ikonami i słowami sygnałowymi: DANGER (czerwony), WARNING (pomarańczowy), CAUTION (żółty), NOTICE (niebieski). Każdy blok jest spójny wizualnie w całym dokumencie i generowany jednym poleceniem LaTeX.' },
+  { q: 'Czy zrobicie schematy techniczne i flowcharty procedur?', a: 'Tak. Diagramy TikZ: flowcharty procedur z decyzjami i rozgałęzieniami, schematy elektryczne (circuitikz), schematy blokowe, diagramy montażowe, drzewa decyzyjne troubleshooting, diagramy swimlane. Rysunki są wektorowe — ostre w każdej skali i rozdzielczości.' },
+  { q: 'Jak szybko da się zaktualizować istniejącą instrukcję o nową sekcję?', a: 'Jeśli szablon jest gotowy — dodanie nowej sekcji to kwestia edycji pliku .tex i kompilacji (minuty). Numeracja rozdziałów, cross-referencje, spis treści, indeks — wszystko przenumerowuje się automatycznie. Nie trzeba ręcznie poprawiać żadnych odwołań w dokumencie.' }
+];
+
+// Sample warning boxes for the page
+const warningTypes = [
+  { level: 'danger', signal: 'NIEBEZPIECZEŃSTWO', text: 'Napięcie 400V AC na zaciskach siłowych. Przed otwarciem szafy odłączyć zasilanie i odczekać 5 minut.', color: '#c0392b' },
+  { level: 'warning', signal: 'OSTRZEŻENIE', text: 'Nie uruchamiać urządzenia bez osłon ochronnych. Ryzyko obrażeń ciała od ruchomych elementów.', color: '#e67e22' },
+  { level: 'caution', signal: 'UWAGA', text: 'Stosować moment dokręcania 25 ± 2 Nm. Przekroczenie momentu grozi uszkodzeniem gwintu.', color: '#f39c12' },
+  { level: 'notice', signal: 'INFORMACJA', text: 'Procedurę kalibracji wykonywać co 6 miesięcy lub po każdej wymianie czujnika temperatury.', color: '#2c5282' }
+];
+---
+
+<BaseLayout
+  title="Skład instrukcji obsługi i procedur w LaTeX"
+  description="Profesjonalny skład instrukcji obsługi, procedur operacyjnych (SOP), dokumentacji ISO, podręczników serwisowych i regulaminów w LaTeX. Cross-referencje, ostrzeżenia ANSI, wersjonowanie, wielojęzyczność."
+  keywords="skład instrukcji obsługi latex, skład procedur operacyjnych, dokumentacja techniczna latex, instrukcja obsługi skład, SOP latex, dokumentacja ISO latex, podręcznik serwisowy latex, skład regulaminów, instrukcje techniczne"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>Instrukcje i&nbsp;procedury</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.6</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">instrukcji</span><br>i&nbsp;procedur operacyjnych
+      </h1>
+      <p class="hero__subtitle">
+        Instrukcje obsługi, procedury SOP, dokumentacja ISO, podręczniki serwisowe —<br>
+        z&nbsp;cross-referencjami, ostrzeżeniami i&nbsp;pełną nawigacją
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">manual</span>
+        <span class="hero__tag">hyperref</span>
+        <span class="hero__tag">tcolorbox</span>
+        <span class="hero__tag">tikz</span>
+        <span class="hero__tag">glossaries</span>
+        <span class="hero__tag">changes</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij materiały do wyceny <span>→</span></a>
+        <a href="#typy" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Instrukcja, której można zaufać</h2>
+          <p>
+            Instrukcja obsługi to nie formalność — to dokument, od którego zależy bezpieczeństwo,
+            efektywność i&nbsp;zgodność z&nbsp;przepisami. Kiedy technik na hali produkcyjnej szuka
+            procedury awaryjnej, a&nbsp;lekarz sprawdza parametry kalibracji aparatu — nie ma miejsca
+            na nieaktualne referencje, rozjechaną numerację czy niespójne ostrzeżenia.
+          </p>
+          <p>
+            LaTeX gwarantuje, że każda cross-referencja w&nbsp;dokumencie jest poprawna — jeśli
+            „Krok 7" nie istnieje, kompilacja nie przejdzie. Ostrzeżenia DANGER/WARNING/CAUTION
+            wyglądają identycznie na każdej stronie. Spis treści, indeks i&nbsp;glosariusz generują
+            się automatycznie. A&nbsp;kiedy za pół roku trzeba wydać nową wersję instrukcji — zmiany
+            śledzi Git, tabela historii aktualizuje się sama, a&nbsp;numeracja przenumerowuje się
+            w&nbsp;całym dokumencie.
+          </p>
+          <p>
+            Składamy instrukcje dla producentów urządzeń, firm IT, laboratoriów, zakładów przemysłowych,
+            firm medycznych i&nbsp;energetycznych. Od 20-stronicowej procedury po 500-stronicowy
+            podręcznik serwisowy ze schematami elektrycznymi i&nbsp;drzewem troubleshooting.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">0</span>
+            <span class="intro__sidebar-label">zepsutych referencji</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">Git</span>
+            <span class="intro__sidebar-label">pełna historia zmian</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">ANSI</span>
+            <span class="intro__sidebar-label">ostrzeżenia wg normy</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section class="types" id="typy" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.1"
+          title="Rodzaje dokumentów"
+          subtitle="Każdy typ dokumentacji technicznej ma swoją specyfikę — inne wymagania normatywne, inną strukturę, inny poziom kontroli wersji."
+        />
+      </div>
+      <div class="types__grid">
+        {docTypes.map((t) => (
+          <div class="types__card reveal">
+            <span class="types__card-icon" aria-hidden="true">{t.icon}</span>
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" aria-labelledby="features-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.2"
+          title="Co daje LaTeX w&nbsp;instrukcjach"
+          subtitle="Kluczowe funkcje, które sprawiają, że instrukcja złożona w LaTeX jest bardziej niezawodna, spójna i łatwiejsza w utrzymaniu niż dokument z edytora WYSIWYG."
+        />
+      </div>
+      <div class="features__grid">
+        {features.map((f) => (
+          <div class="features__card reveal">
+            <span class="features__icon" aria-hidden="true">{f.icon}</span>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WARNING BOXES DEMO -->
+  <section class="warnings-demo" aria-label="Przykładowe bloki ostrzeżeń">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.3"
+          title="Ostrzeżenia zgodne z&nbsp;normami"
+          subtitle="Wystandaryzowane bloki ostrzeżeń ANSI Z535 / ISO 3864 — spójne wizualnie, jednoznaczne, niepomijalnie widoczne. Każdy typ generowany jednym poleceniem LaTeX."
+          inverted
+        />
+      </div>
+      <div class="warnings-demo__grid reveal">
+        {warningTypes.map((w) => (
+          <div class={`warnings-demo__box warnings-demo__box--${w.level}`}>
+            <div class="warnings-demo__signal">{w.signal}</div>
+            <p>{w.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="comparison" aria-labelledby="comparison-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.4"
+          title="Typowe problemy — i&nbsp;jak LaTeX je&nbsp;rozwiązuje"
+          subtitle="Każdy, kto utrzymywał wielostronicową dokumentację w Wordzie, zna te sytuacje. LaTeX eliminuje je systemowo."
+        />
+      </div>
+
+      <div class="comparison__table reveal">
+        <div class="comparison__header">
+          <div class="comparison__col-label comparison__col-label--before">Problem w edytorze WYSIWYG</div>
+          <div class="comparison__col-label comparison__col-label--after">Rozwiązanie w LaTeX</div>
+        </div>
+        {comparisons.map((c) => (
+          <div class="comparison__row">
+            <div class="comparison__cell comparison__cell--before">
+              <span class="comparison__marker comparison__marker--before" aria-hidden="true">✕</span>
+              {c.before}
+            </div>
+            <div class="comparison__cell comparison__cell--after">
+              <span class="comparison__marker comparison__marker--after" aria-hidden="true">✓</span>
+              {c.after}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE PAGE -->
+  <section class="sample" aria-label="Przykładowa strona instrukcji">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.5"
+          title="Jak wygląda strona instrukcji w&nbsp;LaTeX"
+          subtitle="Symulacja typowej strony instrukcji obsługi — procedura krok po kroku z ostrzeżeniem, schematem i cross-referencją."
+        />
+      </div>
+    </div>
+    <div class="sample__preview reveal">
+      <div class="sample__page">
+        <div class="sample__page-header">
+          <div class="sample__header-left">
+            <span class="sample__doc-id">DOC-MAN-0042 v3.1</span>
+          </div>
+          <div class="sample__header-right">
+            <span>Rozdział 4. Konserwacja</span>
+            <span>23</span>
+          </div>
+        </div>
+
+        <h4 class="sample__heading">4.3&emsp;Wymiana filtra oleju</h4>
+
+        <div class="sample__warning sample__warning--warning">
+          <div class="sample__warning-signal">⚠ OSTRZEŻENIE</div>
+          <p>Przed rozpoczęciem procedury upewnić się, że urządzenie jest wyłączone i&nbsp;odłączone od zasilania (patrz Procedura 2.1). Olej może być gorący — odczekać min. 30 minut od wyłączenia.</p>
+        </div>
+
+        <div class="sample__procedure">
+          <div class="sample__step">
+            <span class="sample__step-num">1.</span>
+            <span>Przygotować narzędzia zgodnie z&nbsp;Tabelą 4.1 (klucz nasadowy 17 mm, miska na olej, nowy filtr — nr kat. FLT-2200).</span>
+          </div>
+          <div class="sample__step">
+            <span class="sample__step-num">2.</span>
+            <span>Odkręcić korek spustowy (poz. A na Rysunku 4.2) i&nbsp;spuścić olej do miski. Czas spuszczania: ~5 min.</span>
+          </div>
+          <div class="sample__step">
+            <span class="sample__step-num">3.</span>
+            <span>Wykręcić zużyty filtr (poz. B na Rysunku 4.2) obracając w&nbsp;kierunku przeciwnym do ruchu wskazówek zegara.</span>
+          </div>
+          <div class="sample__step">
+            <span class="sample__step-num">4.</span>
+            <span>Nałożyć cienką warstwę oleju na uszczelkę nowego filtra i&nbsp;wkręcić ręcznie do oporu + ¾ obrotu.</span>
+          </div>
+          <div class="sample__step">
+            <span class="sample__step-num">5.</span>
+            <span>Zakręcić korek spustowy momentem 25 ± 2 Nm (patrz Tabela momentów, Załącznik C).</span>
+          </div>
+        </div>
+
+        <!-- Fake diagram -->
+        <div class="sample__diagram">
+          <div class="sample__diagram-caption">Rysunek 4.2: Lokalizacja korka spustowego (A) i filtra oleju (B)</div>
+          <div class="sample__diagram-area">
+            <div class="sample__diagram-box">
+              <div class="sample__diagram-label" style="top:20%;left:15%">A</div>
+              <div class="sample__diagram-label" style="top:55%;left:70%">B</div>
+              <div class="sample__diagram-placeholder">
+                <span>schemat TikZ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sample__warning sample__warning--notice">
+          <div class="sample__warning-signal">ℹ INFORMACJA</div>
+          <p>Po wymianie filtra uruchomić urządzenie na 2 minuty i&nbsp;sprawdzić szczelność połączeń. W&nbsp;razie wycieku — patrz Procedura 7.4 (Troubleshooting).</p>
+        </div>
+
+        <div class="sample__page-footer">
+          <span>DOC-MAN-0042 v3.1 | 2025-01-15 | Zatwierdzono: J. Nowak</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDUSTRIES -->
+  <section class="industries" aria-labelledby="industries-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.6"
+          title="Branże, które obsługujemy"
+          subtitle="Instrukcje i procedury to potrzeba każdej branży, w której liczy się bezpieczeństwo, powtarzalność i zgodność z normami."
+        />
+      </div>
+      <div class="industries__grid">
+        {industries.map((ind) => (
+          <div class="industries__card reveal">
+            <h3>{ind.name}</h3>
+            <p>{ind.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.7"
+          title="Proces realizacji"
+          subtitle="Od materiałów źródłowych do gotowej dokumentacji — jasne etapy, konkretne terminy."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.6.8"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania od producentów, działów jakości, inżynierów procesów i szefów dokumentacji."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html="\\begin{procedura}" />
+        <h2 id="cta-title">Wyślij materiały — wycenimy skład instrukcji w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to instrukcja obsługi, procedura SOP, dokumentacja ISO czy podręcznik
+          serwisowy — przygotujemy wycenę z&nbsp;rozbiciem na elementy i&nbsp;konkretnym terminem.
+          Wystarczy przesłać treść i&nbsp;opis wymagań. Bezpłatnie.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">Wyślij materiały <span class="cta__button-arrow">→</span></a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true" set:html="\\end{procedura}" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o składzie instrukcji i procedur w LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład instrukcji obsługi i&nbsp;procedur operacyjnych w&nbsp;LaTeX</h2>
+        <p>
+          Profesjonalny <strong>skład instrukcji obsługi</strong> to więcej niż estetyka — to gwarancja,
+          że każda cross-referencja jest poprawna, każde ostrzeżenie jest widoczne i&nbsp;spójne,
+          a&nbsp;każda wersja dokumentu jest kontrolowana. System LaTeX zapewnia poziom niezawodności
+          dokumentacji nieosiągalny w&nbsp;edytorach WYSIWYG.
+        </p>
+        <h3>Instrukcje obsługi zgodne z&nbsp;normami</h3>
+        <p>
+          <strong>Skład instrukcji obsługi w&nbsp;LaTeX</strong> pozwala na tworzenie dokumentacji
+          zgodnej z&nbsp;dyrektywą maszynową 2006/42/WE, normami IEC 82079 i&nbsp;ANSI Z535.
+          Wystandaryzowane bloki ostrzeżeń (DANGER, WARNING, CAUTION, NOTICE) generowane jednym
+          poleceniem, spójne w&nbsp;całym dokumencie. Cross-referencje weryfikowane automatycznie
+          przy każdej kompilacji — niemożliwe do przeoczenia.
+        </p>
+        <h3>Procedury operacyjne (SOP) i&nbsp;dokumentacja ISO</h3>
+        <p>
+          <strong>Skład procedur operacyjnych</strong> w&nbsp;LaTeX to idealne rozwiązanie dla firm
+          z&nbsp;wdrożonym systemem zarządzania jakością. Kontrolowany nagłówek z&nbsp;metadanymi,
+          tabela historii zmian, precyzyjna numeracja, wersjonowanie w&nbsp;Git. <strong>Dokumentacja
+          ISO</strong> (9001, 14001, 45001, 27001) w&nbsp;spójnym, profesjonalnym szablonie.
+        </p>
+        <h3>Podręczniki serwisowe i&nbsp;dokumentacja techniczna</h3>
+        <p>
+          <strong>Skład podręczników serwisowych</strong> wymaga połączenia precyzji technicznej
+          z&nbsp;czytelną nawigacją. Schematy elektryczne (circuitikz), diagramy procedur
+          diagnostycznych, tabele momentów, listy części zamiennych — każdy element z&nbsp;automatyczną
+          numeracją i&nbsp;cross-referencjami. Wersja PDF z&nbsp;pełną nawigacją hiperłączową
+          pozwala technikowi znaleźć informację w&nbsp;sekundy.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 1fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-4); }
+  .intro__sidebar-block { padding: var(--space-5) var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); text-align: center; }
+  .intro__sidebar-value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-bold); color: var(--accent); display: block; line-height: 1; margin-bottom: var(--space-1); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-icon { font-size: 1.6rem; display: block; margin-bottom: var(--space-3); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-2); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ FEATURES ═════ */
+  .features { padding: var(--space-20) 0; }
+  .features__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .features__card { padding: var(--space-8) var(--space-6); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .features__card:hover { background: var(--white); box-shadow: var(--shadow-md); border-color: var(--rule); }
+  .features__icon { display: block; font-size: 1.6rem; margin-bottom: var(--space-4); }
+  .features__card h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .features__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ WARNING BOXES DEMO ═════ */
+  .warnings-demo { padding: var(--space-20) 0; background: var(--ink); }
+  .warnings-demo__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-5); max-width: var(--page-wide); margin: 0 auto; padding: 0 var(--gutter); }
+  .warnings-demo__box { padding: var(--space-4) var(--space-5); border-radius: var(--radius-sm); border-left: 4px solid; }
+  .warnings-demo__box--danger { background: rgba(192,57,43,0.12); border-color: #c0392b; }
+  .warnings-demo__box--warning { background: rgba(230,126,34,0.12); border-color: #e67e22; }
+  .warnings-demo__box--caution { background: rgba(243,156,18,0.12); border-color: #f39c12; }
+  .warnings-demo__box--notice { background: rgba(44,82,130,0.12); border-color: #2c5282; }
+  .warnings-demo__signal { font-family: var(--font-mono); font-size: 0.72rem; font-weight: var(--fw-bold); letter-spacing: 0.08em; margin-bottom: var(--space-2); }
+  .warnings-demo__box--danger .warnings-demo__signal { color: #e74c3c; }
+  .warnings-demo__box--warning .warnings-demo__signal { color: #e67e22; }
+  .warnings-demo__box--caution .warnings-demo__signal { color: #f39c12; }
+  .warnings-demo__box--notice .warnings-demo__signal { color: #4a90d9; }
+  .warnings-demo__box p { font-size: 0.82rem; line-height: 1.6; color: rgba(250,248,244,0.75); }
+
+  /* ═════ COMPARISON ═════ */
+  .comparison { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .comparison__table { border: 1px solid var(--rule); border-radius: var(--radius-sm); overflow: hidden; }
+  .comparison__header { display: grid; grid-template-columns: 1fr 1fr; background: var(--ink); }
+  .comparison__col-label { padding: var(--space-3) var(--space-5); font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; }
+  .comparison__col-label--before { color: var(--ink-faint); background: #2a2a2a; }
+  .comparison__col-label--after { color: var(--paper); background: var(--accent); }
+  .comparison__row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 0.5px solid var(--rule-light); }
+  .comparison__row:last-child { border-bottom: none; }
+  .comparison__cell { padding: var(--space-4) var(--space-5); font-size: var(--fs-sm); line-height: var(--lh-relaxed); display: flex; gap: var(--space-3); align-items: flex-start; }
+  .comparison__cell--before { background: #faf7f7; color: var(--ink-muted); }
+  .comparison__cell--after { background: var(--white); color: var(--ink-light); }
+  .comparison__marker { flex-shrink: 0; font-weight: var(--fw-bold); font-size: var(--fs-sm); margin-top: 1px; }
+  .comparison__marker--before { color: #c0392b; }
+  .comparison__marker--after { color: var(--success); }
+  @media (max-width: 768px) {
+    .comparison__header, .comparison__row { grid-template-columns: 1fr; }
+    .comparison__col-label--before { display: none; }
+    .comparison__cell--before { border-bottom: 0.5px solid var(--rule-light); }
+  }
+
+  /* ═════ SAMPLE PAGE ═════ */
+  .sample { padding: var(--space-20) 0; }
+  .sample__preview { max-width: 620px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample__page { background: var(--white); padding: var(--space-6) var(--space-5); box-shadow: var(--shadow-xl); border-radius: var(--radius-sm); font-size: 0.78rem; line-height: 1.6; color: var(--ink); }
+  .sample__page-header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: var(--space-3); margin-bottom: var(--space-5); border-bottom: 1px solid var(--ink); }
+  .sample__header-left { display: flex; flex-direction: column; }
+  .sample__doc-id { font-family: var(--font-mono); font-size: 0.6rem; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .sample__header-right { display: flex; gap: var(--space-8); font-family: var(--font-serif); font-size: var(--fs-xs); font-style: italic; color: var(--ink-faint); }
+  .sample__heading { font-family: var(--font-display); font-size: 1.1rem; font-weight: var(--fw-bold); margin-bottom: var(--space-4); }
+  .sample__page-footer { text-align: center; font-family: var(--font-mono); font-size: 0.5rem; color: var(--rule); padding-top: var(--space-3); margin-top: var(--space-4); border-top: 1px solid var(--ink); }
+
+  .sample__warning { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border-left: 3px solid; margin-bottom: var(--space-4); }
+  .sample__warning--warning { background: rgba(230,126,34,0.08); border-color: #e67e22; }
+  .sample__warning--notice { background: rgba(44,82,130,0.06); border-color: #2c5282; }
+  .sample__warning-signal { font-family: var(--font-mono); font-size: 0.65rem; font-weight: var(--fw-bold); letter-spacing: 0.06em; margin-bottom: 4px; }
+  .sample__warning--warning .sample__warning-signal { color: #e67e22; }
+  .sample__warning--notice .sample__warning-signal { color: #2c5282; }
+  .sample__warning p { font-size: 0.72rem; line-height: 1.6; color: var(--ink-light); }
+
+  .sample__procedure { margin-bottom: var(--space-4); }
+  .sample__step { display: flex; gap: var(--space-2); margin-bottom: var(--space-2); font-size: 0.75rem; line-height: 1.6; }
+  .sample__step-num { font-weight: var(--fw-bold); flex-shrink: 0; min-width: 18px; color: var(--ink); }
+  .sample__step span:last-child { color: var(--ink-light); }
+
+  .sample__diagram { margin-bottom: var(--space-4); }
+  .sample__diagram-caption { font-family: var(--font-serif); font-size: 0.68rem; font-style: italic; text-align: center; color: var(--ink-muted); margin-bottom: var(--space-2); }
+  .sample__diagram-area { display: flex; justify-content: center; }
+  .sample__diagram-box { position: relative; width: 260px; height: 90px; border: 0.5px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); }
+  .sample__diagram-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-family: var(--font-mono); font-size: 0.55rem; color: var(--rule); text-transform: uppercase; letter-spacing: 0.1em; }
+  .sample__diagram-label { position: absolute; font-family: var(--font-mono); font-size: 0.6rem; font-weight: var(--fw-bold); color: var(--accent); background: var(--white); padding: 1px 4px; border: 1px solid var(--accent); border-radius: 2px; }
+
+  /* ═════ INDUSTRIES ═════ */
+  .industries { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .industries__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-5); }
+  .industries__card { padding: var(--space-5) var(--space-6); border: 1px solid var(--rule-light); background: var(--paper); transition: all 0.4s ease; }
+  .industries__card:hover { background: var(--white); box-shadow: var(--shadow-sm); border-color: var(--rule); }
+  .industries__card h3 { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-1); }
+  .industries__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

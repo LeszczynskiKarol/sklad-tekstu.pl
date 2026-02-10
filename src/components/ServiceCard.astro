@@ -1,0 +1,120 @@
+---
+interface Props {
+  chapter: string;
+  title: string;
+  description: string;
+  icon: string;
+  tags: string[];
+  href?: string;
+}
+
+const { chapter, title, description, icon, tags, href } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag class="service-card" data-chapter={chapter} href={href}>
+  <span class="service-card__icon" aria-hidden="true">{icon}</span>
+  <h3 class="service-card__title">{title}</h3>
+  <p class="service-card__desc">{description}</p>
+  {tags.length > 0 && (
+    <div class="service-card__tags">
+      {tags.map((tag) => (
+        <span class="service-card__tag">{tag}</span>
+      ))}
+    </div>
+  )}
+</Tag>
+
+<style>
+  .service-card {
+    background: var(--paper);
+    padding: var(--space-8) var(--space-6);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    cursor: default;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    border: 0.5px solid var(--rule-light);
+  }
+
+  a.service-card {
+    cursor: pointer;
+  }
+
+  a.service-card::after {
+    content: '→';
+    position: absolute;
+    bottom: var(--space-4);
+    right: var(--space-5);
+    font-family: var(--font-serif);
+    font-size: var(--fs-sm);
+    color: var(--rule);
+    transition: all var(--transition-base);
+  }
+
+  a.service-card:hover::after {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  .service-card:hover {
+    background: var(--white);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-color: var(--rule);
+  }
+
+  .service-card::before {
+    content: attr(data-chapter);
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--rule);
+    letter-spacing: 0.05em;
+  }
+
+  .service-card__icon {
+    font-size: 1.4rem;
+    margin-bottom: var(--space-4);
+    display: block;
+  }
+
+  .service-card__title {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-lg);
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+    transition: color var(--transition-fast);
+  }
+
+  .service-card:hover .service-card__title {
+    color: var(--accent);
+  }
+
+  .service-card__desc {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .service-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .service-card__tag {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.6rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: var(--radius-sm);
+  }
+</style>

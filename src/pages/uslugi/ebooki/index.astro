@@ -1,0 +1,702 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/ebooki/#service",
+      "name": "Tworzenie e-booków i publikacji cyfrowych z LaTeX",
+      "description": "Profesjonalne tworzenie e-booków EPUB, MOBI i interaktywnych PDF z plików LaTeX. Konwersja publikacji naukowych i podręczników do formatów cyfrowych z zachowaniem wzorów matematycznych, tabel i cross-referencji.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Tworzenie e-booków z LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Formaty publikacji cyfrowych",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Konwersja LaTeX do EPUB" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "E-booki MOBI/KF8 na Kindle" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Interaktywne PDF" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Publikacje dostępne (WCAG)" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "E-booki", "item": "https://sklad-tekstu.pl/uslugi/ebooki/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy wzory matematyczne z LaTeX wyświetlą się poprawnie w e-booku?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Wzory konwertujemy do MathML (standard EPUB 3) lub SVG. MathML jest renderowany natywnie przez czytniki obsługujące EPUB 3 (Apple Books, Thorium, Calibre). Dla starszych czytników generujemy wzory jako wektorowe SVG — wyglądają identycznie na każdym urządzeniu." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje konwersja podręcznika LaTeX do EPUB?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od objętości i złożoności (wzory, tabele, ilustracje, cross-referencje). Typowy podręcznik 200-300 stron — od 1500 zł netto. Wycena jest bezpłatna — wyślij pliki źródłowe .tex i wymagania." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy e-book będzie działał na Kindle?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Generujemy pliki MOBI/KF8 kompatybilne z czytnikami Kindle. Wzory matematyczne renderujemy jako obrazy SVG/PNG z odpowiednią rozdzielczością. Testujemy na Kindle Previewer przed dostarczeniem." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę mieć jednocześnie PDF i EPUB z jednego źródła LaTeX?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak — i to jest kluczowa przewaga LaTeX. Z jednego pliku źródłowego .tex generujemy: PDF drukarski (pdflatex), EPUB reflowable (tex4ebook/pandoc), MOBI na Kindle, HTML online. Jedno źródło, wiele formatów — bez duplikowania treści." }
+        }
+      ]
+    }
+  ]
+};
+
+// Format types
+const formatTypes = [
+  {
+    title: 'EPUB 3 (reflowable)',
+    desc: 'Standardowy format e-booków z dynamicznym dopasowaniem do ekranu. Tekst przełamuje się do rozmiaru czytnika — od telefonu po tablet. Obsługa MathML do wzorów matematycznych, CSS do stylizacji, nawigacja TOC, metadane Dublin Core. Kompatybilny z Apple Books, Kobo, Google Play Books, Thorium Reader.',
+    tags: ['EPUB 3', 'MathML', 'reflowable', 'CSS'],
+    icon: '📱'
+  },
+  {
+    title: 'EPUB 3 (fixed-layout)',
+    desc: 'E-book z ustalonym layoutem strony — idealne dla podręczników z rozbudowanymi tabelami, diagramami i precyzyjnym rozmieszczeniem elementów. Wygląda identycznie na każdym urządzeniu, jak PDF, ale z metadanymi i nawigacją EPUB.',
+    tags: ['fixed-layout', 'FXL', 'tabele', 'diagramy'],
+    icon: '📐'
+  },
+  {
+    title: 'MOBI / KF8 (Kindle)',
+    desc: 'Format natywny dla czytników Amazon Kindle. Generujemy pliki MOBI (starsze Kindle) i KF8 (Kindle Fire, Paperwhite 4+) z poprawnym formatowaniem, spisem treści i nawigacją. Wzory jako SVG/PNG w odpowiedniej rozdzielczości.',
+    tags: ['MOBI', 'KF8', 'Kindle', 'Amazon'],
+    icon: '📖'
+  },
+  {
+    title: 'Interaktywny PDF',
+    desc: 'PDF wzbogacony o elementy interaktywne: klikalny spis treści, hiperłącza wewnętrzne i zewnętrzne, zakładki, miniaturki stron, warstwy (layers). Idealny do dystrybucji online i na platformach e-learningowych.',
+    tags: ['hyperref', 'bookmarks', 'layers', 'forms'],
+    icon: '🔗'
+  },
+  {
+    title: 'HTML / strona internetowa',
+    desc: 'Publikacja w formie strony internetowej — responsywny HTML5 z CSS, nawigacją między rozdziałami, MathJax/KaTeX do wzorów, kodem źródłowym z podświetlaniem składni. Hosting na własnym serwerze lub integracja z CMS.',
+    tags: ['HTML5', 'MathJax', 'responsive', 'KaTeX'],
+    icon: '🌐'
+  },
+  {
+    title: 'Pakiet wieloformatowy',
+    desc: 'Komplet formatów z jednego źródła LaTeX: PDF drukarski + EPUB reflowable + MOBI na Kindle + HTML online. Jedno źródło, spójna treść, wiele kanałów dystrybucji. Aktualizacja treści propaguje się do wszystkich formatów jednocześnie.',
+    tags: ['multi-format', 'single-source', 'pandoc', 'tex4ebook'],
+    icon: '📦'
+  }
+];
+
+// Challenge: math in ebooks
+const mathChallenges = [
+  {
+    problem: 'Wzory jako bitmapy',
+    bad: 'Wzory renderowane jako PNG w niskiej rozdzielczości — pikselowe przy powiększeniu, nieczytelne na ekranach HiDPI',
+    solution: 'MathML lub SVG — wektorowe, ostre w każdej skali, skalują się razem z tekstem, dostępne dla czytników ekranowych'
+  },
+  {
+    problem: 'Złamane tabele',
+    bad: 'Szerokie tabele ucięte na małym ekranie lub zredukowane do nieczytelnych rozmiarów',
+    solution: 'Responsywne tabele z przewijaniem poziomym, alternatywne układy dla małych ekranów, fixed-layout dla krytycznych tabel'
+  },
+  {
+    problem: 'Utracone referencje',
+    bad: '„Patrz Rozdział 4.2" — ale w EPUB nie ma numerów stron, a referencja nie jest klikalna',
+    solution: 'Automatyczna konwersja \\ref i \\label na hiperłącza EPUB — każda referencja jest klikalna i prowadzi do właściwego miejsca'
+  },
+  {
+    problem: 'Brak nawigacji',
+    bad: 'Płaski plik bez spisu treści, zakładek i możliwości szybkiego przeskoczenia do rozdziału',
+    solution: 'Pełna nawigacja EPUB NCX/NAV: spis treści, lista ilustracji, lista tabel, landmarks, page-list dla zgodności z wydaniem drukowanym'
+  },
+  {
+    problem: 'Niespójne fonty',
+    bad: 'Czytnik podmienia kroje pisma — nagłówki w Comic Sans, wzory w domyślnym foncie systemowym',
+    solution: 'Osadzone fonty (embedded fonts) w EPUB — pełna kontrola nad typografią, fallbacki dla czytników, które nie obsługują osadzania'
+  },
+  {
+    problem: 'Brak dostępności',
+    bad: 'Obrazy bez tekstu alternatywnego, brak struktury semantycznej, nieczytelne dla osób z dysfunkcją wzroku',
+    solution: 'EPUB Accessibility 1.1: alt text dla obrazów i wzorów, aria-label, role, semantyczny HTML5, zgodność z WCAG 2.1 AA'
+  }
+];
+
+// What we deliver
+const deliverables = [
+  { icon: '📄', title: 'Pliki e-book', desc: 'EPUB 3 (reflowable lub fixed-layout), MOBI/KF8, PDF interaktywny — gotowe do dystrybucji i uploadu do sklepów.' },
+  { icon: '✅', title: 'Walidacja', desc: 'Każdy EPUB przechodzi walidację EPUBCheck (W3C). Pliki MOBI testowane w Kindle Previewer. PDF sprawdzony w Acrobat Preflight.' },
+  { icon: '📑', title: 'Metadane', desc: 'Kompletne metadane Dublin Core: tytuł, autor, ISBN, język, wydawca, data, prawa autorskie. Gotowe do katalogowania i dystrybucji.' },
+  { icon: '🖼', title: 'Okładka', desc: 'Okładka e-booka w wymaganym formacie (min. 1600×2400 px dla EPUB, 2560×1600 dla Kindle). Projektujemy lub adaptujemy z istniejącej okładki drukowanej.' },
+  { icon: '♿', title: 'Dostępność', desc: 'Na życzenie: pełna zgodność z EPUB Accessibility 1.1 i WCAG 2.1 AA. Alt text, semantyczna struktura, nawigacja klawiaturowa, kompatybilność z czytnikami ekranowymi.' },
+  { icon: '📂', title: 'Pliki źródłowe', desc: 'Na życzenie: pliki .tex, konfiguracja konwersji, skrypty budowania. Do samodzielnej aktualizacji i generowania nowych wersji w przyszłości.' }
+];
+
+// Pipeline
+const pipelineSteps = [
+  { from: '.tex', to: 'pdflatex', out: 'PDF drukarski', desc: 'Standardowa kompilacja — PDF do druku i dystrybucji ekranowej' },
+  { from: '.tex', to: 'tex4ebook', out: 'EPUB 3', desc: 'Konwersja TeX → HTML → EPUB z zachowaniem MathML i struktury' },
+  { from: '.tex', to: 'pandoc', out: 'EPUB / HTML', desc: 'Alternatywna ścieżka konwersji z szerokim wsparciem formatów' },
+  { from: 'EPUB', to: 'Calibre', out: 'MOBI / KF8', desc: 'Konwersja EPUB → format Kindle z optymalizacją pod czytniki Amazon' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały źródłowe', desc: 'Wyślij pliki .tex (lub Word/PDF do konwersji), zdjęcia, okładkę, wymagania (formaty docelowe, metadane, ISBN). Jeśli masz już gotowy PDF z LaTeX — konwersja do EPUB jest znacznie prostsza niż z Worda.', time: '1 dzień' },
+  { num: '02', title: 'Analiza i wycena', desc: 'Analizujemy strukturę dokumentu: złożoność wzorów, tabele, ilustracje, cross-referencje, fonty. Identyfikujemy elementy wymagające specjalnej obsługi w formacie e-book. Wycena z rozbiciem na formaty — w 24h. Bezpłatnie.', time: '24 godz.' },
+  { num: '03', title: 'Konwersja i stylizacja', desc: 'Konwertujemy LaTeX do docelowych formatów. Stylizujemy CSS (EPUB), optymalizujemy wzory (MathML/SVG), adaptujemy tabele i ilustracje do ekranów czytników. Konfigurujemy nawigację, metadane i okładkę.', time: '3–7 dni' },
+  { num: '04', title: 'Testowanie', desc: 'Testujemy na rzeczywistych czytnikach: Kindle Paperwhite, iPad (Apple Books), Android (Google Play Books), desktop (Thorium, Calibre). Sprawdzamy renderowanie wzorów, nawigację, responsywność tabel, poprawność hiperłączy.', time: '1–2 dni' },
+  { num: '05', title: 'Korekta i finalizacja', desc: 'Wprowadzamy poprawki, walidujemy EPUBCheck, finalizujemy metadane. Dostarczamy: pliki e-book (EPUB, MOBI, PDF), raport z walidacji, opcjonalnie pliki źródłowe i skrypty konwersji do samodzielnej aktualizacji.', time: '1–3 dni' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czy wzory matematyczne z LaTeX wyświetlą się poprawnie w e-booku?', a: 'Tak. Wzory konwertujemy do MathML (standard EPUB 3) lub wektorowego SVG. MathML jest renderowany natywnie przez nowoczesne czytniki (Apple Books, Thorium, Kobo). Dla starszych czytników i Kindle generujemy wzory jako SVG lub PNG w wysokiej rozdzielczości. Testujemy rendering na wielu urządzeniach przed dostarczeniem.' },
+  { q: 'Ile kosztuje konwersja podręcznika LaTeX do EPUB?', a: 'Koszt zależy od objętości, złożoności wzorów i tabel, liczby ilustracji i wymaganych formatów docelowych. Typowy podręcznik 200–300 stron z umiarkowaną liczbą wzorów — od 1500 zł netto za EPUB. Pakiet wieloformatowy (EPUB + MOBI + PDF interaktywny) — od 2500 zł. Wycena jest bezpłatna.' },
+  { q: 'Czy e-book będzie działał na Kindle?', a: 'Tak. Generujemy MOBI/KF8 kompatybilne z Kindle Paperwhite, Kindle Fire i aplikacją Kindle na iOS/Android/desktop. Wzory renderujemy jako SVG/PNG w odpowiedniej rozdzielczości. Każdy plik testujemy w Kindle Previewer. Dla publikacji na Amazon KDP przygotowujemy plik zgodny z ich wymaganiami technicznymi.' },
+  { q: 'Czy mogę mieć PDF i EPUB z jednego źródła LaTeX?', a: 'Tak — to kluczowa przewaga LaTeX nad innymi formatami źródłowymi. Z jednego pliku .tex generujemy: PDF drukarski (pdflatex), EPUB reflowable (tex4ebook/pandoc), MOBI na Kindle, HTML online. Aktualizujesz treść w jednym miejscu — wszystkie formaty aktualizują się automatycznie. Zero duplikowania, zero niespójności między wersjami.' },
+  { q: 'Czy e-book będzie dostępny (accessibility)?', a: 'Na życzenie implementujemy pełną zgodność z EPUB Accessibility 1.1 i WCAG 2.1 AA: tekst alternatywny dla obrazów i wzorów (alt, aria-label), semantyczna struktura HTML5 (role, landmarks), nawigacja klawiaturowa, poprawna kolejność czytania (reading order), kompatybilność z czytnikami ekranowymi (VoiceOver, NVDA, JAWS).' },
+  { q: 'Czy obsługujecie publikację w księgarniach online?', a: 'Przygotowujemy pliki techniczne gotowe do uploadu: EPUB dla Apple Books, Google Play Books, Kobo, Legimi; MOBI/KF8 dla Amazon KDP; PDF dla platform e-learningowych. Kompletne metadane, okładka w wymaganej rozdzielczości, walidacja EPUBCheck. Sam upload do platform leży po stronie wydawcy — ale dostarczamy pliki, które przechodzą walidację za pierwszym razem.' },
+  { q: 'Mam podręcznik w Wordzie — czy też go skonwertujecie?', a: 'Tak, choć ścieżka jest inna. Word → LaTeX → EPUB (jeśli chcesz też PDF drukarskiej jakości) lub Word → pandoc → EPUB (jeśli zależy Ci głównie na e-booku). Pierwsza ścieżka daje lepsze rezultaty typograficzne, ale jest droższa. Drugą można zastosować, gdy treść jest prosta (mało wzorów i tabel). Wycenimy obie opcje.' },
+  { q: 'Jak szybko da się zrobić e-booka z gotowego PDF LaTeX?', a: 'Jeśli masz pliki źródłowe .tex — konwersja prostego dokumentu (tekst, ilustracje, podstawowe tabele) to 3–5 dni roboczych. Rozbudowany podręcznik z setkami wzorów, złożonymi tabelami i cross-referencjami — 1–3 tygodnie. Express (24–48h) — możliwy dla prostych dokumentów, wycena indywidualna.' }
+];
+---
+
+<BaseLayout
+  title="Tworzenie e-booków EPUB i publikacji cyfrowych z LaTeX"
+  description="Profesjonalne tworzenie e-booków EPUB, MOBI i interaktywnych PDF z plików LaTeX. Konwersja podręczników i publikacji naukowych do formatów cyfrowych z zachowaniem wzorów matematycznych, tabel i nawigacji."
+  keywords="ebook latex, epub z latex, konwersja latex epub, ebook matematyczny, latex do epub, latex do mobi, kindle latex, ebook naukowy, publikacja cyfrowa latex, tex4ebook, pandoc latex"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>E-booki</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.8</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Tworzenie <span class="hero__highlight">e-booków</span><br>i&nbsp;publikacji cyfrowych
+      </h1>
+      <p class="hero__subtitle">
+        EPUB, MOBI, interaktywny PDF — z&nbsp;jednego źródła LaTeX,<br>
+        z&nbsp;perfekcyjnymi wzorami i&nbsp;pełną nawigacją
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">tex4ebook</span>
+        <span class="hero__tag">pandoc</span>
+        <span class="hero__tag">EPUB 3</span>
+        <span class="hero__tag">MathML</span>
+        <span class="hero__tag">KF8</span>
+        <span class="hero__tag">hyperref</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij materiały do wyceny <span>→</span></a>
+        <a href="#formaty" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Jeden LaTeX — wszystkie formaty</h2>
+          <p>
+            Napisałeś podręcznik w&nbsp;LaTeX. Masz perfekcyjny PDF do druku. Ale Twoi studenci
+            czytają na tabletach, recenzenci na Kindle, a&nbsp;wydawca wymaga EPUB do księgarni
+            online. I&nbsp;nagle okazuje się, że wzory nie renderują się w&nbsp;e-booku, tabele
+            są ucięte na małym ekranie, a&nbsp;„patrz Rozdział 4.2" prowadzi donikąd.
+          </p>
+          <p>
+            Konwersja LaTeX → EPUB to nie kopiuj-wklej. To inżynierski proces, w&nbsp;którym
+            każdy wzór musi zostać przekonwertowany do MathML lub SVG, każda tabela zaadaptowana
+            do responsywnego layoutu, każda cross-referencja zamieniona na klikalny hiperłącze.
+            Robimy to systematycznie — z&nbsp;narzędziami tex4ebook, pandoc i&nbsp;własną
+            konfiguracją, przetestowaną na dziesiątkach publikacji.
+          </p>
+          <p>
+            Efekt: z&nbsp;jednego pliku .tex dostajesz PDF drukarski, EPUB na czytniki, MOBI
+            na Kindle i&nbsp;HTML na stronę — spójne, walidowane, gotowe do dystrybucji.
+            Aktualizujesz treść w&nbsp;jednym miejscu, a&nbsp;wszystkie formaty aktualizują
+            się automatycznie.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">1 → N</span>
+            <span class="intro__sidebar-label">jedno źródło, wiele formatów</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">MathML</span>
+            <span class="intro__sidebar-label">wzory w jakości LaTeX</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">WCAG</span>
+            <span class="intro__sidebar-label">dostępność na życzenie</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMATS -->
+  <section class="types" id="formaty" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.1"
+          title="Formaty publikacji cyfrowych"
+          subtitle="Każdy format ma swoją specyfikę, ograniczenia i grupę docelową. Dobieramy formaty do Twojego kanału dystrybucji."
+        />
+      </div>
+      <div class="types__grid">
+        {formatTypes.map((t) => (
+          <div class="types__card reveal">
+            <span class="types__card-icon" aria-hidden="true">{t.icon}</span>
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="pipeline" aria-labelledby="pipeline-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.2"
+          title="Ścieżki konwersji"
+          subtitle="Z jednego pliku .tex — wiele formatów. Każda ścieżka konwersji jest zoptymalizowana pod docelowy format."
+          inverted
+        />
+      </div>
+      <div class="pipeline__flow reveal">
+        {pipelineSteps.map((step, i) => (
+          <div class="pipeline__step">
+            <div class="pipeline__node pipeline__node--from">{step.from}</div>
+            <div class="pipeline__arrow">
+              <span class="pipeline__tool">{step.to}</span>
+              <svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true">
+                <line x1="0" y1="6" x2="32" y2="6" stroke="currentColor" stroke-width="1"/>
+                <polyline points="30,2 36,6 30,10" fill="none" stroke="currentColor" stroke-width="1"/>
+              </svg>
+            </div>
+            <div class="pipeline__node pipeline__node--to">{step.out}</div>
+            <p class="pipeline__desc">{step.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CHALLENGES: MATH IN EBOOKS -->
+  <section class="challenges" aria-labelledby="challenges-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.3"
+          title="Typowe problemy — i&nbsp;nasze rozwiązania"
+          subtitle="Konwersja publikacji naukowych do e-booków to pełne pułapek zadanie. Oto problemy, które rozwiązujemy systematycznie."
+        />
+      </div>
+      <div class="challenges__grid">
+        {mathChallenges.map((c) => (
+          <div class="challenges__card reveal">
+            <h3 class="challenges__problem">{c.problem}</h3>
+            <div class="challenges__bad">
+              <span class="challenges__marker" aria-hidden="true">✕</span>
+              <p>{c.bad}</p>
+            </div>
+            <div class="challenges__good">
+              <span class="challenges__marker challenges__marker--good" aria-hidden="true">✓</span>
+              <p>{c.solution}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE: EPUB READER SIMULATION -->
+  <section class="sample" aria-label="Symulacja e-booka na czytniku">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.4"
+          title="Jak wygląda e-book z&nbsp;LaTeX"
+          subtitle="Symulacja strony podręcznika w czytniku EPUB — responsywny tekst, wzory MathML, klikalny spis treści."
+          inverted
+        />
+      </div>
+    </div>
+    <div class="sample__preview reveal">
+      <div class="sample__reader">
+        <!-- Reader chrome -->
+        <div class="sample__reader-top">
+          <span class="sample__reader-back">‹ Spis treści</span>
+          <span class="sample__reader-title">Analiza Matematyczna</span>
+          <span class="sample__reader-progress">42%</span>
+        </div>
+
+        <div class="sample__reader-body">
+          <h4 class="sample__chapter">Rozdział 3</h4>
+          <h3 class="sample__heading">Rachunek różniczkowy funkcji jednej zmiennej</h3>
+
+          <p class="sample__text">
+            Pochodną funkcji <em>f</em> w&nbsp;punkcie <em>x₀</em> nazywamy granicę:
+          </p>
+
+          <div class="sample__formula">
+            <em>f</em> '(<em>x₀</em>) = lim<sub><em>h</em>→0</sub> &nbsp;
+            <span class="sample__frac">
+              <span class="sample__frac-num"><em>f</em>(<em>x₀</em> + <em>h</em>) − <em>f</em>(<em>x₀</em>)</span>
+              <span class="sample__frac-den"><em>h</em></span>
+            </span>
+          </div>
+
+          <p class="sample__text">
+            o&nbsp;ile granica ta istnieje i&nbsp;jest skończona. Jeśli funkcja posiada pochodną
+            w&nbsp;punkcie <em>x₀</em>, mówimy, że jest <strong>różniczkowalna</strong>
+            w&nbsp;tym punkcie (por. <span class="sample__link">Definicja 2.14</span>).
+          </p>
+
+          <div class="sample__theorem">
+            <div class="sample__theorem-title">Twierdzenie 3.1 (Reguła de l'Hôpitala)</div>
+            <p>
+              Jeśli <em>f</em> i&nbsp;<em>g</em> są różniczkowalne na przedziale (<em>a</em>,&nbsp;<em>b</em>)
+              i&nbsp;<em>g</em>'(<em>x</em>) ≠ 0 dla <em>x</em> ∈ (<em>a</em>,&nbsp;<em>b</em>), to:
+            </p>
+            <div class="sample__formula sample__formula--small">
+              lim<sub><em>x</em>→<em>a</em>⁺</sub> &nbsp;
+              <span class="sample__frac">
+                <span class="sample__frac-num"><em>f</em>(<em>x</em>)</span>
+                <span class="sample__frac-den"><em>g</em>(<em>x</em>)</span>
+              </span>
+              &nbsp;= lim<sub><em>x</em>→<em>a</em>⁺</sub> &nbsp;
+              <span class="sample__frac">
+                <span class="sample__frac-num"><em>f</em> '(<em>x</em>)</span>
+                <span class="sample__frac-den"><em>g</em>'(<em>x</em>)</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sample__reader-bottom">
+          <span>str. 87</span>
+          <div class="sample__reader-dots">
+            <span></span><span></span><span class="active"></span><span></span><span></span>
+          </div>
+          <span>z 204</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DELIVERABLES -->
+  <section class="deliverables" aria-labelledby="deliverables-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.5"
+          title="Co dostarczamy"
+          subtitle="Kompletny pakiet plików gotowych do dystrybucji — przetestowanych, zwalidowanych, z pełnymi metadanymi."
+        />
+      </div>
+      <div class="deliverables__grid">
+        {deliverables.map((d) => (
+          <div class="deliverables__card reveal">
+            <span class="deliverables__icon" aria-hidden="true">{d.icon}</span>
+            <h3>{d.title}</h3>
+            <p>{d.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.6"
+          title="Proces realizacji"
+          subtitle="Od plików .tex do gotowych e-booków — jasne etapy, testowanie na rzeczywistych czytnikach."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.8.7"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania od wydawców, autorów podręczników i uczelni."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html={'\\begin{ebook}'} />
+        <h2 id="cta-title">Wyślij pliki .tex — wycenimy e-booka w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to podręcznik na 500 stron z&nbsp;setkami wzorów, czy broszura firmowa
+          do dystrybucji online — przygotujemy wycenę z&nbsp;rozbiciem na formaty i&nbsp;konkretnym
+          terminem. Wystarczy przesłać pliki źródłowe i&nbsp;opis wymagań. Bezpłatnie.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">Wyślij materiały <span class="cta__button-arrow">→</span></a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true" set:html={'\\end{ebook}'} />
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o tworzeniu e-booków z LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Tworzenie e-booków i&nbsp;publikacji cyfrowych z&nbsp;LaTeX</h2>
+        <p>
+          Profesjonalne <strong>tworzenie e-booków z&nbsp;LaTeX</strong> to odpowiedź na rosnące
+          zapotrzebowanie na publikacje cyfrowe w&nbsp;świecie akademickim i&nbsp;wydawniczym.
+          System LaTeX, dzięki narzędziom takim jak tex4ebook i&nbsp;pandoc, pozwala na
+          <strong>konwersję publikacji do formatu EPUB</strong> z&nbsp;zachowaniem wzorów
+          matematycznych (MathML), tabel, cross-referencji i&nbsp;pełnej nawigacji.
+        </p>
+        <h3>Konwersja LaTeX do EPUB — wzory, tabele, referencje</h3>
+        <p>
+          <strong>Konwersja LaTeX do EPUB</strong> wymaga specjalistycznego podejścia. Wzory
+          matematyczne konwertujemy do MathML (standard EPUB 3) lub wektorowego SVG — ostrych
+          w&nbsp;każdej skali, skalowalnych razem z&nbsp;tekstem. Tabele adaptujemy do
+          responsywnego layoutu czytników. Cross-referencje (\\ref, \\label) zamieniamy na
+          klikalne hiperłącza. Rezultat: e-book, który wygląda profesjonalnie na każdym urządzeniu.
+        </p>
+        <h3>E-booki na Kindle z&nbsp;LaTeX</h3>
+        <p>
+          <strong>E-booki MOBI/KF8</strong> na czytniki Amazon Kindle wymagają osobnej ścieżki
+          konwersji. Kindle nie obsługuje MathML, dlatego wzory renderujemy jako SVG/PNG
+          w&nbsp;wysokiej rozdzielczości. Testujemy każdy plik w&nbsp;Kindle Previewer
+          i&nbsp;na fizycznych czytnikach. Przygotowujemy pliki zgodne z&nbsp;wymaganiami
+          Amazon KDP do bezpośredniej publikacji.
+        </p>
+        <h3>Jedno źródło — wiele formatów</h3>
+        <p>
+          Kluczowa przewaga <strong>e-booków z&nbsp;LaTeX</strong> to zasada single-source
+          publishing: z&nbsp;jednego pliku .tex generujesz PDF drukarski, EPUB na czytniki,
+          MOBI na Kindle i&nbsp;HTML na stronę internetową. Aktualizacja treści w&nbsp;jednym
+          miejscu propaguje się do&nbsp;wszystkich formatów automatycznie — zero duplikowania,
+          zero niespójności między wersjami.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 1fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-4); }
+  .intro__sidebar-block { padding: var(--space-5) var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); text-align: center; }
+  .intro__sidebar-value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-bold); color: var(--accent); display: block; line-height: 1; margin-bottom: var(--space-1); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-icon { font-size: 1.6rem; display: block; margin-bottom: var(--space-3); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-2); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ PIPELINE ═════ */
+  .pipeline { padding: var(--space-20) 0; background: var(--ink); }
+  .pipeline__flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6); max-width: var(--page-wide); margin: 0 auto; padding: 0 var(--gutter); }
+  .pipeline__step { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); }
+  .pipeline__node { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: var(--fw-bold); padding: 0.4rem 1rem; border-radius: var(--radius-sm); letter-spacing: 0.04em; }
+  .pipeline__node--from { background: rgba(250,248,244,0.1); color: var(--paper); border: 1px solid rgba(250,248,244,0.2); }
+  .pipeline__node--to { background: var(--accent); color: var(--paper); }
+  .pipeline__arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; color: rgba(250,248,244,0.3); }
+  .pipeline__tool { font-family: var(--font-mono); font-size: 0.6rem; color: rgba(250,248,244,0.5); letter-spacing: 0.06em; }
+  .pipeline__desc { font-size: 0.78rem; color: rgba(250,248,244,0.5); line-height: 1.5; max-width: 220px; }
+
+  /* ═════ CHALLENGES ═════ */
+  .challenges { padding: var(--space-20) 0; }
+  .challenges__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .challenges__card { padding: var(--space-6); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .challenges__card:hover { box-shadow: var(--shadow-md); }
+  .challenges__problem { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-3); }
+  .challenges__bad, .challenges__good { display: flex; gap: var(--space-2); align-items: flex-start; margin-bottom: var(--space-2); }
+  .challenges__bad p, .challenges__good p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); }
+  .challenges__bad p { color: var(--ink-faint); }
+  .challenges__good p { color: var(--ink-light); }
+  .challenges__marker { flex-shrink: 0; font-weight: var(--fw-bold); font-size: var(--fs-sm); margin-top: 2px; color: #c0392b; }
+  .challenges__marker--good { color: var(--success); }
+
+  /* ═════ SAMPLE READER ═════ */
+  .sample { padding: var(--space-20) 0; background: var(--ink); }
+  .sample__preview { max-width: 420px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample__reader { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 16px 50px rgba(0,0,0,0.4); }
+  .sample__reader-top { display: flex; justify-content: space-between; align-items: center; padding: var(--space-2) var(--space-4); background: var(--paper); border-bottom: 0.5px solid var(--rule-light); font-family: var(--font-serif); font-size: 0.6rem; color: var(--ink-faint); }
+  .sample__reader-back { color: var(--accent); }
+  .sample__reader-title { font-style: italic; }
+  .sample__reader-body { padding: var(--space-6) var(--space-5); }
+  .sample__chapter { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: var(--space-1); }
+  .sample__heading { font-family: var(--font-display); font-size: 1rem; font-weight: var(--fw-bold); color: var(--ink); margin-bottom: var(--space-4); line-height: 1.3; }
+  .sample__text { font-family: var(--font-serif); font-size: 0.82rem; line-height: 1.7; color: var(--ink-light); margin-bottom: var(--space-3); }
+  .sample__link { color: var(--accent); border-bottom: 0.5px solid var(--accent); cursor: pointer; }
+  .sample__formula { text-align: center; padding: var(--space-3) 0; font-family: var(--font-serif); font-style: italic; font-size: 0.95rem; color: var(--ink); margin-bottom: var(--space-3); }
+  .sample__formula--small { font-size: 0.85rem; padding: var(--space-2) 0; }
+  .sample__frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; }
+  .sample__frac-num { border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+  .sample__frac-den { padding-top: 1px; }
+  .sample__theorem { padding: var(--space-3) var(--space-4); background: rgba(44,82,130,0.05); border-left: 3px solid #2c5282; border-radius: var(--radius-sm); margin-top: var(--space-3); }
+  .sample__theorem-title { font-family: var(--font-display); font-size: 0.72rem; font-weight: var(--fw-bold); color: #2c5282; margin-bottom: var(--space-1); }
+  .sample__theorem p { font-family: var(--font-serif); font-size: 0.78rem; line-height: 1.6; color: var(--ink-light); }
+  .sample__reader-bottom { display: flex; justify-content: space-between; align-items: center; padding: var(--space-2) var(--space-4); background: var(--paper); border-top: 0.5px solid var(--rule-light); font-family: var(--font-mono); font-size: 0.55rem; color: var(--ink-faint); }
+  .sample__reader-dots { display: flex; gap: 4px; }
+  .sample__reader-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--rule-light); }
+  .sample__reader-dots span.active { background: var(--accent); }
+
+  /* ═════ DELIVERABLES ═════ */
+  .deliverables { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .deliverables__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .deliverables__card { padding: var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .deliverables__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .deliverables__icon { display: block; font-size: 1.4rem; margin-bottom: var(--space-3); }
+  .deliverables__card h3 { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .deliverables__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

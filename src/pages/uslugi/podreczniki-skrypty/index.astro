@@ -1,0 +1,1477 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+// Schema.org
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/podreczniki-skrypty/#service",
+      "name": "Skład podręczników i skryptów akademickich w LaTeX",
+      "description": "Profesjonalny skład podręczników akademickich, skryptów wykładowych i materiałów dydaktycznych w systemie LaTeX. Wzory matematyczne, tabele, indeksy, spisy treści, bibliografia.",
+      "provider": {
+        "@type": "ProfessionalService",
+        "@id": "https://sklad-tekstu.pl/#organization"
+      },
+      "serviceType": "Skład podręczników LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy publikacji dydaktycznych",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład podręczników akademickich" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład skryptów wykładowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład zeszytów ćwiczeń" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład materiałów dydaktycznych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład monografii naukowych" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Podręczniki i skrypty", "item": "https://sklad-tekstu.pl/uslugi/podreczniki-skrypty/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład podręcznika w LaTeX?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Koszt składu podręcznika zależy od objętości, złożoności (ilość wzorów, tabel, ilustracji) i wymaganego terminu. Wycena jest bezpłatna — wyślij materiały, a otrzymasz szczegółową kalkulację w ciągu 24 godzin."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "W jakim formacie dostarczyć tekst do składu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Przyjmujemy tekst w dowolnym formacie: Word (.docx), PDF, Markdown, LaTeX (.tex), tekst surowy (.txt), a nawet zdjęcia rękopisów. Najwygodniejszy jest Word lub Markdown z wyraźnie oznaczoną strukturą (nagłówki, wzory, tabele)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile trwa skład podręcznika?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Typowy podręcznik (200-300 stron) składamy w 2-4 tygodnie, w zależności od złożoności. Skrypty wykładowe (50-100 stron) — w 1-2 tygodnie. Podajemy konkretny termin realizacji przy wycenie."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę samodzielnie edytować pliki po składzie?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tak. Na życzenie dostarczamy kompletne pliki źródłowe .tex wraz z instrukcją kompilacji. Możesz samodzielnie aktualizować treść w kolejnych wydaniach."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy PDF będzie gotowy do druku offsetowego?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tak. Generujemy PDF w jakości drukarskiej: profil kolorów CMYK, spady (bleed), znaczniki cięcia (crop marks), fonty wektorowe osadzone w dokumencie. Plik jest gotowy do wysłania do drukarni bez żadnej dodatkowej konwersji."
+          }
+        }
+      ]
+    }
+  ]
+};
+
+// Features data
+const features = [
+  {
+    icon: '∑',
+    title: 'Wzory matematyczne',
+    desc: 'Składamy wzory dowolnej złożoności — od prostych równań po wieloliniowe wyprowadzenia, macierze, całki wielokrotne i systemy równań z numeracją i cross-referencjami. LaTeX renderuje je z niezrównaną precyzją typograficzną.'
+  },
+  {
+    icon: '▦',
+    title: 'Tabele i zestawienia',
+    desc: 'Profesjonalne tabele z nagłówkami wielopoziomowymi, łączonymi komórkami, kolorowaniem wierszy i automatycznym łamaniem na kolejne strony. Od prostych zestawień po rozbudowane tabele danych eksperymentalnych.'
+  },
+  {
+    icon: '⊞',
+    title: 'Indeksy i spisy',
+    desc: 'Automatycznie generowane spisy treści, rysunków, tabel, oznaczeń i skrótów. Indeksy rzeczowe i osobowe z odsyłaczami do stron. Każdy element aktualizuje się automatycznie przy zmianach w tekście.'
+  },
+  {
+    icon: '⟐',
+    title: 'Ilustracje i wykresy',
+    desc: 'Wektorowe diagramy TikZ, wykresy PGFPlots, schematy blokowe, drzewa decyzyjne, układy współrzędnych. Ilustracje rastrowe w pełnej rozdzielczości z profesjonalnymi podpisami i numeracją.'
+  },
+  {
+    icon: '§',
+    title: 'Struktura rozdziałów',
+    desc: 'Hierarchiczna numeracja: części, rozdziały, podrozdziały, akapity. Twierdzenia, definicje, dowody, przykłady, uwagi — w wydzielonych, numerowanych środowiskach z ramkami i kolorowym tłem.'
+  },
+  {
+    icon: '⁂',
+    title: 'Bibliografia i cytowania',
+    desc: 'System BibTeX/BibLaTeX z automatycznym formatowaniem bibliografii w dowolnym standardzie (APA, IEEE, Chicago, Vancouver). Cytowania w tekście aktualizują się automatycznie przy dodawaniu nowych źródeł.'
+  }
+];
+
+// Types of textbooks
+const textbookTypes = [
+  {
+    title: 'Podręczniki akademickie',
+    desc: 'Kompleksowe podręczniki do nauki na poziomie uniwersyteckim. Struktura rozdziałów, twierdzenia z dowodami, przykłady, zadania do samodzielnego rozwiązania, indeks pojęć. Zgodność z wymogami wydawnictw akademickich.',
+    examples: 'Analiza matematyczna, fizyka, chemia, mechanika, elektronika, statystyka, ekonometria'
+  },
+  {
+    title: 'Skrypty wykładowe',
+    desc: 'Materiały towarzyszące wykładom — bardziej zwięzłe niż pełne podręczniki, ale z pełną formalnością matematyczną. Notatki z wykładów, konspekty, materiały uzupełniające do zajęć.',
+    examples: 'Notatki z wykładów, konspekty, materiały do ćwiczeń, suplementy'
+  },
+  {
+    title: 'Zeszyty ćwiczeń',
+    desc: 'Zestawy zadań z podziałem na tematy i poziomy trudności. Automatyczna numeracja zadań, warianty (A/B/C), klucze odpowiedzi, miejsce na rozwiązania. Idealne do ćwiczeń audytoryjnych i laboratoryjnych.',
+    examples: 'Ćwiczenia z algebry, zadania z fizyki, arkusze laboratoryjne, zestawy problemów'
+  },
+  {
+    title: 'Monografie naukowe',
+    desc: 'Publikacje prezentujące wyniki badań w usystematyzowanej formie. Rozbudowana bibliografia, przypisy, aneksy, aparat naukowy. Zgodność z wymaganiami wydawnictw punktowanych.',
+    examples: 'Rozprawy habilitacyjne, monografie tematyczne, publikacje punktowane'
+  },
+  {
+    title: 'Materiały do kursów',
+    desc: 'Podręczniki i materiały szkoleniowe do kursów i warsztatów. Czytelna struktura modułowa, checklisty, ćwiczenia praktyczne, case studies. Format dostosowany do specyfiki kursu.',
+    examples: 'Kursy programowania, szkolenia techniczne, warsztaty, e-learning'
+  },
+  {
+    title: 'Tablice i karty wzorów',
+    desc: 'Kompaktowe zestawienia wzorów, tabel i zależności na jednej lub kilku stronach. Idealne jako pomoc dydaktyczna podczas egzaminów lub pracy zawodowej.',
+    examples: 'Tablice matematyczne, karty wzorów fizycznych, zestawienia chemiczne'
+  }
+];
+
+// Process steps
+const processSteps = [
+  {
+    num: '01',
+    title: 'Przesłanie materiałów',
+    desc: 'Wyślij tekst w dowolnym formacie (Word, PDF, Markdown, LaTeX, tekst surowy). Opisz wymagania: format docelowy, krój pisma, wymiary strony, wymagania uczelni lub wydawnictwa. Im więcej informacji, tym trafniejsza wycena.',
+    time: '5 min'
+  },
+  {
+    num: '02',
+    title: 'Wycena i harmonogram',
+    desc: 'W ciągu 24 godzin otrzymasz szczegółową wycenę z rozbiciem na elementy (tekst podstawowy, wzory, tabele, ilustracje, indeksy) oraz proponowany harmonogram realizacji. Wycena jest bezpłatna i niezobowiązująca.',
+    time: '24 godz.'
+  },
+  {
+    num: '03',
+    title: 'Makieta i akceptacja',
+    desc: 'Projektujemy stronę tytułową, układ strony, style nagłówków, środowiska (twierdzenia, definicje, przykłady) i składamy próbny rozdział. Po Twojej akceptacji makiety przystępujemy do składu całości.',
+    time: '2–3 dni'
+  },
+  {
+    num: '04',
+    title: 'Skład właściwy',
+    desc: 'Składamy kompletny podręcznik: tekst, wzory, tabele, ilustracje, spisy, bibliografia, indeksy. Regularnie przesyłamy PDF-y z postępem prac, żebyś mógł na bieżąco sprawdzać efekty.',
+    time: '1–4 tyg.'
+  },
+  {
+    num: '05',
+    title: 'Korekta i poprawki',
+    desc: 'Przesyłamy gotowy PDF do sprawdzenia. Wprowadzamy wszystkie poprawki — merytoryczne, typograficzne, layoutowe. Robimy tyle rund korekt, ile potrzeba, aż podręcznik będzie idealny.',
+    time: 'do uzgodnienia'
+  },
+  {
+    num: '06',
+    title: 'Finalizacja',
+    desc: 'Generujemy finalny PDF: drukarski (CMYK, spady, crop marks) i/lub ekranowy (RGB, hiperłącza, zakładki). Na życzenie przekazujemy pliki źródłowe .tex z instrukcją kompilacji do samodzielnej edycji.',
+    time: '1 dzień'
+  }
+];
+
+// FAQ
+const faqItems = [
+  {
+    q: 'Ile kosztuje skład podręcznika w LaTeX?',
+    a: 'Koszt zależy od trzech czynników: objętości dokumentu (liczba stron), złożoności (gęstość wzorów, tabel, ilustracji) i wymaganego terminu. Typowy skład strony tekstu z umiarkowaną liczbą wzorów to 15–40 zł netto. Strony z gęstą matematyką lub skomplikowanymi tabelami — odpowiednio więcej. Wycena jest zawsze bezpłatna — wyślij materiały, a w ciągu 24 godzin otrzymasz szczegółową kalkulację.'
+  },
+  {
+    q: 'W jakim formacie dostarczyć tekst?',
+    a: 'Przyjmujemy tekst w dowolnym formacie: Word (.docx), PDF, Markdown, LaTeX (.tex), tekst surowy (.txt), a nawet zdjęcia rękopisów. Najwygodniejszy jest Word lub Markdown z wyraźnie oznaczoną strukturą (nagłówki na odpowiednich poziomach, wzory w Equation Editor lub zapisane tekstem, tabele w komórkach). Jeśli masz już częściowo przygotowane pliki .tex, możemy na nich bazować.'
+  },
+  {
+    q: 'Ile trwa skład podręcznika?',
+    a: 'Typowy podręcznik akademicki (200–300 stron) składamy w 2–4 tygodnie, w zależności od złożoności. Krótsze skrypty wykładowe (50–100 stron) — w 1–2 tygodnie. Zeszyty ćwiczeń i karty wzorów — zwykle w kilka dni. Przy wycenie zawsze podajemy konkretny termin realizacji. W uzasadnionych przypadkach oferujemy tryb ekspresowy.'
+  },
+  {
+    q: 'Czy mogę samodzielnie edytować pliki po składzie?',
+    a: 'Tak. Na życzenie dostarczamy kompletne pliki źródłowe .tex wraz z dokumentacją klasy dokumentu, instrukcją instalacji potrzebnych pakietów i instrukcją kompilacji. Dzięki temu możesz samodzielnie aktualizować treść w kolejnych wydaniach — poprawiać literówki, dodawać rozdziały, aktualizować dane — bez ponownego zlecania składu.'
+  },
+  {
+    q: 'Czy PDF będzie gotowy do druku offsetowego?',
+    a: 'Tak. Generujemy PDF/X zgodny z wymaganiami drukarni: profil kolorów CMYK, spady (bleed 3–5 mm), znaczniki cięcia (crop marks), fonty wektorowe osadzone w dokumencie, rozdzielczość obrazów min. 300 DPI. Plik jest gotowy do wysłania do drukarni bez żadnej dodatkowej konwersji. Na życzenie przygotowujemy też wersję ekranową z hiperłączami i zakładkami.'
+  },
+  {
+    q: 'Czy składacie podręczniki w języku angielskim?',
+    a: 'Tak. Składamy publikacje w języku polskim, angielskim, niemieckim i innych językach europejskich. LaTeX obsługuje zaawansowane reguły dzielenia wyrazów dla każdego języka. W przypadku podręczników wielojęzycznych stosujemy pakiet babel z odpowiednimi konfiguracjami dla każdego języka w dokumencie.'
+  },
+  {
+    q: 'Jakie formaty stron obsługujecie?',
+    a: 'Dowolne. Najczęściej składamy podręczniki w formatach B5 (176 × 250 mm — standard wydawnictw akademickich), A4 (210 × 297 mm — skrypty i materiały dydaktyczne) i A5 (148 × 210 mm — kompaktowe poradniki). Możemy też przygotować niestandardowe formaty wymagane przez konkretne wydawnictwo.'
+  },
+  {
+    q: 'Czy zapewniacie korektę tekstu?',
+    a: 'Naszą główną usługą jest skład typograficzny, nie korekta językowa. Zakładamy, że tekst jest merytorycznie i językowo gotowy. Natomiast w trakcie składu wyłapujemy oczywiste literówki i niespójności typograficzne (np. różne zapisy tego samego symbolu) i sygnalizujemy je autorowi. Na życzenie możemy polecić profesjonalnego korektora.'
+  }
+];
+
+// Before/after comparison points
+const comparisonPoints = [
+  { word: 'Ręczna numeracja rozdziałów i wzorów — rozjeżdża się przy każdej zmianie', latex: 'Automatyczna numeracja wszystkiego — dodajesz rozdział, reszta przenumerowuje się sama' },
+  { word: 'Wzory w Equation Editor — ograniczone możliwości, niespójna typografia', latex: 'Pełna moc LaTeX — dowolna złożoność wzorów, idealna typografia matematyczna' },
+  { word: 'Bibliografia wklejana ręcznie — każda zmiana to ryzyko błędu', latex: 'BibTeX generuje bibliografię automatycznie w wybranym standardzie (APA, IEEE, Chicago)' },
+  { word: 'Spis treści aktualizowany ręcznie — numery stron się nie zgadzają', latex: 'Spis treści, rysunków i tabel generowany jednym poleceniem — zawsze aktualny' },
+  { word: 'Tabele rozjeżdżają się między stronami', latex: 'Inteligentne łamanie tabel z powtarzaniem nagłówków na kolejnych stronach' },
+  { word: '"U mnie wyglądało inaczej" — PDF zależy od drukarki, systemu, wersji Worda', latex: 'Identyczny PDF na każdym komputerze, w każdym systemie — zawsze' },
+];
+---
+
+<BaseLayout
+  title="Skład podręczników i skryptów akademickich w LaTeX"
+  description="Profesjonalny skład podręczników akademickich, skryptów wykładowych i materiałów dydaktycznych w systemie LaTeX. Wzory matematyczne, tabele, indeksy, spisy treści, bibliografia. Print-ready PDF."
+  keywords="skład podręczników latex, skład skryptów akademickich, skład materiałów dydaktycznych, skład podręcznika, podręcznik akademicki latex, skrypt wykładowy latex, zeszyt ćwiczeń latex, skład publikacji naukowych"
+  schema={serviceSchema}
+>
+
+  <!-- ════════════════════════════════════════════════
+       HERO
+       ════════════════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a>
+        <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a>
+        <span aria-hidden="true">›</span>
+        <span>Podręczniki i&nbsp;skrypty</span>
+      </nav>
+    </div>
+
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.1</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">podręczników</span><br>
+        i&nbsp;skryptów akademickich
+      </h1>
+
+      <p class="hero__subtitle">
+        Profesjonalny skład podręczników, skryptów wykładowych, zeszytów ćwiczeń<br>
+        i&nbsp;materiałów dydaktycznych w&nbsp;systemie LaTeX
+      </p>
+
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+
+      <div class="hero__tags">
+        <span class="hero__tag">book</span>
+        <span class="hero__tag">memoir</span>
+        <span class="hero__tag">amsmath</span>
+        <span class="hero__tag">makeidx</span>
+        <span class="hero__tag">hyperref</span>
+        <span class="hero__tag">biblatex</span>
+      </div>
+
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">
+          Wyślij tekst do wyceny
+          <span>→</span>
+        </a>
+        <a href="#co-skladamy" class="hero__cta-secondary">
+          Dowiedz się więcej
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       INTRO — what we do
+       ════════════════════════════════════════════════ -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Podręcznik złożony w&nbsp;LaTeX to&nbsp;inna liga</h2>
+          <p>
+            Podręcznik akademicki to nie ulotka — to&nbsp;dokument, z&nbsp;którym studenci będą pracować 
+            przez miesiące lub lata. Dlatego każdy detal ma znaczenie: czytelność wzorów, konsystencja 
+            numeracji, jakość tabel, logika indeksu rzeczowego, estetyka strony.
+          </p>
+          <p>
+            System LaTeX został stworzony właśnie do tego. Profesor Donald Knuth zaprojektował go 
+            w&nbsp;Stanford, bo nie był zadowolony z&nbsp;jakości składu swoich podręczników informatyki. 
+            Dziś LaTeX jest standardem w&nbsp;wydawnictwach naukowych na całym świecie — od Cambridge 
+            University Press po Springer i&nbsp;Elsevier.
+          </p>
+          <p>
+            Składamy podręczniki dla wykładowców, instytutów badawczych, wydawnictw akademickich 
+            i&nbsp;firm szkoleniowych. Niezależnie od dziedziny — matematyka, fizyka, informatyka, 
+            ekonomia, medycyna, inżynieria — dostarczamy PDF w&nbsp;jakości drukarskiej, gotowy 
+            do&nbsp;wysłania do&nbsp;drukarni lub publikacji online.
+          </p>
+        </div>
+        <aside class="intro__stats">
+          <div class="intro__stat">
+            <span class="intro__stat-value">2500+</span>
+            <span class="intro__stat-label">złożonych stron</span>
+          </div>
+          <div class="intro__stat">
+            <span class="intro__stat-value">20+</span>
+            <span class="intro__stat-label">wydanych publikacji</span>
+          </div>
+          <div class="intro__stat">
+            <span class="intro__stat-value">24h</span>
+            <span class="intro__stat-label">czas wyceny</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FEATURES — what LaTeX gives you
+       ════════════════════════════════════════════════ -->
+  <section class="features" id="co-skladamy" aria-labelledby="features-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.1"
+          title="Co składamy w&nbsp;Twoim podręczniku"
+          subtitle="Każdy element publikacji dydaktycznej — od wzorów matematycznych po indeks rzeczowy — składamy z pełną typograficzną precyzją. Oto kluczowe komponenty, które znajdziesz w każdym naszym podręczniku."
+        />
+      </div>
+    </div>
+    <div class="container-wide">
+      <div class="features__grid">
+        {features.map((f) => (
+          <div class="features__card reveal">
+            <span class="features__icon" aria-hidden="true">{f.icon}</span>
+            <h3 class="features__title">{f.title}</h3>
+            <p class="features__desc">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       COMPARISON — Word vs LaTeX
+       ════════════════════════════════════════════════ -->
+  <section class="comparison" aria-labelledby="comparison-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.2"
+          title="Word vs. LaTeX — dlaczego to&nbsp;ma&nbsp;znaczenie"
+          subtitle="Przy krótkim tekście różnica jest kosmetyczna. Przy 200-stronicowym podręczniku z setkami wzorów, tabel i ilustracji — różnica jest fundamentalna."
+        />
+      </div>
+
+      <div class="comparison__table reveal">
+        <div class="comparison__header">
+          <div class="comparison__col-label comparison__col-label--word">Word / WYSIWYG</div>
+          <div class="comparison__col-label comparison__col-label--latex">LaTeX</div>
+        </div>
+        {comparisonPoints.map((point) => (
+          <div class="comparison__row">
+            <div class="comparison__cell comparison__cell--word">
+              <span class="comparison__marker comparison__marker--word" aria-hidden="true">✕</span>
+              {point.word}
+            </div>
+            <div class="comparison__cell comparison__cell--latex">
+              <span class="comparison__marker comparison__marker--latex" aria-hidden="true">✓</span>
+              {point.latex}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       TYPES — types of textbooks
+       ════════════════════════════════════════════════ -->
+  <section class="types" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.3"
+          title="Typy publikacji dydaktycznych"
+          subtitle="Każdy typ podręcznika wymaga innego podejścia do struktury, layoutu i typografii. Mamy doświadczenie w składzie każdego z nich."
+        />
+      </div>
+
+      <div class="types__grid">
+        {textbookTypes.map((t, i) => (
+          <div class="types__card reveal">
+            <div class="types__card-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-examples">
+              <span class="types__card-examples-label">Przykłady:</span>
+              {t.examples}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       SAMPLE — preview of LaTeX textbook
+       ════════════════════════════════════════════════ -->
+  <section class="sample" aria-label="Przykładowa strona podręcznika">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.4"
+          title="Jak wygląda podręcznik złożony w&nbsp;LaTeX"
+          subtitle="Poniżej — symulacja typowej strony podręcznika akademickiego. Zwróć uwagę na jakość wzorów, konsystencję numeracji, elegancję środowisk twierdzenie/dowód i czytelność całości."
+          inverted
+        />
+      </div>
+    </div>
+
+    <div class="sample__preview reveal">
+      <div class="sample__page">
+        <div class="sample__page-header">
+          <span>Rozdział 3. Rachunek różniczkowy</span>
+          <span>47</span>
+        </div>
+
+        <div class="sample__page-content">
+          <h4 class="sample__heading">3.2&emsp;Pochodna funkcji</h4>
+
+          <div class="sample__env sample__env--def">
+            <div class="sample__env-label">Definicja 3.1.</div>
+            <p>
+              Niech <em>f</em>&nbsp;: (<em>a</em>,&nbsp;<em>b</em>)&nbsp;→&nbsp;ℝ i&nbsp;niech 
+              <em>x</em>₀&nbsp;∈&nbsp;(<em>a</em>,&nbsp;<em>b</em>). Jeśli istnieje granica
+            </p>
+            <div class="sample__formula">
+              <em>f</em>&thinsp;'(<em>x</em>₀) = lim<sub><em>h</em>→0</sub> 
+              &nbsp;<sup><em>f</em>(<em>x</em>₀ + <em>h</em>) − <em>f</em>(<em>x</em>₀)</sup>&frasl;<sub><em>h</em></sub>
+            </div>
+            <p>
+              to&nbsp;nazywamy ją <strong>pochodną funkcji <em>f</em> w&nbsp;punkcie <em>x</em>₀</strong>.
+            </p>
+          </div>
+
+          <div class="sample__env sample__env--thm">
+            <div class="sample__env-label">Twierdzenie 3.2</div>
+            <span class="sample__env-name">(Reguła Leibniza).</span>
+            <p>
+              Jeśli funkcje <em>f</em>&nbsp;i&nbsp;<em>g</em> są różniczkowalne w&nbsp;punkcie <em>x</em>₀, to
+            </p>
+            <div class="sample__formula">
+              (<em>f</em> · <em>g</em>)' = <em>f</em>&thinsp;' · <em>g</em> + <em>f</em> · <em>g</em>&thinsp;'
+            </div>
+          </div>
+
+          <div class="sample__env sample__env--proof">
+            <div class="sample__env-label">Dowód.</div>
+            <p>
+              Z definicji pochodnej mamy:
+            </p>
+            <div class="sample__formula sample__formula--small">
+              (<em>fg</em>)'(<em>x</em>₀) = lim<sub><em>h</em>→0</sub>
+              &nbsp;<sup><em>f</em>(<em>x</em>₀+<em>h</em>)<em>g</em>(<em>x</em>₀+<em>h</em>) − <em>f</em>(<em>x</em>₀)<em>g</em>(<em>x</em>₀)</sup>&frasl;<sub><em>h</em></sub>
+            </div>
+            <p>
+              Dodając i&nbsp;odejmując <em>f</em>(<em>x</em>₀)<em>g</em>(<em>x</em>₀+<em>h</em>) w&nbsp;liczniku 
+              i&nbsp;korzystając z&nbsp;własności granicy iloczynu, otrzymujemy tezę.
+              <span class="sample__qed">□</span>
+            </p>
+          </div>
+
+          <div class="sample__env sample__env--example">
+            <div class="sample__env-label">Przykład 3.3.</div>
+            <p>
+              Obliczyć pochodną funkcji <em>f</em>(<em>x</em>) = <em>x</em>² · sin(<em>x</em>).
+            </p>
+          </div>
+        </div>
+
+        <div class="sample__page-footer">
+          <span>sklad-tekstu.pl</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       PROCESS
+       ════════════════════════════════════════════════ -->
+  <section class="process" id="proces" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.5"
+          title="Jak wygląda proces składu podręcznika"
+          subtitle="Od przesłania materiałów do gotowego PDF-a — przejrzysty, przewidywalny proces z jasno określonymi etapami i terminami."
+        />
+      </div>
+
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       FAQ
+       ════════════════════════════════════════════════ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.1.6"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania, które dostajemy najczęściej od autorów podręczników i wydawców."
+        />
+      </div>
+
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       CTA
+       ════════════════════════════════════════════════ -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html="\\begin{wycena}" />
+
+        <h2 id="cta-title">Wyślij materiały — wycenimy skład Twojego podręcznika w&nbsp;24h</h2>
+
+        <p>
+          Niezależnie od dziedziny, objętości i&nbsp;złożoności materiału — przygotujemy szczegółową 
+          wycenę z&nbsp;rozbiciem na elementy i&nbsp;zaproponujemy optymalny harmonogram realizacji. 
+          Przyjmujemy pliki Word, PDF, Markdown, LaTeX i&nbsp;dowolne inne formaty. Wycena jest 
+          bezpłatna i&nbsp;niezobowiązująca.
+        </p>
+
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">
+          Wyślij materiały
+          <span class="cta__button-arrow">→</span>
+        </a>
+
+        <div class="cta__details">
+          <a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a>
+        </div>
+
+        <div class="cta__env" aria-hidden="true" set:html="\\end{wycena}" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════
+       SEO CONTENT
+       ════════════════════════════════════════════════ -->
+  <section class="seo-content" aria-label="Dodatkowe informacje o składzie podręczników">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład podręczników akademickich w&nbsp;LaTeX — profesjonalna typografia dla&nbsp;edukacji</h2>
+
+        <p>
+          Profesjonalny <strong>skład podręczników</strong> to fundament każdej wartościowej publikacji 
+          dydaktycznej. Podręcznik akademicki, skrypt wykładowy czy zeszyt ćwiczeń musi być nie tylko 
+          merytorycznie poprawny, ale też typograficznie perfekcyjny — bo od czytelności dokumentu 
+          zależy skuteczność nauki. System LaTeX, stworzony przez Donalda Knutha na Uniwersytecie 
+          Stanforda, jest złotym standardem <strong>składu materiałów dydaktycznych</strong> 
+          w&nbsp;uczelniach wyższych i&nbsp;wydawnictwach naukowych na całym świecie.
+        </p>
+
+        <h3>Dlaczego podręcznik akademicki powinien być złożony w&nbsp;LaTeX?</h3>
+
+        <p>
+          <strong>Skład podręcznika w&nbsp;LaTeX</strong> zapewnia jakość typograficzną nieosiągalną 
+          w&nbsp;edytorach WYSIWYG. Algorytm Knutha-Plassa analizuje cały akapit naraz (nie linijka 
+          po linijce jak Word), co daje idealnie równomierne odstępy między słowami. Wzory matematyczne 
+          — serce każdego podręcznika ścisłego — są renderowane z&nbsp;precyzją, o&nbsp;jakiej użytkownik 
+          Equation Editora może tylko marzyć. Automatyczna numeracja rozdziałów, wzorów, rysunków, tabel 
+          i&nbsp;cross-referencje eliminują ryzyko błędów przy aktualizacjach.
+        </p>
+
+        <h3>Dla kogo składamy podręczniki?</h3>
+
+        <p>
+          Nasze usługi <strong>składu skryptów akademickich</strong> i&nbsp;podręczników kierujemy 
+          do: wykładowców przygotowujących materiały do&nbsp;zajęć, autorów podręczników akademickich, 
+          wydawnictw uczelnianych i&nbsp;naukowych, instytutów badawczych publikujących monografie, 
+          firm szkoleniowych tworzących materiały do&nbsp;kursów, a&nbsp;także nauczycieli szkół 
+          średnich przygotowujących autorskie materiały dydaktyczne. Niezależnie od dziedziny — 
+          matematyka, fizyka, informatyka, chemia, ekonomia, medycyna — dostarczamy PDF w&nbsp;jakości 
+          gotowej do&nbsp;druku offsetowego lub publikacji cyfrowej.
+        </p>
+
+        <h3>Co wyróżnia nasz skład podręczników?</h3>
+
+        <p>
+          Łączymy biegłość w&nbsp;systemie LaTeX z&nbsp;doświadczeniem w&nbsp;tworzeniu publikacji 
+          edukacyjnych. Rozumiemy specyfikę <strong>materiałów dydaktycznych</strong>: wiemy, jak 
+          zaprojektować środowiska twierdzenie-dowód-przykład, jak rozmieścić wzory, żeby nie 
+          zaburzały rytmu lektury, jak sformatować indeks rzeczowy, który faktycznie pomaga 
+          w&nbsp;nauce. Na życzenie dostarczamy pliki źródłowe .tex, które autor może samodzielnie 
+          edytować w&nbsp;kolejnych wydaniach.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ══════════════════════════════════════════════════
+     HERO
+     ══════════════════════════════════════════════════ */
+  .hero {
+    padding: var(--space-24) 0 var(--space-16);
+    position: relative;
+    text-align: center;
+  }
+
+  .hero__breadcrumb {
+    position: absolute;
+    top: var(--space-6);
+    left: 0;
+    right: 0;
+  }
+
+  .hero__breadcrumb nav {
+    display: flex;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+  }
+
+  .hero__breadcrumb a {
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .hero__breadcrumb a:hover {
+    color: var(--accent);
+  }
+
+  .hero__chapter {
+    font-family: var(--font-display);
+    font-size: var(--fs-4xl);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    margin-bottom: var(--space-2);
+    opacity: 0;
+    animation: fadeInUp 0.7s ease 0.2s forwards;
+  }
+
+  .hero__rule-top {
+    width: 100%;
+    height: 2.5px;
+    background: var(--ink);
+    margin-bottom: var(--space-8);
+    transform: scaleX(0);
+    animation: expandRule 0.8s ease 0.3s forwards;
+  }
+
+  .hero__rule-bottom {
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+    transform: scaleX(0);
+    animation: expandRule 0.8s ease 0.5s forwards;
+  }
+
+  .hero__title {
+    font-family: var(--font-display);
+    font-weight: var(--fw-bold);
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    line-height: 1.15;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeInUp 0.9s ease 0.5s forwards;
+  }
+
+  .hero__highlight { color: var(--accent); }
+
+  .hero__subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+    font-weight: var(--fw-light);
+    font-style: italic;
+    color: var(--ink-light);
+    margin-top: var(--space-4);
+    opacity: 0;
+    animation: fadeInUp 0.9s ease 0.7s forwards;
+  }
+
+  .hero__tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+    opacity: 0;
+    animation: fadeInUp 0.8s ease 0.9s forwards;
+  }
+
+  .hero__tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.6rem;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: var(--radius-sm);
+  }
+
+  .hero__actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease 1.1s forwards;
+  }
+
+  .hero__cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+  }
+
+  .hero__cta-primary:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(139,26,26,0.2);
+  }
+
+  .hero__cta-secondary {
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: all var(--transition-fast);
+  }
+
+  .hero__cta-secondary:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* ══════════════════════════════════════════════════
+     INTRO
+     ══════════════════════════════════════════════════ */
+  .intro {
+    padding: var(--space-16) 0 var(--space-20);
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .intro__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .intro__grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  .intro__text h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-6);
+    line-height: var(--lh-tight);
+  }
+
+  .intro__text p {
+    font-size: 0.95rem;
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    margin-bottom: var(--space-4);
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .intro__stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    background: var(--paper-warm);
+    border-left: 2px solid var(--accent);
+  }
+
+  .intro__stat-value {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+
+  .intro__stat-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* ══════════════════════════════════════════════════
+     FEATURES
+     ══════════════════════════════════════════════════ */
+  .features {
+    padding: var(--space-20) 0;
+    background: var(--paper-warm);
+    border-top: 0.5px solid var(--rule-light);
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .features__card {
+    padding: var(--space-8) var(--space-6);
+    background: var(--paper);
+    border: 1px solid var(--rule-light);
+    transition: all 0.4s ease;
+  }
+
+  .features__card:hover {
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    border-color: var(--rule);
+  }
+
+  .features__icon {
+    display: block;
+    font-size: 1.8rem;
+    margin-bottom: var(--space-4);
+    color: var(--accent);
+  }
+
+  .features__title {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-2);
+    color: var(--ink);
+  }
+
+  .features__desc {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-muted);
+  }
+
+  /* ══════════════════════════════════════════════════
+     COMPARISON
+     ══════════════════════════════════════════════════ */
+  .comparison {
+    padding: var(--space-20) 0;
+  }
+
+  .comparison__table {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .comparison__header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--ink);
+  }
+
+  .comparison__col-label {
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .comparison__col-label--word {
+    color: var(--ink-faint);
+    background: #2a2a2a;
+  }
+
+  .comparison__col-label--latex {
+    color: var(--paper);
+    background: var(--accent);
+  }
+
+  .comparison__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .comparison__row:last-child {
+    border-bottom: none;
+  }
+
+  .comparison__cell {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .comparison__cell--word {
+    background: #faf7f7;
+    color: var(--ink-muted);
+  }
+
+  .comparison__cell--latex {
+    background: var(--white);
+    color: var(--ink-light);
+  }
+
+  .comparison__marker {
+    flex-shrink: 0;
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    margin-top: 1px;
+  }
+
+  .comparison__marker--word { color: #c0392b; }
+  .comparison__marker--latex { color: var(--success); }
+
+  @media (max-width: 768px) {
+    .comparison__header,
+    .comparison__row {
+      grid-template-columns: 1fr;
+    }
+
+    .comparison__col-label--word {
+      display: none;
+    }
+
+    .comparison__cell--word {
+      border-bottom: 0.5px solid var(--rule-light);
+    }
+  }
+
+  /* ══════════════════════════════════════════════════
+     TYPES
+     ══════════════════════════════════════════════════ */
+  .types {
+    padding: var(--space-20) 0;
+    background: var(--paper-warm);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .types__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .types__card {
+    padding: var(--space-8) var(--space-6);
+    background: var(--paper);
+    border: 1px solid var(--rule-light);
+    position: relative;
+    transition: all 0.4s ease;
+  }
+
+  .types__card:hover {
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+  }
+
+  .types__card-num {
+    font-family: var(--font-display);
+    font-size: var(--fs-4xl);
+    font-weight: var(--fw-light);
+    color: var(--rule);
+    line-height: 1;
+    margin-bottom: var(--space-3);
+  }
+
+  .types__card-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+  }
+
+  .types__card-desc {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .types__card-examples {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    line-height: 1.6;
+    padding-top: var(--space-3);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .types__card-examples-label {
+    color: var(--ink-muted);
+    font-weight: var(--fw-medium);
+  }
+
+  /* ══════════════════════════════════════════════════
+     SAMPLE PAGE
+     ══════════════════════════════════════════════════ */
+  .sample {
+    padding: var(--space-20) 0;
+    background: var(--ink);
+  }
+
+  .sample__preview {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  .sample__page {
+    background: var(--white);
+    padding: var(--space-10) var(--space-8);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    border-radius: var(--radius-sm);
+    position: relative;
+    font-size: 0.88rem;
+    line-height: var(--lh-relaxed);
+    color: var(--ink);
+  }
+
+  .sample__page-header {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-serif);
+    font-size: var(--fs-xs);
+    font-style: italic;
+    color: var(--ink-faint);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  .sample__page-footer {
+    display: flex;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--rule);
+    padding-top: var(--space-4);
+    margin-top: var(--space-6);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .sample__heading {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: var(--fw-bold);
+    margin-bottom: var(--space-6);
+  }
+
+  .sample__env {
+    margin-bottom: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-sm);
+  }
+
+  .sample__env p {
+    font-size: 0.85rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .sample__env p:last-child {
+    margin-bottom: 0;
+  }
+
+  .sample__env-label {
+    font-weight: var(--fw-bold);
+    font-size: 0.82rem;
+    margin-bottom: var(--space-2);
+    display: inline;
+  }
+
+  .sample__env-name {
+    font-style: italic;
+    font-size: 0.82rem;
+  }
+
+  .sample__env--def {
+    background: rgba(44, 82, 130, 0.06);
+    border-left: 3px solid var(--latex-blue);
+  }
+
+  .sample__env--def .sample__env-label { color: var(--latex-blue); }
+
+  .sample__env--thm {
+    background: rgba(139, 26, 26, 0.05);
+    border-left: 3px solid var(--accent);
+  }
+
+  .sample__env--thm .sample__env-label { color: var(--accent); }
+
+  .sample__env--proof {
+    background: transparent;
+    border-left: none;
+    padding-left: var(--space-5);
+    font-style: italic;
+  }
+
+  .sample__env--proof .sample__env-label {
+    font-style: normal;
+  }
+
+  .sample__env--example {
+    background: rgba(45, 106, 79, 0.05);
+    border-left: 3px solid var(--success);
+  }
+
+  .sample__env--example .sample__env-label { color: var(--success); }
+
+  .sample__formula {
+    text-align: center;
+    padding: var(--space-3) 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  .sample__formula--small {
+    font-size: 0.85rem;
+  }
+
+  .sample__qed {
+    float: right;
+    font-style: normal;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 480px) {
+    .sample__page {
+      padding: var(--space-6) var(--space-4);
+      font-size: 0.8rem;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════
+     PROCESS
+     ══════════════════════════════════════════════════ */
+  .process {
+    padding: var(--space-20) 0;
+  }
+
+  .process__timeline {
+    position: relative;
+  }
+
+  .process__step {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6) 0;
+    border-bottom: 0.5px solid var(--rule-light);
+  }
+
+  @media (max-width: 768px) {
+    .process__step {
+      grid-template-columns: 70px 1fr;
+      gap: var(--space-4);
+    }
+  }
+
+  .process__step-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+    padding-top: var(--space-1);
+  }
+
+  .process__step-num {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-light);
+    color: var(--rule);
+    line-height: 1;
+  }
+
+  .process__step-time {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .process__step-body h3 {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-2);
+    color: var(--ink);
+  }
+
+  .process__step-body p {
+    font-size: 0.92rem;
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    max-width: 600px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     FAQ
+     ══════════════════════════════════════════════════ */
+  .faq {
+    padding: var(--space-20) 0;
+    background: var(--paper-warm);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .faq__list {
+    max-width: 720px;
+  }
+
+  .faq__item {
+    border-bottom: 0.5px solid var(--rule);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: var(--fs-base);
+    font-weight: var(--fw-medium);
+    color: var(--ink);
+    list-style: none;
+    transition: color var(--transition-fast);
+  }
+
+  .faq__question::-webkit-details-marker { display: none; }
+
+  .faq__question:hover {
+    color: var(--accent);
+  }
+
+  .faq__q-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    flex-shrink: 0;
+    min-width: 24px;
+  }
+
+  .faq__chevron {
+    margin-left: auto;
+    flex-shrink: 0;
+    color: var(--ink-faint);
+    transition: transform var(--transition-base);
+  }
+
+  details[open] .faq__chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq__answer {
+    padding: 0 0 var(--space-6) calc(24px + var(--space-4));
+  }
+
+  .faq__answer p {
+    font-size: 0.92rem;
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+  }
+
+  /* ══════════════════════════════════════════════════
+     CTA
+     ══════════════════════════════════════════════════ */
+  .cta {
+    padding: var(--space-20) 0;
+    background: var(--paper);
+    border-top: 0.5px solid var(--rule);
+  }
+
+  .cta__block {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .cta__env {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-6);
+  }
+
+  .cta__env:last-child {
+    margin-bottom: 0;
+    margin-top: var(--space-6);
+  }
+
+  .cta__block h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-4);
+    line-height: var(--lh-tight);
+  }
+
+  .cta__block p {
+    font-size: 0.95rem;
+    color: var(--ink-light);
+    line-height: var(--lh-relaxed);
+    margin-bottom: var(--space-8);
+  }
+
+  .cta__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1rem 2.5rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+  }
+
+  .cta__button:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(139,26,26,0.2);
+  }
+
+  .cta__button-arrow {
+    transition: transform var(--transition-fast);
+  }
+
+  .cta__button:hover .cta__button-arrow {
+    transform: translateX(4px);
+  }
+
+  .cta__details {
+    margin-top: var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+  }
+
+  .cta__details a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* ══════════════════════════════════════════════════
+     SEO CONTENT
+     ══════════════════════════════════════════════════ */
+  .seo-content {
+    padding: var(--space-20) 0;
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .seo-content__article {
+    max-width: 680px;
+  }
+
+  .seo-content__article h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-6);
+    line-height: var(--lh-tight);
+  }
+
+  .seo-content__article h3 {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-semibold);
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-3);
+  }
+
+  .seo-content__article p {
+    font-size: 0.95rem;
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    margin-bottom: var(--space-4);
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .seo-content__article strong {
+    color: var(--ink);
+    font-weight: var(--fw-medium);
+  }
+</style>

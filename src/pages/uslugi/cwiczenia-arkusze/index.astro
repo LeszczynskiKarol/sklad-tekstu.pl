@@ -1,0 +1,702 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/cwiczenia-arkusze/#service",
+      "name": "Skład ćwiczeń i arkuszy egzaminacyjnych w LaTeX",
+      "description": "Profesjonalny skład zestawów zadań, arkuszy egzaminacyjnych, kart pracy i zeszytów ćwiczeń w systemie LaTeX. Automatyczna numeracja, warianty zadań, klucze odpowiedzi.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Skład ćwiczeń i arkuszy LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy materiałów ćwiczeniowych",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład zestawów zadań" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład arkuszy egzaminacyjnych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład kart pracy" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład zeszytów ćwiczeń" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład testów z wariantami" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Ćwiczenia i arkusze", "item": "https://sklad-tekstu.pl/uslugi/cwiczenia-arkusze/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy można automatycznie generować warianty arkuszy egzaminacyjnych?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. LaTeX pozwala na tworzenie wielu wariantów tego samego egzaminu z automatyczną zmianą kolejności zadań, danych liczbowych lub odpowiedzi. Każdy wariant ma spójną numerację i własny klucz odpowiedzi." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład zestawu ćwiczeń?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od liczby zadań, złożoności wzorów i wymaganych elementów (rysunki, tabele, klucze). Wycena jest bezpłatna — wyślij materiały, a w ciągu 24h otrzymasz szczegółową kalkulację." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę samodzielnie dodawać nowe zadania w kolejnych semestrach?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Dostarczamy pliki źródłowe .tex z modularną strukturą — każde zadanie to osobny blok, który łatwo skopiować, zmodyfikować lub przenieść. Numeracja i klucz odpowiedzi aktualizują się automatycznie." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy zrobicie miejsce na rozwiązania studentów (linie, kratki)?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Projektujemy karty pracy z precyzyjnie odmierzonymi polami na rozwiązania: linie do pisania, kratka do obliczeń, puste pola na rysunki, siatka współrzędnych do wykresów — wszystko w dokładnie określonych wymiarach." }
+        }
+      ]
+    }
+  ]
+};
+
+// Types
+const materialTypes = [
+  {
+    title: 'Zestawy zadań',
+    desc: 'Zadania pogrupowane tematycznie z podziałem na poziomy trudności. Automatyczna numeracja, cross-referencje między zadaniami, wskazówki (hints) i pełne rozwiązania w osobnej sekcji lub na końcu dokumentu.',
+    tags: ['enumerate', 'tasks', 'hints', 'solutions'],
+    useCase: 'Ćwiczenia audytoryjne, praca domowa, materiały do samodzielnej nauki'
+  },
+  {
+    title: 'Arkusze egzaminacyjne',
+    desc: 'Profesjonalne arkusze z nagłówkiem (uczelnia, przedmiot, data, czas, punktacja), instrukcjami, zadaniami zamkniętymi i otwartymi, tabelą punktacji i miejscem na odpowiedzi. Warianty A/B/C z automatyczną zmianą kolejności.',
+    tags: ['exam', 'warianty', 'punktacja', 'timer'],
+    useCase: 'Egzaminy sesyjne, kolokwia, sprawdziany, egzaminy poprawkowe'
+  },
+  {
+    title: 'Karty pracy',
+    desc: 'Materiały do pracy na zajęciach z polami na rozwiązania: linie do pisania, kratki do obliczeń, puste układy współrzędnych do rysowania wykresów, tabele do uzupełnienia. Precyzyjne wymiary dostosowane do formatu A4.',
+    tags: ['worksheet', 'pola', 'kratka', 'wykresy'],
+    useCase: 'Zajęcia laboratoryjne, warsztaty, ćwiczenia w klasie'
+  },
+  {
+    title: 'Zeszyty ćwiczeń',
+    desc: 'Kompletne publikacje na cały semestr lub rok akademicki. Podział na rozdziały odpowiadające tematom wykładów, wprowadzenia teoretyczne, przykłady z rozwiązaniami, zadania do samodzielnego rozwiązania, klucz odpowiedzi.',
+    tags: ['book', 'memoir', 'semestralny', 'TOC'],
+    useCase: 'Materiał towarzyszący wykładowi, kurs całosemestralny'
+  },
+  {
+    title: 'Testy wielokrotnego wyboru',
+    desc: 'Testy z pytaniami zamkniętymi: jednokrotny i wielokrotny wybór, prawda/fałsz, uzupełnianie luk, dopasowywanie. Automatyczna randomizacja kolejności pytań i odpowiedzi między wariantami. Klucz odpowiedzi z podziałem na warianty.',
+    tags: ['mcq', 'randomizacja', 'klucz', 'warianty'],
+    useCase: 'Testy wejściowe, egzaminy testowe, quizy, zaliczenia'
+  },
+  {
+    title: 'Tablice wzorów i karty pomocy',
+    desc: 'Kompaktowe zestawienia wzorów, twierdzeń, definicji i zależności na jednej lub dwóch stronach A4. Idealne jako dozwolona pomoc na egzaminie lub ściągawka do nauki. Maksymalna gęstość informacji przy zachowaniu czytelności.',
+    tags: ['cheatsheet', 'kompaktowy', 'dwukolumnowy'],
+    useCase: 'Pomoc egzaminacyjna, powtórka przed sesją, karta referencyjna'
+  }
+];
+
+// LaTeX advantages for exercises specifically
+const advantages = [
+  {
+    label: 'Warianty',
+    title: 'Automatyczne generowanie wariantów',
+    desc: 'Jeden plik źródłowy — wiele wariantów egzaminu. LaTeX pozwala na automatyczną zmianę kolejności zadań, permutację odpowiedzi w pytaniach zamkniętych, podmianę danych liczbowych i generowanie osobnych kluczy odpowiedzi dla każdego wariantu. Koniec z ręcznym kopiowaniem i przeklejaniem.'
+  },
+  {
+    label: 'Numeracja',
+    title: 'Inteligentna numeracja zadań',
+    desc: 'Dodajesz zadanie w środku zestawu? Usuwasz dwa z końca? Zmieniasz kolejność rozdziałów? Cała numeracja — zadań, podpunktów, stron, referencji — przenumerowuje się automatycznie. Klucz odpowiedzi aktualizuje się razem z zadaniami. Zero ręcznej pracy, zero błędów.'
+  },
+  {
+    label: 'Wzory',
+    title: 'Wzory matematyczne bez kompromisów',
+    desc: 'Arkusze z fizyki, matematyki, chemii czy statystyki wymagają setek wzorów — i każdy musi być perfekcyjny. LaTeX renderuje wzory dowolnej złożoności: od prostych równań po macierze, całki wielokrotne, układy równań i diagramy Feynmana. Idealna typografia w każdym zadaniu.'
+  },
+  {
+    label: 'Modularność',
+    title: 'Baza zadań do wielokrotnego użytku',
+    desc: 'Każde zadanie to niezależny blok kodu, który możesz przenosić między zestawami. Budujesz bibliotekę zadań, z której składasz nowe arkusze jak z klocków — wystarczy \\input{zadanie-37.tex}. Idealne rozwiązanie na kolejne semestry i roczniki.'
+  },
+  {
+    label: 'Layout',
+    title: 'Precyzyjne pola na rozwiązania',
+    desc: 'Linie do pisania, kratka do obliczeń, puste wykresy, tabele do uzupełnienia — każdy element ma dokładnie określone wymiary i jest perfekcyjnie wyrównany. Na kartach pracy i arkuszach egzaminacyjnych precyzja layoutu jest krytyczna — LaTeX ją gwarantuje.'
+  },
+  {
+    label: 'Spójność',
+    title: 'Jednolity styl w całym zestawie',
+    desc: 'Definiujesz styl raz — nagłówek, czcionki, marginesy, formatowanie zadań, styl wskazówek, oznaczenie poziomu trudności — i stosujesz go konsekwentnie w każdym zestawie. Studenci dostają materiały, które zawsze wyglądają tak samo, co ułatwia nawigację i naukę.'
+  }
+];
+
+// Sample exam structure
+const examParts = [
+  { label: 'Nagłówek', desc: 'Uczelnia, wydział, przedmiot, data, czas, wariant, punktacja' },
+  { label: 'Instrukcja', desc: 'Zasady egzaminu, dozwolone pomoce, sposób oceniania' },
+  { label: 'Część A', desc: 'Zadania zamknięte — test wielokrotnego wyboru z kartą odpowiedzi' },
+  { label: 'Część B', desc: 'Zadania otwarte z miejscem na rozwiązania i obliczenia' },
+  { label: 'Część C', desc: 'Zadania problemowe / dowodowe z polem na wyprowadzenie' },
+  { label: 'Tabela punktacji', desc: 'Zestawienie maksymalnych punktów za każde zadanie' },
+  { label: 'Klucz odpowiedzi', desc: 'Osobna strona z odpowiedziami (drukowana oddzielnie)' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały źródłowe', desc: 'Wyślij treść zadań w dowolnym formacie — Word, PDF, plik tekstowy, zdjęcia notatek, a nawet opis słowny (np. „10 zadań z rachunku macierzy, poziom: analiza II, z kluczem"). Im więcej kontekstu, tym lepiej.', time: '5 min' },
+  { num: '02', title: 'Wycena i ustalenia', desc: 'Wyceniamy projekt w ciągu 24 godzin. Ustalamy szczegóły: format strony, styl nagłówka, numeracja zadań, czy potrzebne warianty, klucz odpowiedzi, pola na rozwiązania. Wycena jest bezpłatna.', time: '24 godz.' },
+  { num: '03', title: 'Makieta', desc: 'Składamy próbną stronę z kilkoma zadaniami do akceptacji. Sprawdzasz nagłówek, styl zadań, rozmieszczenie wzorów, wielkość pól na odpowiedzi. Po akceptacji — skład reszty.', time: '1–2 dni' },
+  { num: '04', title: 'Skład i warianty', desc: 'Składamy kompletny zestaw. Jeśli potrzebujesz wariantów — generujemy je automatycznie z osobnymi kluczami. Każdy wariant przechodzi weryfikację spójności numeracji.', time: '2–7 dni' },
+  { num: '05', title: 'Korekta i finalizacja', desc: 'Sprawdzasz gotowy PDF, zgłaszasz uwagi, my je wdrażamy. Na końcu dostajesz: PDF do druku, PDF z kluczem, opcjonalnie pliki .tex do samodzielnej edycji w przyszłości.', time: '1–2 dni' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czy mogę dostać kilka wariantów tego samego egzaminu?', a: 'Tak. Generujemy dowolną liczbę wariantów z automatyczną zmianą kolejności zadań, permutacją odpowiedzi w pytaniach zamkniętych i/lub podmianą danych liczbowych. Każdy wariant ma osobny klucz odpowiedzi i jest oznaczony (Wariant A, B, C...). Warianty powstają z jednego pliku źródłowego, co eliminuje ryzyko niespójności.' },
+  { q: 'Ile kosztuje skład arkusza egzaminacyjnego?', a: 'Koszt zależy od liczby zadań i ich złożoności (liczba wzorów, rysunków, tabel). Prosty test z 20 pytaniami zamkniętymi — od 200 zł. Arkusz z 10 zadaniami otwartymi z matematyką i fizyką — od 400 zł. Dokładna wycena po zobaczeniu materiałów. Wycena jest bezpłatna.' },
+  { q: 'Czy mogę samodzielnie modyfikować zadania na kolejne semestry?', a: 'Tak. Dostarczamy pliki .tex z modularną strukturą — każde zadanie to niezależny blok, łatwy do edycji, kopiowania i przenoszenia. Dodajemy komentarze w kodzie i instrukcję, jak dodać nowe zadanie, zmienić dane lub wygenerować nowy wariant. Podstawowa znajomość LaTeX wystarczy.' },
+  { q: 'Czy zrobicie pola na rozwiązania (linie, kratka)?', a: 'Tak. Projektujemy: linie do pisania (z regulowanym odstępem), siatkę do obliczeń (kratka 5mm lub 7mm), puste układy współrzędnych do wykresów (z osiami, podziałką i etykietami), tabele z pustymi komórkami do uzupełnienia, pola na rysunki o określonych wymiarach. Wszystko precyzyjnie odmierzone.' },
+  { q: 'Jak szybko złożycie arkusz na kolokwium za tydzień?', a: 'Krótki arkusz (1–2 strony, kilkanaście zadań) składamy w 1–2 dni robocze. Przy pilnych terminach oferujemy tryb ekspresowy — nawet w ciągu 24 godzin. Skontaktuj się z wyprzedzeniem, żebyśmy mogli zarezerwować termin.' },
+  { q: 'Czy składacie materiały do szkół średnich (matura, sprawdziany)?', a: 'Tak. Składamy arkusze maturalne, sprawdziany, karty pracy i testy dla szkół średnich. Znamy format arkuszy CKE i możemy przygotować materiały w analogicznym stylu — z tabelą punktacji, kartą odpowiedzi i instrukcją dla ucznia.' },
+  { q: 'Czy zrobicie zadania z rysunkami technicznymi i wykresami?', a: 'Tak. Rysunki wektorowe TikZ (układy współrzędnych, wykresy funkcji, schematy obwodów, figury geometryczne, diagramy) oraz wykresy PGFPlots (histogramy, wykresy punktowe, box ploty). Rysunki są wektorowe — wyglądają idealnie w każdej skali i rozdzielczości.' },
+  { q: 'W jakim formacie dostarczycie gotowe materiały?', a: 'PDF gotowy do druku (A4 lub inny format, z marginesami na bindowanie). Na życzenie: osobny PDF z kluczem odpowiedzi, osobny PDF z rozwiązaniami, pliki źródłowe .tex do samodzielnej edycji. Przy materiałach do dystrybucji online — PDF z hiperłączami i zakładkami.' }
+];
+---
+
+<BaseLayout
+  title="Skład ćwiczeń i arkuszy egzaminacyjnych w LaTeX"
+  description="Profesjonalny skład zestawów zadań, arkuszy egzaminacyjnych, kart pracy i zeszytów ćwiczeń w LaTeX. Automatyczna numeracja, warianty zadań, klucze odpowiedzi, pola na rozwiązania. Matematyka, fizyka, chemia, informatyka."
+  keywords="skład ćwiczeń latex, arkusze egzaminacyjne latex, zestawy zadań latex, karty pracy latex, zeszyt ćwiczeń latex, skład zadań matematyka, arkusz egzaminacyjny skład, warianty egzaminu latex, klucz odpowiedzi latex"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>Ćwiczenia i&nbsp;arkusze</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.3</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">ćwiczeń i&nbsp;arkuszy</span><br>egzaminacyjnych
+      </h1>
+      <p class="hero__subtitle">
+        Zestawy zadań, arkusze egzaminacyjne, karty pracy, testy —<br>
+        z&nbsp;automatyczną numeracją, wariantami i&nbsp;kluczami odpowiedzi
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">exam</span>
+        <span class="hero__tag">tasks</span>
+        <span class="hero__tag">enumerate</span>
+        <span class="hero__tag">tikz</span>
+        <span class="hero__tag">warianty</span>
+        <span class="hero__tag">klucz</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij zadania do wyceny <span>→</span></a>
+        <a href="#typy" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Arkusz egzaminacyjny to nie miejsce na kompromisy typograficzne</h2>
+          <p>
+            Student ma 90 minut na egzaminie. Każda sekunda spędzona na odcyfrowywaniu rozjechanego
+            wzoru, szukaniu numeru zadania albo zastanawianiu się, czy to „x" czy „×" — to&nbsp;sekunda
+            stracona na myśleniu. Profesjonalny skład arkusza to nie fanaberia — to szacunek dla
+            czasu i&nbsp;wysiłku zdających.
+          </p>
+          <p>
+            LaTeX zapewnia, że każde zadanie wygląda identycznie — konsystentna numeracja, czytelne
+            wzory, precyzyjne pola na odpowiedzi. Warianty A/B/C generują się automatycznie z&nbsp;jednego
+            pliku, więc masz pewność, że każdy ma te same zadania, tylko w&nbsp;innej kolejności. Klucz
+            odpowiedzi aktualizuje się sam — zero błędów, zero ręcznej roboty.
+          </p>
+          <p>
+            Składamy materiały dla wykładowców akademickich, nauczycieli szkół średnich, autorów
+            podręczników i&nbsp;firm szkoleniowych. Od prostego kolokwium z&nbsp;10 zadaniami po
+            semestralny zeszyt ćwiczeń z&nbsp;setkami zadań, rysunkami TikZ i&nbsp;pełnymi rozwiązaniami.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">∞</span>
+            <span class="intro__sidebar-label">wariantów z jednego pliku</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">0</span>
+            <span class="intro__sidebar-label">błędów w numeracji</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">24h</span>
+            <span class="intro__sidebar-label">czas wyceny</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section class="types" id="typy" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.1"
+          title="Rodzaje materiałów ćwiczeniowych"
+          subtitle="Każdy typ materiału dydaktycznego wymaga innego podejścia do layoutu, numeracji i struktury. Mamy doświadczenie w składzie każdego z nich."
+        />
+      </div>
+      <div class="types__grid">
+        {materialTypes.map((t) => (
+          <div class="types__card reveal">
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-use">
+              <span class="types__card-use-label">Zastosowanie:</span> {t.useCase}
+            </div>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE EXAM -->
+  <section class="sample" aria-label="Przykładowa struktura arkusza egzaminacyjnego">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.2"
+          title="Anatomia arkusza egzaminacyjnego"
+          subtitle="Profesjonalny arkusz to przemyślana struktura, w której każdy element ma swoje miejsce. Oto jak wygląda typowy arkusz złożony w LaTeX."
+          inverted
+        />
+      </div>
+    </div>
+
+    <div class="sample__layout reveal">
+      <div class="sample__page">
+        <!-- Exam header -->
+        <div class="sample__exam-header">
+          <div class="sample__exam-row">
+            <span>Politechnika Warszawska</span>
+            <span>Wariant A</span>
+          </div>
+          <div class="sample__exam-row">
+            <span>Wydział Elektroniki i Technik Informacyjnych</span>
+            <span>Czas: 90 min</span>
+          </div>
+          <h4 class="sample__exam-title">Egzamin z Analizy Matematycznej II</h4>
+          <div class="sample__exam-row sub">
+            <span>Semestr letni 2024/2025</span>
+            <span>Maks. punktów: 60</span>
+          </div>
+        </div>
+
+        <div class="sample__exam-instructions">
+          Pisać długopisem. Kalkulator dozwolony. Przy zadaniach otwartych wymagane
+          jest przedstawienie pełnego rozwiązania.
+        </div>
+
+        <!-- Part A -->
+        <div class="sample__exam-section">
+          <h5>Część A — zadania zamknięte <span class="sample__points">(20 pkt)</span></h5>
+
+          <div class="sample__exam-task">
+            <span class="sample__task-num">1.</span>
+            <div class="sample__task-content">
+              <p>Szereg <span class="sample__math">Σ 1/n²</span> jest:</p>
+              <div class="sample__answers">
+                <span>☐ A) rozbieżny</span>
+                <span>☐ B) zbieżny warunkowo</span>
+                <span>☐ C) zbieżny bezwzględnie</span>
+                <span>☐ D) oscylujący</span>
+              </div>
+            </div>
+            <span class="sample__task-pts">[2 pkt]</span>
+          </div>
+
+          <div class="sample__exam-task">
+            <span class="sample__task-num">2.</span>
+            <div class="sample__task-content">
+              <p>Gradient funkcji <span class="sample__math">f(x,y) = x²y + sin(xy)</span> w punkcie (1, 0) wynosi:</p>
+              <div class="sample__answers">
+                <span>☐ A) (0, 1)</span>
+                <span>☐ B) (0, 2)</span>
+                <span>☐ C) (1, 1)</span>
+                <span>☐ D) (1, 2)</span>
+              </div>
+            </div>
+            <span class="sample__task-pts">[2 pkt]</span>
+          </div>
+        </div>
+
+        <!-- Part B -->
+        <div class="sample__exam-section">
+          <h5>Część B — zadania otwarte <span class="sample__points">(40 pkt)</span></h5>
+
+          <div class="sample__exam-task">
+            <span class="sample__task-num">5.</span>
+            <div class="sample__task-content">
+              <p>Zbadać zbieżność szeregu <span class="sample__math">Σ (−1)ⁿ · n/(n² + 1)</span> . Uzasadnić odpowiedź.</p>
+              <div class="sample__answer-space">
+                <div class="sample__answer-line"></div>
+                <div class="sample__answer-line"></div>
+                <div class="sample__answer-line"></div>
+                <div class="sample__answer-line"></div>
+                <div class="sample__answer-line"></div>
+              </div>
+            </div>
+            <span class="sample__task-pts">[8 pkt]</span>
+          </div>
+        </div>
+
+        <div class="sample__page-footer">
+          <span>Strona 1 / 4</span>
+        </div>
+      </div>
+
+      <!-- Anatomy labels -->
+      <div class="sample__anatomy">
+        {examParts.map((part) => (
+          <div class="sample__anatomy-item">
+            <span class="sample__anatomy-label">{part.label}</span>
+            <span class="sample__anatomy-desc">{part.desc}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY LATEX FOR EXERCISES -->
+  <section class="advantages" aria-labelledby="advantages-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.3"
+          title="Dlaczego LaTeX do ćwiczeń i&nbsp;egzaminów"
+          subtitle="Przy jednorazowym kolokwium z 5 zadaniami — Word wystarczy. Przy regularnym tworzeniu materiałów dydaktycznych z setkami zadań, wariantami i wieloma semestrami — LaTeX jest niezastąpiony."
+        />
+      </div>
+      <div class="advantages__grid">
+        {advantages.map((a) => (
+          <div class="advantages__item reveal">
+            <div class="advantages__label">{a.label}</div>
+            <div class="advantages__content">
+              <h3>{a.title}</h3>
+              <p>{a.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBJECTS -->
+  <section class="subjects" aria-labelledby="subjects-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.4"
+          title="Dziedziny i&nbsp;przedmioty"
+          subtitle="Składamy ćwiczenia i arkusze z dowolnego przedmiotu ścisłego, technicznego i przyrodniczego. Oto dziedziny, w których mamy największe doświadczenie."
+        />
+      </div>
+      <div class="subjects__grid reveal">
+        <div class="subjects__col">
+          <h4>Matematyka</h4>
+          <p>Analiza matematyczna, algebra liniowa, rachunek prawdopodobieństwa, statystyka, matematyka dyskretna, równania różniczkowe, topologia, geometria</p>
+        </div>
+        <div class="subjects__col">
+          <h4>Fizyka</h4>
+          <p>Mechanika klasyczna, elektrodynamika, termodynamika, optyka, fizyka kwantowa, fizyka ciała stałego, fizyka jądrowa, astronomia</p>
+        </div>
+        <div class="subjects__col">
+          <h4>Informatyka</h4>
+          <p>Algorytmy i struktury danych, bazy danych, systemy operacyjne, sieci komputerowe, sztuczna inteligencja, kryptografia, teoria obliczeń</p>
+        </div>
+        <div class="subjects__col">
+          <h4>Chemia</h4>
+          <p>Chemia ogólna, chemia organiczna, chemia fizyczna, chemia analityczna, biochemia, krystalografia, elektrochemia</p>
+        </div>
+        <div class="subjects__col">
+          <h4>Inżynieria</h4>
+          <p>Elektronika, automatyka, mechanika budowli, wytrzymałość materiałów, termodynamika techniczna, metrologia, CAD/CAM</p>
+        </div>
+        <div class="subjects__col">
+          <h4>Ekonomia</h4>
+          <p>Mikroekonomia, makroekonomia, ekonometria, finanse, rachunkowość, badania operacyjne, statystyka ekonomiczna</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.5"
+          title="Jak wygląda realizacja"
+          subtitle="Od przesłania zadań do gotowego PDF — szybki, przejrzysty proces."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.3.6"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania, które dostajemy od wykładowców, nauczycieli i autorów materiałów dydaktycznych."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html="\\begin{egzamin}" />
+        <h2 id="cta-title">Wyślij zadania — wycenimy skład w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to arkusz na kolokwium, zeszyt ćwiczeń na cały semestr czy seria testów
+          z&nbsp;wariantami — przygotujemy wycenę z&nbsp;konkretnym terminem. Wystarczy przesłać
+          treść zadań i&nbsp;opisać wymagania. Wycena jest bezpłatna.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">
+          Wyślij zadania <span class="cta__button-arrow">→</span>
+        </a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true" set:html="\\end{egzamin}" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o składzie ćwiczeń i arkuszy LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład ćwiczeń i&nbsp;arkuszy egzaminacyjnych w&nbsp;LaTeX</h2>
+        <p>
+          Profesjonalny <strong>skład ćwiczeń w&nbsp;LaTeX</strong> to gwarancja czytelności, spójności
+          i&nbsp;bezbłędnej numeracji w&nbsp;materiałach dydaktycznych. System LaTeX umożliwia
+          automatyczne generowanie wariantów egzaminów, tworzenie kluczy odpowiedzi i&nbsp;budowanie
+          modularnych baz zadań, które służą przez wiele semestrów.
+        </p>
+        <h3>Arkusze egzaminacyjne w&nbsp;LaTeX</h3>
+        <p>
+          <strong>Skład arkuszy egzaminacyjnych</strong> wymaga precyzji, której nie zapewni edytor
+          WYSIWYG. LaTeX gwarantuje: konsystentną numerację zadań i&nbsp;podpunktów, perfekcyjne
+          wzory matematyczne, automatyczne warianty z&nbsp;osobnymi kluczami odpowiedzi, precyzyjne
+          pola na rozwiązania i&nbsp;tabele punktacji. Składamy arkusze dla uczelni wyższych,
+          szkół średnich i&nbsp;firm szkoleniowych.
+        </p>
+        <h3>Zestawy zadań i&nbsp;zeszyty ćwiczeń</h3>
+        <p>
+          <strong>Skład zestawów zadań</strong> i&nbsp;zeszytów ćwiczeń to nasza specjalność.
+          Tworzymy materiały z&nbsp;podziałem na tematy, poziomy trudności i&nbsp;typy zadań.
+          Wskazówki, rozwiązania, klucze odpowiedzi — każdy element ma swoje miejsce i&nbsp;spójny
+          styl. Modularna struktura plików .tex pozwala na łatwe aktualizacje w&nbsp;kolejnych
+          semestrach — wystarczy dodać nowe zadania i&nbsp;przekompilować dokument.
+        </p>
+        <h3>Karty pracy z&nbsp;polami na rozwiązania</h3>
+        <p>
+          <strong>Karty pracy w&nbsp;LaTeX</strong> to materiały z&nbsp;precyzyjnie odmierzonymi
+          polami na odpowiedzi: linie do pisania, kratka do obliczeń, puste układy współrzędnych,
+          tabele do uzupełnienia. Idealne do&nbsp;pracy na zajęciach, ćwiczeń laboratoryjnych
+          i&nbsp;warsztatów. Każdy element ma dokładne wymiary, co zapewnia profesjonalny wygląd
+          po wydrukowaniu.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 1fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-4); }
+  .intro__sidebar-block { padding: var(--space-5) var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); text-align: center; }
+  .intro__sidebar-value { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-bold); color: var(--accent); display: block; line-height: 1; margin-bottom: var(--space-1); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-2); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-3); }
+  .types__card-use { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-faint); line-height: 1.6; padding-top: var(--space-3); border-top: 0.5px solid var(--rule-light); margin-bottom: var(--space-3); }
+  .types__card-use-label { color: var(--ink-muted); font-weight: var(--fw-medium); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ SAMPLE EXAM ═════ */
+  .sample { padding: var(--space-20) 0; background: var(--ink); }
+  .sample__layout { display: grid; grid-template-columns: 1fr; gap: var(--space-8); max-width: 900px; margin: 0 auto; padding: 0 var(--gutter); }
+  @media (min-width: 768px) { .sample__layout { grid-template-columns: 2fr 1fr; } }
+
+  .sample__page { background: var(--white); padding: var(--space-6) var(--space-5); box-shadow: 0 12px 40px rgba(0,0,0,0.3); border-radius: var(--radius-sm); font-size: 0.78rem; line-height: 1.5; color: var(--ink); }
+  .sample__exam-header { border-bottom: 2px solid var(--ink); padding-bottom: var(--space-3); margin-bottom: var(--space-3); }
+  .sample__exam-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--ink-muted); }
+  .sample__exam-row.sub { font-size: 0.65rem; color: var(--ink-faint); margin-top: var(--space-1); }
+  .sample__exam-title { font-family: var(--font-display); font-size: 1rem; font-weight: var(--fw-bold); text-align: center; margin: var(--space-2) 0; }
+  .sample__exam-instructions { font-size: 0.68rem; font-style: italic; color: var(--ink-muted); padding: var(--space-2) var(--space-3); background: var(--paper); margin-bottom: var(--space-4); border-left: 2px solid var(--rule); }
+  .sample__exam-section { margin-bottom: var(--space-4); }
+  .sample__exam-section h5 { font-family: var(--font-display); font-size: 0.82rem; font-weight: var(--fw-bold); margin-bottom: var(--space-3); padding-bottom: var(--space-1); border-bottom: 0.5px solid var(--rule-light); }
+  .sample__points { font-weight: var(--fw-regular); color: var(--ink-muted); }
+  .sample__exam-task { display: grid; grid-template-columns: 24px 1fr 50px; gap: var(--space-2); margin-bottom: var(--space-4); align-items: start; }
+  .sample__task-num { font-weight: var(--fw-bold); font-size: 0.78rem; color: var(--ink); }
+  .sample__task-content p { font-size: 0.75rem; margin-bottom: var(--space-2); }
+  .sample__math { font-family: var(--font-serif); font-style: italic; }
+  .sample__answers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; font-size: 0.7rem; color: var(--ink-light); }
+  .sample__task-pts { font-family: var(--font-mono); font-size: 0.6rem; color: var(--ink-faint); text-align: right; }
+  .sample__answer-space { display: flex; flex-direction: column; gap: 12px; margin-top: var(--space-3); }
+  .sample__answer-line { height: 0; border-bottom: 0.5px solid var(--rule-light); width: 100%; }
+  .sample__page-footer { text-align: center; font-family: var(--font-serif); font-size: 0.65rem; color: var(--ink-faint); padding-top: var(--space-3); margin-top: var(--space-4); border-top: 0.5px solid var(--rule-light); }
+
+  .sample__anatomy { display: flex; flex-direction: column; gap: var(--space-3); padding-top: var(--space-2); }
+  .sample__anatomy-item { padding: var(--space-3) var(--space-4); border-left: 2px solid var(--accent-light); }
+  .sample__anatomy-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent-light); letter-spacing: 0.06em; text-transform: uppercase; display: block; margin-bottom: 0.2rem; }
+  .sample__anatomy-desc { font-size: 0.75rem; color: rgba(250,248,244,0.6); line-height: 1.5; }
+
+  /* ═════ ADVANTAGES ═════ */
+  .advantages { padding: var(--space-20) 0; }
+  .advantages__grid { display: grid; grid-template-columns: 180px 1fr; gap: 0; }
+  @media (max-width: 768px) { .advantages__grid { grid-template-columns: 1fr; } }
+  .advantages__item { display: contents; }
+  .advantages__label { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--margin-note); text-align: right; padding-top: var(--space-1); padding-right: var(--space-8); letter-spacing: 0.04em; }
+  @media (max-width: 768px) { .advantages__label { text-align: left; padding-right: 0; margin-bottom: var(--space-1); } }
+  .advantages__content { padding-bottom: var(--space-8); margin-bottom: var(--space-4); border-bottom: 0.5px solid var(--rule-light); }
+  .advantages__content h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .advantages__content p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); text-align: justify; hyphens: auto; }
+
+  /* ═════ SUBJECTS ═════ */
+  .subjects { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .subjects__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); }
+  .subjects__col { padding: var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); }
+  .subjects__col h4 { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); color: var(--ink); }
+  .subjects__col p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

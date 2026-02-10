@@ -1,0 +1,172 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = [
+  { label: 'Usługi', href: '/#uslugi' },
+  { label: 'Proces', href: '/#proces' },
+  { label: 'Realizacje', href: '/#realizacje' },
+  { label: 'Dlaczego LaTeX', href: '/#dlaczego-latex' },
+  { label: 'Kontakt', href: '/#kontakt' },
+];
+
+const serviceLinks = [
+  { chapter: '§1.1', label: 'Podręczniki i skrypty', href: '/uslugi/podreczniki-skrypty/' },
+  { chapter: '§1.2', label: 'Prace naukowe', href: '/uslugi/prace-naukowe/' },
+  { chapter: '§1.3', label: 'Ćwiczenia i arkusze', href: '/uslugi/cwiczenia-arkusze/' },
+  { chapter: '§1.4', label: 'Raporty i dokumentacja', href: '/uslugi/raporty-dokumentacja/' },
+  { chapter: '§1.5', label: 'Katalogi i broszury', href: '/uslugi/katalogi-broszury/' },
+  { chapter: '§1.6', label: 'Instrukcje i procedury', href: '/uslugi/instrukcje-procedury/' },
+  { chapter: '§1.7', label: 'Prezentacje i postery', href: '/uslugi/prezentacje-postery/' },
+  { chapter: '§1.8', label: 'Ebooki', href: '/uslugi/ebooki/' },
+];
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="container-wide">
+    <div class="footer__top">
+      <div class="footer__colophon">
+        <div class="footer__logo">
+          <span class="footer__logo-text">sklad-tekstu</span><span class="footer__logo-dot">.pl</span>
+        </div>
+        <p class="footer__desc">
+          Profesjonalny skład tekstu i&nbsp;dokumentów<br>
+          w&nbsp;systemie LaTeX
+        </p>
+        <div class="footer__contact">
+          <a href="mailto:kontakt@sklad-tekstu.pl" class="footer__email">kontakt@sklad-tekstu.pl</a>
+        </div>
+      </div>
+
+      <nav class="footer__nav" aria-label="Nawigacja">
+        <span class="footer__nav-title">Nawigacja</span>
+        {footerLinks.map((link) => (
+          <a href={link.href} class="footer__nav-link">{link.label}</a>
+        ))}
+      </nav>
+
+      <nav class="footer__services" aria-label="Usługi">
+        <span class="footer__nav-title">Usługi</span>
+        {serviceLinks.map((link) => (
+          <a href={link.href} class="footer__nav-link">
+            <span class="footer__service-chapter">{link.chapter}</span>
+            {link.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <span class="footer__copyright">
+        Złożono z&nbsp;typograficzną precyzją · © {currentYear} sklad-tekstu.pl
+      </span>
+      <span class="footer__latex-sig">
+        Powered by LaTeX · pdflatex v3.141592
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding: var(--space-12) 0 var(--space-6);
+    border-top: 2px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .footer__top {
+      grid-template-columns: 2fr 1fr 1.5fr;
+    }
+  }
+
+  .footer__logo {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .footer__logo-dot { color: var(--accent); }
+
+  .footer__desc {
+    font-family: var(--font-serif);
+    font-size: var(--fs-sm);
+    color: var(--ink-muted);
+    line-height: var(--lh-relaxed);
+    margin-bottom: var(--space-4);
+  }
+
+  .footer__email {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .footer__email:hover { color: var(--accent-hover); }
+
+  .footer__nav,
+  .footer__services {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer__nav-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: var(--space-2);
+  }
+
+  .footer__nav-link {
+    font-family: var(--font-serif);
+    font-size: var(--fs-sm);
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .footer__nav-link:hover { color: var(--accent); }
+
+  .footer__service-chapter {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--ink-faint);
+    min-width: 26px;
+    letter-spacing: 0.03em;
+  }
+
+  .footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding-top: var(--space-6);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
+  .footer__copyright,
+  .footer__latex-sig {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+</style>

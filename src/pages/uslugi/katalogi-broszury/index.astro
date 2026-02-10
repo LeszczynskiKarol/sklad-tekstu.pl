@@ -1,0 +1,692 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://sklad-tekstu.pl/uslugi/katalogi-broszury/#service",
+      "name": "Skład katalogów i broszur w LaTeX",
+      "description": "Profesjonalny skład katalogów produktowych, broszur firmowych, cenników i materiałów marketingowych w systemie LaTeX. Automatyzacja z baz danych, PDF drukarski CMYK, spady, crop marks.",
+      "provider": { "@id": "https://sklad-tekstu.pl/#organization" },
+      "serviceType": "Skład katalogów i broszur LaTeX",
+      "areaServed": ["PL", "EU"],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Typy katalogów i broszur",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład katalogów produktowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład broszur firmowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład cenników" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład folderów reklamowych" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Skład katalogów targowych" } }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Strona główna", "item": "https://sklad-tekstu.pl/" },
+        { "@type": "ListItem", "position": 2, "name": "Usługi", "item": "https://sklad-tekstu.pl/uslugi/" },
+        { "@type": "ListItem", "position": 3, "name": "Katalogi i broszury", "item": "https://sklad-tekstu.pl/uslugi/katalogi-broszury/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy LaTeX nadaje się do katalogów produktowych?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. LaTeX doskonale sprawdza się w katalogach, które wymagają spójnego formatowania setek produktów, automatycznego generowania z baz danych, precyzyjnych tabel parametrów i jakości PDF gotowej do druku offsetowego. To idealne narzędzie, gdy katalog ma powtarzalną strukturę i regularnie się aktualizuje." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę automatycznie generować katalog z bazy produktów?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. LaTeX pozwala na import danych z CSV, JSON lub XML i automatyczne generowanie kart produktowych z nazwami, opisami, parametrami, cenami i zdjęciami. Przy aktualizacji katalogu wystarczy podmienić plik z danymi i przekompilować." }
+        },
+        {
+          "@type": "Question",
+          "name": "Ile kosztuje skład katalogu produktowego?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od liczby produktów, złożoności kart produktowych i wymagań graficznych. Wycena jest bezpłatna — wyślij materiały i opis wymagań, a w ciągu 24h otrzymasz szczegółową kalkulację." }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy PDF będzie gotowy do druku offsetowego?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Tak. Generujemy PDF/X zgodny z wymaganiami drukarni: profil CMYK, spady 3-5mm, crop marks, fonty wektorowe osadzone, rozdzielczość obrazów min. 300 DPI. Plik gotowy do wysłania do drukarni bez dodatkowej konwersji." }
+        }
+      ]
+    }
+  ]
+};
+
+// Types of catalogs
+const catalogTypes = [
+  {
+    title: 'Katalogi produktowe',
+    desc: 'Wielostronicowe katalogi prezentujące ofertę firmy — od kilkudziesięciu do kilku tysięcy produktów. Karty produktowe ze zdjęciami, opisami, parametrami technicznymi i cenami. Spis treści, indeks produktów, system oznaczeń i kategorii.',
+    tags: ['multicol', 'graphicx', 'makeidx', 'datatool'],
+    icon: '📖'
+  },
+  {
+    title: 'Cenniki i taryfikatory',
+    desc: 'Zestawienia cenowe z podziałem na kategorie, warianty i konfiguracje. Automatyczna kalkulacja cen (netto/brutto, rabaty), tabele porównawcze, warunki handlowe. Regularna aktualizacja z pliku CSV — nowy cennik w minuty zamiast dni.',
+    tags: ['longtable', 'siunitx', 'datatool', 'CSV'],
+    icon: '💰'
+  },
+  {
+    title: 'Broszury firmowe',
+    desc: 'Materiały prezentujące firmę, jej usługi, kompetencje i referencje. Od 4-stronicowych folderów po rozbudowane broszury korporacyjne. Łączenie tekstu, zdjęć, infografik, cytatów i case studies w spójną, atrakcyjną wizualnie całość.',
+    tags: ['memoir', 'tcolorbox', 'graphicx', 'wrapfig'],
+    icon: '🏢'
+  },
+  {
+    title: 'Katalogi targowe',
+    desc: 'Materiały na targi i wystawy — prezentacja nowości, flagowych produktów, przewodnik po stoisku. Wysoka jakość druku, efektowna typografia, duże zdjęcia. Format dostosowany do specyfiki eventu (A4, A5, DL, kwadrat).',
+    tags: ['layout', 'CMYK', 'bleed', 'spot'],
+    icon: '🎪'
+  },
+  {
+    title: 'Lookbooki i portfolio',
+    desc: 'Wizualne katalogi z przewagą zdjęć — portfolio architektoniczne, lookbooki modowe, albumy realizacji. Precyzyjny grid zdjęć, minimalistyczna typografia, duże białe przestrzenie. Format i proporcje dostosowane do charakteru marki.',
+    tags: ['graphicx', 'geometry', 'minimalny', 'grid'],
+    icon: '📸'
+  },
+  {
+    title: 'Katalogi techniczne',
+    desc: 'Specjalistyczne katalogi z parametrami technicznymi, rysunkami wymiarowymi, schematami montażowymi i tabelami doboru. Idealne dla producentów komponentów, materiałów budowlanych, urządzeń przemysłowych. Precyzja danych jest krytyczna.',
+    tags: ['siunitx', 'tikz', 'booktabs', 'techspec'],
+    icon: '🔧'
+  }
+];
+
+// Why LaTeX for catalogs
+const advantages = [
+  {
+    label: 'Automatyzacja',
+    title: 'Katalog z bazy danych — nie z ręcznego DTP',
+    desc: 'Dane produktowe (nazwy, opisy, parametry, ceny, ścieżki zdjęć) przechowujesz w pliku CSV lub bazie danych. LaTeX automatycznie generuje karty produktowe z szablonu — 50 produktów czy 5000, nakład pracy jest ten sam. Aktualizacja katalogu sprowadza się do podmiany pliku z danymi.'
+  },
+  {
+    label: 'Spójność',
+    title: 'Identyczny layout na każdej stronie',
+    desc: 'Szablon karty produktowej definiujesz raz. LaTeX gwarantuje, że każdy produkt — niezależnie od długości opisu, liczby parametrów czy proporcji zdjęcia — wygląda spójnie. Żadnego ręcznego dopasowywania, przesuwania ramek, korygowania odstępów.'
+  },
+  {
+    label: 'Druk',
+    title: 'PDF gotowy do drukarni od razu',
+    desc: 'PDF/X z profilem CMYK, spadami (bleed), znacznikami cięcia (crop marks), fontami wektorowymi osadzonymi w dokumencie. Rozdzielczość obrazów kontrolowana automatycznie. Plik gotowy do wysłania do drukarni bez dodatkowej konwersji w Acrobacie.'
+  },
+  {
+    label: 'Wersje',
+    title: 'Jeden plik źródłowy — wiele wersji',
+    desc: 'Z jednego pliku źródłowego generujesz: pełny katalog (druk), skrócony katalog (targi), cennik bez zdjęć (handlowcy), wersję online (hiperłącza, zakładki). Flagi kompilacji decydują, które elementy się pojawią — bez duplikowania plików.'
+  },
+  {
+    label: 'Wielojęzyczność',
+    title: 'Katalog w wielu językach z jednego źródła',
+    desc: 'Pakiet babel obsługuje dziesiątki języków w jednym dokumencie. Tłumaczenia przechowujesz w osobnych plikach — przełączenie języka to zmiana jednego parametru. Idealne dla firm eksportujących na wiele rynków.'
+  },
+  {
+    label: 'Indeksy',
+    title: 'Automatyczne spisy i indeksy',
+    desc: 'Spis treści, indeks produktów, indeks numerów katalogowych, spis oznaczeń — wszystko generowane automatycznie z danych. Dodajesz produkt do bazy, a on pojawia się we właściwej kategorii, w spisie i w indeksie. Zero ręcznej pracy.'
+  }
+];
+
+// Elements of a catalog
+const catalogElements = [
+  { icon: '🖼', title: 'Zdjęcia produktowe', desc: 'Profesjonalna obróbka i osadzanie zdjęć: kadrowanie, skalowanie do szablonu, kontrola rozdzielczości (min. 300 DPI), konwersja do CMYK. Automatyczne podpisy i numeracja ilustracji.' },
+  { icon: '▦', title: 'Tabele parametrów', desc: 'Zestawienia techniczne z precyzyjnym formatowaniem: jednostki SI (siunitx), wyrównanie liczb, nagłówki wielopoziomowe, kolorowanie wierszy, łączenie komórek. Czytelne w druku i na ekranie.' },
+  { icon: '💲', title: 'Cenniki i kalkulacje', desc: 'Automatyczne formatowanie cen: netto/brutto, waluta, rabaty, progi cenowe. Import z CSV/Excel — aktualizacja cennika bez ręcznego przepisywania. Warunkowe formatowanie (promocje, wyprzedaże).' },
+  { icon: '📐', title: 'Rysunki techniczne', desc: 'Wektorowe schematy wymiarowe, rzuty, przekroje i rysunki montażowe w TikZ. Schematy elektryczne, hydrauliczne, pneumatyczne. Rysunki ostre w każdej skali — od A4 po banner.' },
+  { icon: '🏷', title: 'System oznaczeń', desc: 'Ikony cech (wodoodporność, certyfikaty, klasa energetyczna), kolorowe etykiety kategorii, piktogramy zastosowań. Spójny system wizualny, który ułatwia nawigację po katalogu.' },
+  { icon: '📑', title: 'Spisy i nawigacja', desc: 'Spis treści, indeks produktów, indeks numerów katalogowych, zakładki boczne (thumb indexes), nagłówki z nazwą kategorii. W wersji PDF — klikalny spis treści i hiperłącza wewnętrzne.' }
+];
+
+// Industries
+const industries = [
+  { name: 'Przemysł i produkcja', examples: 'Katalogi komponentów, materiałów, narzędzi, maszyn, części zamiennych, urządzeń przemysłowych' },
+  { name: 'Budownictwo', examples: 'Katalogi materiałów budowlanych, okien, drzwi, armatury, oświetlenia, instalacji' },
+  { name: 'Elektronika i IT', examples: 'Katalogi podzespołów, urządzeń sieciowych, serwerów, oprogramowania, akcesoriów' },
+  { name: 'Medycyna i farmacja', examples: 'Katalogi wyrobów medycznych, aparatury diagnostycznej, implantów, sprzętu laboratoryjnego' },
+  { name: 'Gastronomia i FMCG', examples: 'Katalogi produktów spożywczych, napojów, wyposażenia gastronomii, opakowań' },
+  { name: 'Meble i wnętrza', examples: 'Katalogi mebli, oświetlenia, tkanin, materiałów wykończeniowych, kolekcje sezonowe' },
+  { name: 'Motoryzacja', examples: 'Katalogi części, akcesoriów, opon, olejów, narzędzi warsztatowych, flot pojazdów' },
+  { name: 'Chemia i kosmetyki', examples: 'Katalogi produktów chemicznych, kosmetyków, środków czystości, substancji technicznych' }
+];
+
+// Process
+const processSteps = [
+  { num: '01', title: 'Materiały i brief', desc: 'Wyślij dane produktowe (Excel, CSV, baza danych), zdjęcia, logo, kolory firmowe i opis wymagań (format, objętość, styl). Im kompletniejsze materiały, tym szybsza realizacja i trafniejsza wycena.', time: '1 dzień' },
+  { num: '02', title: 'Wycena i koncepcja', desc: 'W ciągu 24h: wycena z rozbiciem na elementy (szablon, skład, obróbka zdjęć, druk) + propozycja koncepcji layoutu (format strony, grid, styl kart produktowych). Bezpłatnie.', time: '24 godz.' },
+  { num: '03', title: 'Makieta', desc: 'Projektujemy szablon katalogu: strona tytułowa, układ karty produktowej, styl tabel, system oznaczeń, okładka. Składamy próbne strony (2–4 produkty) do akceptacji.', time: '3–5 dni' },
+  { num: '04', title: 'Skład właściwy', desc: 'Generujemy kompletny katalog z danych. Obróbka zdjęć, skład kart produktowych, tabele, indeksy. Przesyłamy PDF z postępem — możesz sprawdzać i zgłaszać uwagi na bieżąco.', time: '1–4 tyg.' },
+  { num: '05', title: 'Korekta i finalizacja', desc: 'Wprowadzamy poprawki, aktualizujemy dane, dopracowujemy detale. Na końcu: PDF drukarski (CMYK, spady, crop marks), PDF ekranowy (hiperłącza), opcjonalnie pliki .tex do samodzielnej aktualizacji.', time: '2–5 dni' }
+];
+
+// FAQ
+const faqItems = [
+  { q: 'Czy LaTeX nadaje się do katalogów produktowych? Czy to nie jest narzędzie tylko do nauki?', a: 'LaTeX to system składu tekstu, nie „narzędzie naukowe". Służy do tworzenia dowolnych dokumentów wymagających precyzyjnej typografii. W katalogach produktowych jego przewagi są szczególnie widoczne: automatyczne generowanie kart z bazy danych, perfekcyjna spójność layoutu na każdej stronie, PDF gotowy do drukarni bez dodatkowej konwersji. Firmy takie jak producenci komponentów elektronicznych regularnie generują katalogi z tysięcami pozycji w LaTeX.' },
+  { q: 'Czy mogę automatycznie generować katalog z Excela lub bazy danych?', a: 'Tak. Dane z Excela eksportujemy do CSV, a LaTeX (pakiet datatool lub csvsimple) automatycznie generuje karty produktowe z szablonu. Każdy wiersz w CSV = jeden produkt w katalogu. Kolumny to: nazwa, opis, parametry, cena, ścieżka zdjęcia. Przy aktualizacji — podmieniasz CSV i kompilujesz. Obsługujemy też JSON i XML.' },
+  { q: 'Ile kosztuje skład katalogu na 200 produktów?', a: 'Główny koszt to zaprojektowanie szablonu karty produktowej i konfiguracja automatyzacji (import z CSV, obróbka zdjęć). Przy 200 produktach z gotowymi zdjęciami i danymi w CSV — orientacyjnie 2000–5000 zł netto, w zależności od złożoności layoutu. Przy 2000 produktów — koszt nie rośnie proporcjonalnie, bo generowanie jest automatyczne. Wycena jest bezpłatna.' },
+  { q: 'Czy mogę mieć katalog w kilku językach?', a: 'Tak. Tłumaczenia przechowujesz w osobnych plikach CSV (np. produkty_pl.csv, produkty_en.csv, produkty_de.csv). Przełączenie języka to zmiana jednego parametru w pliku głównym. Pakiet babel obsługuje reguły typograficzne każdego języka (dzielenie wyrazów, cudzysłowy, daty). Z jednego szablonu generujesz katalogi PL, EN, DE, FR itd.' },
+  { q: 'Czy zrobicie obróbkę zdjęć produktowych?', a: 'Podstawową obróbkę — tak: kadrowanie do szablonu, skalowanie, konwersja do CMYK, kontrola rozdzielczości. Zaawansowaną retuszę (usunięcie tła, korekcja kolorów, fotomontaż) zlecamy partnerowi lub wykonujemy za dodatkową opłatą. Zdjęcia powinny być w rozdzielczości min. 300 DPI w docelowym rozmiarze.' },
+  { q: 'Czy mogę samodzielnie aktualizować katalog w przyszłości?', a: 'Tak. Dostarczamy: pliki .tex z szablonami, plik CSV z danymi produktowymi, skrypt kompilacji i instrukcję. Aktualizacja polega na: edycji CSV (dodaj produkt, zmień cenę, zaktualizuj opis), kompilacji jednym poleceniem. Nowy PDF generuje się w sekundy. Potrzebna jest podstawowa znajomość terminala.' },
+  { q: 'W jakich formatach drukujecie katalogi?', a: 'Przygotowujemy PDF do druku w dowolnym formacie: A4 (210×297 mm), A5 (148×210 mm), DL (99×210 mm), kwadrat (210×210 mm), niestandardowe formaty wymagane przez drukarnię. Każdy format z odpowiednimi spadami (3–5 mm) i crop marks. Na życzenie przygotowujemy osobno okładkę (z grzbietem) i środek.' },
+  { q: 'Jak szybko da się zaktualizować katalog o nowe produkty?', a: 'Jeśli masz gotowy szablon i plik CSV — dodanie 50 nowych produktów to kwestia edycji CSV i kompilacji (minuty). Jeśli nowe produkty wymagają nowego typu karty produktowej lub innego layoutu — 1–3 dni robocze. Regularnych klientów obsługujemy priorytetowo.' }
+];
+---
+
+<BaseLayout
+  title="Skład katalogów produktowych i broszur w LaTeX"
+  description="Profesjonalny skład katalogów produktowych, broszur firmowych, cenników i materiałów marketingowych w LaTeX. Automatyczne generowanie z baz danych, PDF drukarski CMYK, wielojęzyczność."
+  keywords="skład katalogu produktowego, skład katalogu latex, katalog produktowy latex, skład broszury, skład cennika, katalog firmowy skład, DTP latex, katalog z bazy danych, skład katalogów, broszura firmowa skład"
+  schema={serviceSchema}
+>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero__breadcrumb container">
+      <nav aria-label="Ścieżka nawigacji">
+        <a href="/">Strona główna</a> <span aria-hidden="true">›</span>
+        <a href="/#uslugi">Usługi</a> <span aria-hidden="true">›</span>
+        <span>Katalogi i&nbsp;broszury</span>
+      </nav>
+    </div>
+    <div class="container hero__inner">
+      <div class="hero__chapter" aria-hidden="true">§1.5</div>
+      <div class="hero__rule-top" aria-hidden="true"></div>
+      <h1 id="hero-title" class="hero__title">
+        Skład <span class="hero__highlight">katalogów</span><br>i&nbsp;broszur firmowych
+      </h1>
+      <p class="hero__subtitle">
+        Katalogi produktowe, cenniki, broszury, foldery reklamowe —<br>
+        generowane automatycznie z&nbsp;bazy danych, gotowe do&nbsp;druku offsetowego
+      </p>
+      <div class="hero__rule-bottom" aria-hidden="true"></div>
+      <div class="hero__tags">
+        <span class="hero__tag">multicol</span>
+        <span class="hero__tag">graphicx</span>
+        <span class="hero__tag">datatool</span>
+        <span class="hero__tag">geometry</span>
+        <span class="hero__tag">CMYK</span>
+        <span class="hero__tag">makeidx</span>
+      </div>
+      <div class="hero__actions">
+        <a href="#wycena" class="hero__cta-primary">Wyślij materiały do wyceny <span>→</span></a>
+        <a href="#typy" class="hero__cta-secondary">Dowiedz się więcej</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container">
+      <div class="intro__grid reveal">
+        <div class="intro__text">
+          <h2 id="intro-title">Katalog, który aktualizuje się sam</h2>
+          <p>
+            Tradycyjny skład katalogu produktowego w&nbsp;InDesignie to tygodnie ręcznej pracy: wklejanie
+            zdjęć, przepisywanie parametrów, formatowanie tabel, korygowanie numeracji. A&nbsp;potem
+            zmienia się jeden produkt i&nbsp;trzeba zaczynać od nowa.
+          </p>
+          <p>
+            LaTeX odwraca ten model. Dane produktowe — nazwy, opisy, parametry, ceny, ścieżki zdjęć —
+            trzymasz w&nbsp;pliku CSV lub bazie danych. Szablon karty produktowej definiujesz raz.
+            LaTeX automatycznie generuje kompletny katalog: 50 produktów czy 5000, nakład pracy jest
+            ten sam. Aktualizacja? Podmień CSV, przekompiluj. Nowy PDF w&nbsp;minuty, nie w&nbsp;dni.
+          </p>
+          <p>
+            To podejście sprawdza się szczególnie przy katalogach, które aktualizujesz regularnie
+            (co&nbsp;sezon, co&nbsp;kwartał), mają powtarzalną strukturę (każdy produkt wygląda
+            podobnie) lub istnieją w&nbsp;wielu wersjach językowych. Jeden szablon, wiele wersji
+            — PL, EN, DE, FR — z&nbsp;jednego kliknięcia.
+          </p>
+        </div>
+        <aside class="intro__sidebar">
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">CSV→PDF</span>
+            <span class="intro__sidebar-label">automatyzacja z danych</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">CMYK</span>
+            <span class="intro__sidebar-label">PDF gotowy do drukarni</span>
+          </div>
+          <div class="intro__sidebar-block">
+            <span class="intro__sidebar-value">∞</span>
+            <span class="intro__sidebar-label">wersji z jednego szablonu</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section class="types" id="typy" aria-labelledby="types-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.1"
+          title="Rodzaje katalogów i&nbsp;broszur"
+          subtitle="Każdy typ materiału wymaga innego podejścia do layoutu, proporcji tekstu do grafiki i sposobu prezentacji produktów."
+        />
+      </div>
+      <div class="types__grid">
+        {catalogTypes.map((t) => (
+          <div class="types__card reveal">
+            <span class="types__card-icon" aria-hidden="true">{t.icon}</span>
+            <h3 class="types__card-title">{t.title}</h3>
+            <p class="types__card-desc">{t.desc}</p>
+            <div class="types__card-tags">
+              {t.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ELEMENTS -->
+  <section class="elements" aria-labelledby="elements-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.2"
+          title="Elementy katalogu"
+          subtitle="Każdy składnik katalogu — od zdjęć po indeksy — przechodzi przez system LaTeX i wychodzi z niego w perfekcyjnej formie."
+        />
+      </div>
+      <div class="elements__grid">
+        {catalogElements.map((e) => (
+          <div class="elements__card reveal">
+            <span class="elements__icon" aria-hidden="true">{e.icon}</span>
+            <h3>{e.title}</h3>
+            <p>{e.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE CATALOG PAGE -->
+  <section class="sample" aria-label="Przykładowa strona katalogu">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.3"
+          title="Jak wygląda strona katalogu w&nbsp;LaTeX"
+          subtitle="Symulacja typowej karty produktowej w katalogu technicznym. Spójny layout, czytelne parametry, profesjonalna typografia."
+          inverted
+        />
+      </div>
+    </div>
+    <div class="sample__preview reveal">
+      <div class="sample__page">
+        <div class="sample__page-nav">
+          <span class="sample__page-cat">Pompy ciepła › Powietrze-woda</span>
+          <span class="sample__page-num">34</span>
+        </div>
+
+        <div class="sample__product-grid">
+          <!-- Product 1 -->
+          <div class="sample__product-card">
+            <div class="sample__product-img">
+              <div class="sample__product-placeholder">
+                <span>foto</span>
+              </div>
+              <span class="sample__product-badge">NOWOŚĆ</span>
+            </div>
+            <div class="sample__product-info">
+              <h4 class="sample__product-name">ThermoAir HPC-12</h4>
+              <p class="sample__product-short">Pompa ciepła powietrze-woda o mocy 12 kW z inwerterem DC i sterowaniem Wi-Fi.</p>
+              <table class="sample__product-specs">
+                <tr><td>Moc grzewcza</td><td>12,4 kW</td></tr>
+                <tr><td>COP (A7/W35)</td><td>4,82</td></tr>
+                <tr><td>Zakres pracy</td><td>−25°C … +43°C</td></tr>
+                <tr><td>Czynnik</td><td>R-290</td></tr>
+                <tr><td>Klasa energetyczna</td><td>A+++</td></tr>
+              </table>
+              <div class="sample__product-icons">
+                <span title="Wi-Fi">📶</span>
+                <span title="Cicha praca">🔇</span>
+                <span title="Ekologiczny czynnik">🌿</span>
+              </div>
+              <span class="sample__product-ref">Nr kat.: HPC-12-INV</span>
+            </div>
+          </div>
+
+          <!-- Product 2 -->
+          <div class="sample__product-card">
+            <div class="sample__product-img">
+              <div class="sample__product-placeholder">
+                <span>foto</span>
+              </div>
+            </div>
+            <div class="sample__product-info">
+              <h4 class="sample__product-name">ThermoAir HPC-16</h4>
+              <p class="sample__product-short">Pompa ciepła powietrze-woda o mocy 16 kW z podwójnym sprężarką i zintegrowanym buforem.</p>
+              <table class="sample__product-specs">
+                <tr><td>Moc grzewcza</td><td>16,1 kW</td></tr>
+                <tr><td>COP (A7/W35)</td><td>4,65</td></tr>
+                <tr><td>Zakres pracy</td><td>−25°C … +43°C</td></tr>
+                <tr><td>Czynnik</td><td>R-290</td></tr>
+                <tr><td>Klasa energetyczna</td><td>A+++</td></tr>
+              </table>
+              <div class="sample__product-icons">
+                <span title="Wi-Fi">📶</span>
+                <span title="Podwójna sprężarka">⚡</span>
+                <span title="Ekologiczny czynnik">🌿</span>
+              </div>
+              <span class="sample__product-ref">Nr kat.: HPC-16-DUO</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sample__page-footer">
+          <span>sklad-tekstu.pl — generowano automatycznie z bazy CSV</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY LATEX -->
+  <section class="advantages" aria-labelledby="advantages-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.4"
+          title="Dlaczego LaTeX do katalogów"
+          subtitle="Przy 10-produktowej broszurze — InDesign wystarczy. Przy katalogach z setkami pozycji, regularnymi aktualizacjami i wieloma wersjami językowymi — LaTeX jest niezastąpiony."
+        />
+      </div>
+      <div class="advantages__grid">
+        {advantages.map((a) => (
+          <div class="advantages__item reveal">
+            <div class="advantages__label">{a.label}</div>
+            <div class="advantages__content">
+              <h3>{a.title}</h3>
+              <p>{a.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- INDUSTRIES -->
+  <section class="industries" aria-labelledby="industries-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.5"
+          title="Branże, które obsługujemy"
+          subtitle="Katalogi produktowe to potrzeba uniwersalna — oto branże, dla których najczęściej składamy katalogi i broszury."
+        />
+      </div>
+      <div class="industries__grid">
+        {industries.map((ind) => (
+          <div class="industries__card reveal">
+            <h3>{ind.name}</h3>
+            <p>{ind.examples}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process" aria-labelledby="process-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.6"
+          title="Proces realizacji"
+          subtitle="Od materiałów źródłowych do gotowego PDF — jasne etapy, konkretne terminy."
+        />
+      </div>
+      <div class="process__timeline">
+        {processSteps.map((step) => (
+          <div class="process__step reveal">
+            <div class="process__step-side">
+              <span class="process__step-num">{step.num}</span>
+              <span class="process__step-time">{step.time}</span>
+            </div>
+            <div class="process__step-body">
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="reveal">
+        <SectionHeading
+          number="§1.5.7"
+          title="Najczęściej zadawane pytania"
+          subtitle="Odpowiedzi na pytania od firm planujących skład katalogu lub broszury."
+        />
+      </div>
+      <div class="faq__list">
+        {faqItems.map((item, i) => (
+          <details class="faq__item reveal">
+            <summary class="faq__question">
+              <span class="faq__q-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {item.q}
+              <span class="faq__chevron" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </span>
+            </summary>
+            <div class="faq__answer"><p>{item.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="wycena" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta__block reveal">
+        <div class="cta__env" aria-hidden="true" set:html="\\begin{katalog}" />
+        <h2 id="cta-title">Wyślij materiały — wycenimy skład katalogu w&nbsp;24h</h2>
+        <p>
+          Niezależnie czy to katalog na 50 czy 5000 produktów, broszura firmowa czy cennik —
+          przygotujemy wycenę z&nbsp;rozbiciem na elementy i&nbsp;konkretnym terminem.
+          Wystarczy przesłać dane produktowe, zdjęcia i&nbsp;opis wymagań. Bezpłatnie.
+        </p>
+        <a href="mailto:kontakt@sklad-tekstu.pl" class="cta__button">Wyślij materiały <span class="cta__button-arrow">→</span></a>
+        <div class="cta__details"><a href="mailto:kontakt@sklad-tekstu.pl">kontakt@sklad-tekstu.pl</a></div>
+        <div class="cta__env" aria-hidden="true" set:html="\\end{katalog}" />
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO CONTENT -->
+  <section class="seo-content" aria-label="Informacje o składzie katalogów i broszur w LaTeX">
+    <div class="container">
+      <article class="seo-content__article">
+        <h2>Skład katalogów produktowych i&nbsp;broszur w&nbsp;LaTeX</h2>
+        <p>
+          Profesjonalny <strong>skład katalogów produktowych</strong> to wyzwanie, które wymaga nie
+          tylko wyczucia typograficznego, ale też systematycznego podejścia do danych. System LaTeX
+          pozwala na <strong>automatyczne generowanie kart produktowych z&nbsp;bazy danych</strong>
+          (CSV, JSON, XML), co radykalnie skraca czas produkcji i&nbsp;eliminuje błędy ręcznego
+          przepisywania.
+        </p>
+        <h3>Katalog z&nbsp;bazy danych — automatyzacja zamiast DTP</h3>
+        <p>
+          <strong>Skład katalogu z&nbsp;bazy danych</strong> to najważniejsza przewaga LaTeX nad
+          tradycyjnymi narzędziami DTP. Dane produktowe (nazwa, opis, parametry, cena, zdjęcie)
+          przechowujesz w&nbsp;pliku CSV. LaTeX automatycznie generuje karty produktowe z&nbsp;szablonu
+          — 50 produktów czy 5000, nakład pracy jest identyczny. Aktualizacja katalogu sprowadza się
+          do&nbsp;podmiany pliku z&nbsp;danymi i&nbsp;kompilacji.
+        </p>
+        <h3>Broszury firmowe i&nbsp;materiały marketingowe</h3>
+        <p>
+          <strong>Skład broszur firmowych</strong> w&nbsp;LaTeX łączy precyzję typograficzną
+          z&nbsp;atrakcyjną formą wizualną. Kolorowe ramki (tcolorbox), ilustracje na pełną stronę,
+          infografiki TikZ, wydzielone cytaty i&nbsp;case studies — wszystko w&nbsp;spójnym szablonie
+          z&nbsp;kolorami firmowymi. PDF gotowy do druku offsetowego lub cyfrowego.
+        </p>
+        <h3>Cenniki — aktualizacja w&nbsp;minuty</h3>
+        <p>
+          <strong>Skład cennika w&nbsp;LaTeX</strong> to szczególnie efektywne zastosowanie automatyzacji.
+          Ceny, rabaty, progi cenowe — wszystko importowane z&nbsp;CSV. Nowa edycja cennika
+          (kwartalnie, sezonowo) to kwestia podmiany pliku z&nbsp;danymi i&nbsp;kompilacji. Formatowanie
+          cen (netto/brutto, waluta, procent rabatu) jest automatyczne i&nbsp;spójne na każdej stronie.
+        </p>
+      </article>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ═════ HERO ═════ */
+  .hero { padding: var(--space-24) 0 var(--space-16); text-align: center; position: relative; }
+  .hero__breadcrumb { position: absolute; top: var(--space-6); left: 0; right: 0; }
+  .hero__breadcrumb nav { display: flex; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .hero__breadcrumb a { color: var(--ink-faint); text-decoration: none; transition: color var(--transition-fast); }
+  .hero__breadcrumb a:hover { color: var(--accent); }
+  .hero__chapter { font-family: var(--font-display); font-size: var(--fs-4xl); font-weight: var(--fw-bold); color: var(--accent); margin-bottom: var(--space-2); opacity: 0; animation: fadeInUp 0.7s ease 0.2s forwards; }
+  .hero__rule-top { width: 100%; height: 2.5px; background: var(--ink); margin-bottom: var(--space-8); transform: scaleX(0); animation: expandRule 0.8s ease 0.3s forwards; }
+  .hero__rule-bottom { width: 100%; height: 1px; background: var(--ink); margin-top: var(--space-6); margin-bottom: var(--space-6); transform: scaleX(0); animation: expandRule 0.8s ease 0.5s forwards; }
+  .hero__title { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: clamp(2rem, 4.5vw, 3.2rem); line-height: 1.15; color: var(--ink); opacity: 0; animation: fadeInUp 0.9s ease 0.5s forwards; }
+  .hero__highlight { color: var(--accent); }
+  .hero__subtitle { font-family: var(--font-serif); font-size: clamp(0.95rem, 2.2vw, 1.15rem); font-weight: var(--fw-light); font-style: italic; color: var(--ink-light); margin-top: var(--space-4); opacity: 0; animation: fadeInUp 0.9s ease 0.7s forwards; }
+  .hero__tags { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-8); opacity: 0; animation: fadeInUp 0.8s ease 0.9s forwards; }
+  .hero__tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+  .hero__actions { display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease 1.1s forwards; }
+  .hero__cta-primary { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .hero__cta-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .hero__cta-secondary { font-family: var(--font-serif); font-size: var(--fs-base); color: var(--ink-muted); border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: all var(--transition-fast); }
+  .hero__cta-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ═════ INTRO ═════ */
+  .intro { padding: var(--space-16) 0 var(--space-20); border-bottom: 0.5px solid var(--rule-light); }
+  .intro__grid { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
+  @media (min-width: 768px) { .intro__grid { grid-template-columns: 3fr 1fr; } }
+  .intro__text h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .intro__text p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .intro__sidebar { display: flex; flex-direction: column; gap: var(--space-4); }
+  .intro__sidebar-block { padding: var(--space-5) var(--space-6); background: var(--paper-warm); border-left: 2px solid var(--accent); text-align: center; }
+  .intro__sidebar-value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-bold); color: var(--accent); display: block; line-height: 1; margin-bottom: var(--space-1); }
+  .intro__sidebar-label { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+
+  /* ═════ TYPES ═════ */
+  .types { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .types__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); }
+  .types__card { padding: var(--space-8) var(--space-6); background: var(--paper); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .types__card:hover { background: var(--white); box-shadow: var(--shadow-md); }
+  .types__card-icon { font-size: 1.6rem; display: block; margin-bottom: var(--space-3); }
+  .types__card-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--ink); margin-bottom: var(--space-2); }
+  .types__card-desc { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); margin-bottom: var(--space-4); }
+  .types__card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.04em; padding: 0.2rem 0.5rem; background: var(--accent-bg); color: var(--accent); border-radius: var(--radius-sm); }
+
+  /* ═════ ELEMENTS ═════ */
+  .elements { padding: var(--space-20) 0; }
+  .elements__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+  .elements__card { padding: var(--space-8) var(--space-6); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .elements__card:hover { background: var(--white); box-shadow: var(--shadow-md); border-color: var(--rule); }
+  .elements__icon { display: block; font-size: 1.6rem; margin-bottom: var(--space-4); }
+  .elements__card h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .elements__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ SAMPLE CATALOG ═════ */
+  .sample { padding: var(--space-20) 0; background: var(--ink); }
+  .sample__preview { max-width: 650px; margin: 0 auto; padding: 0 var(--gutter); }
+  .sample__page { background: var(--white); padding: var(--space-6); box-shadow: 0 12px 40px rgba(0,0,0,0.3); border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--ink); }
+  .sample__page-nav { display: flex; justify-content: space-between; font-size: 0.65rem; padding-bottom: var(--space-2); margin-bottom: var(--space-4); border-bottom: 0.5px solid var(--rule-light); }
+  .sample__page-cat { font-family: var(--font-mono); color: var(--ink-faint); letter-spacing: 0.04em; }
+  .sample__page-num { font-family: var(--font-serif); font-style: italic; color: var(--ink-faint); }
+  .sample__page-footer { text-align: center; font-family: var(--font-mono); font-size: 0.5rem; color: var(--rule); padding-top: var(--space-3); margin-top: var(--space-4); border-top: 0.5px solid var(--rule-light); }
+
+  .sample__product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  @media (max-width: 500px) { .sample__product-grid { grid-template-columns: 1fr; } }
+
+  .sample__product-card { border: 0.5px solid var(--rule-light); padding: var(--space-3); }
+  .sample__product-img { position: relative; margin-bottom: var(--space-2); }
+  .sample__product-placeholder { background: var(--paper-warm); height: 80px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); }
+  .sample__product-placeholder span { font-family: var(--font-mono); font-size: 0.6rem; color: var(--rule); text-transform: uppercase; letter-spacing: 0.1em; }
+  .sample__product-badge { position: absolute; top: 4px; right: 4px; font-family: var(--font-mono); font-size: 0.45rem; letter-spacing: 0.08em; padding: 2px 6px; background: var(--accent); color: var(--paper); border-radius: 2px; }
+  .sample__product-name { font-family: var(--font-display); font-size: 0.82rem; font-weight: var(--fw-bold); margin-bottom: 2px; }
+  .sample__product-short { font-size: 0.62rem; color: var(--ink-muted); line-height: 1.5; margin-bottom: var(--space-2); }
+  .sample__product-specs { width: 100%; border-collapse: collapse; font-size: 0.58rem; margin-bottom: var(--space-2); }
+  .sample__product-specs td { padding: 2px 0; border-bottom: 0.5px solid var(--rule-light); }
+  .sample__product-specs td:first-child { color: var(--ink-faint); width: 55%; }
+  .sample__product-specs td:last-child { font-family: var(--font-mono); font-weight: var(--fw-medium); text-align: right; }
+  .sample__product-icons { display: flex; gap: 4px; font-size: 0.7rem; margin-bottom: var(--space-1); }
+  .sample__product-ref { font-family: var(--font-mono); font-size: 0.5rem; color: var(--ink-faint); }
+
+  /* ═════ ADVANTAGES ═════ */
+  .advantages { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .advantages__grid { display: grid; grid-template-columns: 160px 1fr; gap: 0; }
+  @media (max-width: 768px) { .advantages__grid { grid-template-columns: 1fr; } }
+  .advantages__item { display: contents; }
+  .advantages__label { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--margin-note); text-align: right; padding-top: var(--space-1); padding-right: var(--space-8); letter-spacing: 0.04em; }
+  @media (max-width: 768px) { .advantages__label { text-align: left; padding-right: 0; margin-bottom: var(--space-1); } }
+  .advantages__content { padding-bottom: var(--space-8); margin-bottom: var(--space-4); border-bottom: 0.5px solid var(--rule-light); }
+  .advantages__content h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .advantages__content p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); text-align: justify; hyphens: auto; }
+
+  /* ═════ INDUSTRIES ═════ */
+  .industries { padding: var(--space-20) 0; }
+  .industries__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-5); }
+  .industries__card { padding: var(--space-5) var(--space-6); border: 1px solid var(--rule-light); transition: all 0.4s ease; }
+  .industries__card:hover { background: var(--white); box-shadow: var(--shadow-sm); border-color: var(--rule); }
+  .industries__card h3 { font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-semibold); margin-bottom: var(--space-1); }
+  .industries__card p { font-size: var(--fs-sm); line-height: var(--lh-relaxed); color: var(--ink-muted); }
+
+  /* ═════ PROCESS ═════ */
+  .process { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule-light); }
+  .process__step { display: grid; grid-template-columns: 100px 1fr; gap: var(--space-6); padding: var(--space-6) 0; border-bottom: 0.5px solid var(--rule-light); }
+  @media (max-width: 768px) { .process__step { grid-template-columns: 70px 1fr; gap: var(--space-4); } }
+  .process__step-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); padding-top: var(--space-1); }
+  .process__step-num { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: var(--fw-light); color: var(--rule); line-height: 1; }
+  .process__step-time { font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent); }
+  .process__step-body h3 { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-semibold); margin-bottom: var(--space-2); }
+  .process__step-body p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); max-width: 600px; }
+
+  /* ═════ FAQ ═════ */
+  .faq { padding: var(--space-20) 0; }
+  .faq__list { max-width: 720px; }
+  .faq__item { border-bottom: 0.5px solid var(--rule); }
+  .faq__question { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5) 0; cursor: pointer; font-family: var(--font-display); font-size: var(--fs-base); font-weight: var(--fw-medium); color: var(--ink); list-style: none; transition: color var(--transition-fast); }
+  .faq__question::-webkit-details-marker { display: none; }
+  .faq__question:hover { color: var(--accent); }
+  .faq__q-num { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); flex-shrink: 0; min-width: 24px; }
+  .faq__chevron { margin-left: auto; flex-shrink: 0; color: var(--ink-faint); transition: transform var(--transition-base); }
+  details[open] .faq__chevron { transform: rotate(180deg); }
+  .faq__answer { padding: 0 0 var(--space-6) calc(24px + var(--space-4)); }
+  .faq__answer p { font-size: 0.92rem; line-height: var(--lh-relaxed); color: var(--ink-light); }
+
+  /* ═════ CTA ═════ */
+  .cta { padding: var(--space-20) 0; background: var(--paper-warm); border-top: 0.5px solid var(--rule); }
+  .cta__block { max-width: 600px; margin: 0 auto; text-align: center; }
+  .cta__env { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); letter-spacing: 0.06em; margin-bottom: var(--space-6); }
+  .cta__env:last-child { margin-bottom: 0; margin-top: var(--space-6); }
+  .cta__block h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: var(--fw-semibold); margin-bottom: var(--space-4); line-height: var(--lh-tight); }
+  .cta__block p { font-size: 0.95rem; color: var(--ink-light); line-height: var(--lh-relaxed); margin-bottom: var(--space-8); }
+  .cta__button { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.5rem; background: var(--ink); color: var(--paper); font-family: var(--font-serif); font-size: var(--fs-base); border-radius: var(--radius-sm); transition: all var(--transition-base); }
+  .cta__button:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,26,26,0.2); }
+  .cta__button-arrow { transition: transform var(--transition-fast); }
+  .cta__button:hover .cta__button-arrow { transform: translateX(4px); }
+  .cta__details { margin-top: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); }
+  .cta__details a { color: var(--accent); text-decoration: none; }
+
+  /* ═════ SEO ═════ */
+  .seo-content { padding: var(--space-20) 0; border-top: 0.5px solid var(--rule-light); }
+  .seo-content__article { max-width: 680px; }
+  .seo-content__article h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--fw-semibold); margin-bottom: var(--space-6); line-height: var(--lh-tight); }
+  .seo-content__article h3 { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-semibold); margin-top: var(--space-10); margin-bottom: var(--space-3); }
+  .seo-content__article p { font-size: 0.95rem; line-height: var(--lh-relaxed); color: var(--ink-light); margin-bottom: var(--space-4); text-align: justify; hyphens: auto; }
+  .seo-content__article strong { color: var(--ink); font-weight: var(--fw-medium); }
+</style>

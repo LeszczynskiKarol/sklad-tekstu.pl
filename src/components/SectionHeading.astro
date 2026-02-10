@@ -1,0 +1,74 @@
+---
+interface Props {
+  number: string;
+  title: string;
+  subtitle?: string;
+  inverted?: boolean;
+}
+
+const { number, title, subtitle, inverted = false } = Astro.props;
+---
+
+<div class:list={['section-heading', { 'section-heading--inverted': inverted }]}>
+  <span class="section-heading__number">{number}</span>
+  <h2 class="section-heading__title" set:html={title} />
+  <div class="section-heading__rule" aria-hidden="true"></div>
+  {subtitle && <p class="section-heading__subtitle">{subtitle}</p>}
+</div>
+
+<style>
+  .section-heading {
+    margin-bottom: var(--space-10);
+  }
+
+  .section-heading__number {
+    font-family: var(--font-display);
+    font-size: var(--fs-4xl);
+    font-weight: var(--fw-bold);
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+    margin-bottom: var(--space-1);
+  }
+
+  .section-heading__title {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semibold);
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+    line-height: var(--lh-tight);
+    color: var(--ink);
+  }
+
+  .section-heading__rule {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin-top: var(--space-4);
+  }
+
+  .section-heading__subtitle {
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    color: var(--ink-muted);
+    line-height: var(--lh-relaxed);
+    margin-top: var(--space-4);
+    max-width: 640px;
+  }
+
+  /* Inverted (dark bg) */
+  .section-heading--inverted .section-heading__number {
+    color: var(--accent-light);
+  }
+
+  .section-heading--inverted .section-heading__title {
+    color: var(--paper);
+  }
+
+  .section-heading--inverted .section-heading__rule {
+    background: var(--accent-light);
+  }
+
+  .section-heading--inverted .section-heading__subtitle {
+    color: rgba(250, 248, 244, 0.7);
+  }
+</style>
