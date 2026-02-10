@@ -11,14 +11,33 @@ const BUCKET = process.env.BUCKET_NAME || "sklad-tekstu-attachments";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_EXTENSIONS = [
-  ".pdf", ".doc", ".docx", ".tex", ".bib", ".sty", ".cls",
-  ".jpg", ".jpeg", ".png", ".tiff", ".eps", ".svg",
-  ".zip", ".rar", ".7z", ".tar.gz",
-  ".xlsx", ".csv", ".txt", ".rtf", ".odt", ".md"
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".tex",
+  ".bib",
+  ".sty",
+  ".cls",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".tiff",
+  ".eps",
+  ".svg",
+  ".zip",
+  ".rar",
+  ".7z",
+  ".tar.gz",
+  ".xlsx",
+  ".csv",
+  ".txt",
+  ".rtf",
+  ".odt",
+  ".md",
 ];
 
 const headers = {
-  "Access-Control-Allow-Origin": "https://sklad-tekstu.pl",
+  "Access-Control-Allow-Origin": "https://www.sklad-tekstu.pl",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
@@ -55,7 +74,9 @@ export const handler = async (event) => {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: "Niedozwolony format pliku. Dozwolone: " + ALLOWED_EXTENSIONS.join(", "),
+          error:
+            "Niedozwolony format pliku. Dozwolone: " +
+            ALLOWED_EXTENSIONS.join(", "),
         }),
       };
     }

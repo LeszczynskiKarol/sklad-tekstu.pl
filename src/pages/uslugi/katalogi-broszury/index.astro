@@ -49,7 +49,7 @@ const serviceSchema = {
         {
           "@type": "Question",
           "name": "Ile kosztuje skład katalogu produktowego?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od liczby produktów, złożoności kart produktowych i wymagań graficznych. Wycena jest bezpłatna — wyślij materiały i opis wymagań, a w ciągu 24h otrzymasz szczegółową kalkulację." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od liczby produktów, złożoności kart produktowych i wymagań graficznych. Wycena jest bezpłatna — wyślij materiały i opis wymagań, a w ciągu 24 godz. otrzymasz szczegółową kalkulację." }
         },
         {
           "@type": "Question",
@@ -160,7 +160,7 @@ const industries = [
 // Process
 const processSteps = [
   { num: '01', title: 'Materiały i brief', desc: 'Wyślij dane produktowe (Excel, CSV, baza danych), zdjęcia, logo, kolory firmowe i opis wymagań (format, objętość, styl). Im kompletniejsze materiały, tym szybsza realizacja i trafniejsza wycena.', time: '1 dzień' },
-  { num: '02', title: 'Wycena i koncepcja', desc: 'W ciągu 24h: wycena z rozbiciem na elementy (szablon, skład, obróbka zdjęć, druk) + propozycja koncepcji layoutu (format strony, grid, styl kart produktowych). Bezpłatnie.', time: '24 godz.' },
+  { num: '02', title: 'Wycena i koncepcja', desc: 'W ciągu 24 godz.: wycena z rozbiciem na elementy (szablon, skład, obróbka zdjęć, druk) + propozycja koncepcji layoutu (format strony, grid, styl kart produktowych). Bezpłatnie.', time: '24 godz.' },
   { num: '03', title: 'Makieta', desc: 'Projektujemy szablon katalogu: strona tytułowa, układ karty produktowej, styl tabel, system oznaczeń, okładka. Składamy próbne strony (2–4 produkty) do akceptacji.', time: '3–5 dni' },
   { num: '04', title: 'Skład właściwy', desc: 'Generujemy kompletny katalog z danych. Obróbka zdjęć, skład kart produktowych, tabele, indeksy. Przesyłamy PDF z postępem — możesz sprawdzać i zgłaszać uwagi na bieżąco.', time: '1–4 tyg.' },
   { num: '05', title: 'Korekta i finalizacja', desc: 'Wprowadzamy poprawki, aktualizujemy dane, dopracowujemy detale. Na końcu: PDF drukarski (CMYK, spady, crop marks), PDF ekranowy (hiperłącza), opcjonalnie pliki .tex do samodzielnej aktualizacji.', time: '2–5 dni' }
@@ -495,7 +495,7 @@ const faqItems = [
     <div class="container">
       <div class="cta__block reveal">
         <div class="cta__env" aria-hidden="true" set:html="\\begin{katalog}" />
-        <h2 id="cta-title">Wyślij materiały — wycenimy skład katalogu w&nbsp;24h</h2>
+        <h2 id="cta-title">Wyślij materiały — wycenimy skład katalogu w&nbsp;24 godz.</h2>
         <p>
           Niezależnie czy to katalog na 50 czy 5000 produktów, broszura firmowa czy cennik —
           przygotujemy wycenę z&nbsp;rozbiciem na elementy i&nbsp;konkretnym terminem.

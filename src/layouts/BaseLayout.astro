@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SEO from '../components/SEO.astro';
+import CookieBanner from '../components/CookieBanner.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -49,8 +50,21 @@ const {
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <link rel="preconnect" href="https://www.google-analytics.com" />
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe
+      src="https://www.googletagmanager.com/ns.html?id=GTM-WF37N7DQ"
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden"
+      title="Google Tag Manager"
+    ></iframe>
+  </noscript>
+
   <Header />
 
   <main id="main-content" class="main-content">
@@ -58,6 +72,9 @@ const {
   </main>
 
   <Footer />
+
+  <!-- Cookie Consent Banner (GDPR) -->
+  <CookieBanner />
 
   <!-- Back to top -->
   <button

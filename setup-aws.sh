@@ -21,6 +21,39 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TMP_DIR="$SCRIPT_DIR/.tmp"
 mkdir -p "$TMP_DIR"
 
+# ── Konwertuj ścieżkę MINGW na Windows dla AWS CLI ──
+to_win_path() {
+  cygpath -w "$1" 2>/dev/null || echo "$1"
+}
+
+# ── Zipowanie + upload do Lambda ──
+make_zip() {
+  local src_dir="$1"
+  local zip_name="$2"
+  local zip_path="$TMP_DIR/$zip_name"
+  rm -f "$zip_path"
+
+  if command -v zip &>/dev/null; then
+    (cd "$src_dir" && zip -r "$zip_path" . -x "*.git*" > /dev/null 2>&1)
+  else
+    local win_src win_zip
+    win_src=$(to_win_path "$src_dir")
+    win_zip=$(to_win_path "$zip_path")
+    powershell.exe -NoProfile -Command "Compress-Archive -Path '${win_src}\\*' -DestinationPath '${win_zip}' -Force"
+  fi
+
+  if [ ! -f "$zip_path" ]; then
+    echo "    BŁĄD: Nie udało się utworzyć $zip_path"
+    exit 1
+  fi
+  echo "    ZIP: $(ls -lh "$zip_path" | awk '{print $5}')"
+}
+
+# ── fileb:// z poprawną ścieżką ──
+fileb() {
+  echo "fileb://$(to_win_path "$1")"
+}
+
 echo "============================================"
 echo "Account: $ACCOUNT_ID"
 echo "Region:  $REGION"
@@ -108,16 +141,18 @@ sleep 10
 echo ">>> [3/7] Lambda: $PRESIGN_FUNCTION"
 
 cd "$SCRIPT_DIR/aws-lambdas/presign-upload"
-npm install --production --silent 2>/dev/null
-rm -f "$TMP_DIR/presign-upload.zip"
-zip -r "$TMP_DIR/presign-upload.zip" . -x "*.git*" > /dev/null
+npm install --production --silent 2>/dev/null || npm install --production 2>&1 | tail -3
+make_zip "$SCRIPT_DIR/aws-lambdas/presign-upload" "presign-upload.zip"
+
+PRESIGN_ZIP=$(fileb "$TMP_DIR/presign-upload.zip")
+echo "    fileb: $PRESIGN_ZIP"
 
 aws lambda create-function \
   --function-name "$PRESIGN_FUNCTION" \
   --runtime "nodejs20.x" \
   --role "$ROLE_ARN" \
   --handler "index.handler" \
-  --zip-file "fileb://$TMP_DIR/presign-upload.zip" \
+  --zip-file "$PRESIGN_ZIP" \
   --timeout 10 \
   --memory-size 128 \
   --environment "Variables={BUCKET_NAME=${BUCKET_NAME}}" \
@@ -126,7 +161,7 @@ aws lambda create-function \
     echo "    Funkcja istnieje - aktualizuje..."
     aws lambda update-function-code \
       --function-name "$PRESIGN_FUNCTION" \
-      --zip-file "fileb://$TMP_DIR/presign-upload.zip" \
+      --zip-file "$PRESIGN_ZIP" \
       --region "$REGION" > /dev/null
     sleep 5
     aws lambda update-function-configuration \
@@ -143,16 +178,18 @@ echo ""
 echo ">>> [4/7] Lambda: $CONTACT_FUNCTION"
 
 cd "$SCRIPT_DIR/aws-lambdas/contact-form"
-npm install --production --silent 2>/dev/null
-rm -f "$TMP_DIR/contact-form.zip"
-zip -r "$TMP_DIR/contact-form.zip" . -x "*.git*" > /dev/null
+npm install --production --silent 2>/dev/null || npm install --production 2>&1 | tail -3
+make_zip "$SCRIPT_DIR/aws-lambdas/contact-form" "contact-form.zip"
+
+CONTACT_ZIP=$(fileb "$TMP_DIR/contact-form.zip")
+echo "    fileb: $CONTACT_ZIP"
 
 aws lambda create-function \
   --function-name "$CONTACT_FUNCTION" \
   --runtime "nodejs20.x" \
   --role "$ROLE_ARN" \
   --handler "index.handler" \
-  --zip-file "fileb://$TMP_DIR/contact-form.zip" \
+  --zip-file "$CONTACT_ZIP" \
   --timeout 15 \
   --memory-size 128 \
   --environment "Variables={BUCKET_NAME=${BUCKET_NAME}}" \
@@ -161,7 +198,7 @@ aws lambda create-function \
     echo "    Funkcja istnieje - aktualizuje..."
     aws lambda update-function-code \
       --function-name "$CONTACT_FUNCTION" \
-      --zip-file "fileb://$TMP_DIR/contact-form.zip" \
+      --zip-file "$CONTACT_ZIP" \
       --region "$REGION" > /dev/null
     sleep 5
     aws lambda update-function-configuration \
@@ -333,7 +370,4 @@ echo ""
 echo "  NASTEPNY KROK:"
 echo "  W pliku kontakt.astro zmien API_URL na:"
 echo "  $API_URL"
-echo ""
-echo "  Test:"
-echo "  curl -X POST $API_URL/contact -H \"Content-Type: application/json\" -d \"{\\\"name\\\":\\\"Test\\\",\\\"email\\\":\\\"test@test.com\\\",\\\"message\\\":\\\"Test\\\"}\""
 echo ""

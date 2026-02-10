@@ -7,7 +7,7 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const REGION = process.env.AWS_REGION || "eu-north-1";
-const SES_REGION = "eu-north-1";
+const SES_REGION = "us-east-1";
 const ses = new SESClient({ region: SES_REGION });
 const s3 = new S3Client({ region: REGION });
 
@@ -17,7 +17,7 @@ const FROM_EMAIL = "formularz@sklad-tekstu.pl";
 const FROM_NAME = "sklad-tekstu.pl";
 
 const headers = {
-  "Access-Control-Allow-Origin": "https://sklad-tekstu.pl",
+  "Access-Control-Allow-Origin": "https://www.sklad-tekstu.pl",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
@@ -44,7 +44,16 @@ export const handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { name, email, phone, company, service, message, pages, attachments } = body;
+    const {
+      name,
+      email,
+      phone,
+      company,
+      service,
+      message,
+      pages,
+      attachments,
+    } = body;
 
     // Walidacja
     if (!name || !email || !message) {
@@ -118,7 +127,7 @@ export const handler = async (event) => {
 
     <!-- Title -->
     <h1 style="font-family:'Georgia',serif;font-size:22px;font-weight:600;color:#1a1a1a;margin:0 0 6px;line-height:1.3">Nowe zapytanie o skład tekstu</h1>
-    <p style="font-family:'Courier New',monospace;font-size:11px;color:#9e968d;margin:0 0 24px">${new Date().toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;color:#9e968d;margin:0 0 24px">${new Date().toLocaleDateString("pl-PL", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
 
     <!-- Data table -->
     <table style="width:100%;border-collapse:collapse;background:#ffffff;border:1px solid #ddd6ca">
@@ -132,24 +141,40 @@ export const handler = async (event) => {
           <a href="mailto:${escapeHtml(email)}" style="color:#8b1a1a;text-decoration:underline;font-family:'Georgia',serif">${escapeHtml(email)}</a>
         </td>
       </tr>
-      ${phone ? `<tr>
+      ${
+        phone
+          ? `<tr>
         <td style="padding:10px 20px;font-family:'Georgia',serif;font-weight:600;color:#1a1a1a;border-bottom:1px solid #ddd6ca">Telefon:</td>
         <td style="padding:10px 20px;font-family:'Georgia',serif;color:#3d3d3d;border-bottom:1px solid #ddd6ca">${escapeHtml(phone)}</td>
-      </tr>` : ""}
-      ${company ? `<tr>
+      </tr>`
+          : ""
+      }
+      ${
+        company
+          ? `<tr>
         <td style="padding:10px 20px;font-family:'Georgia',serif;font-weight:600;color:#1a1a1a;border-bottom:1px solid #ddd6ca">Instytucja:</td>
         <td style="padding:10px 20px;font-family:'Georgia',serif;color:#3d3d3d;border-bottom:1px solid #ddd6ca">${escapeHtml(company)}</td>
-      </tr>` : ""}
-      ${service ? `<tr>
+      </tr>`
+          : ""
+      }
+      ${
+        service
+          ? `<tr>
         <td style="padding:10px 20px;font-family:'Georgia',serif;font-weight:600;color:#1a1a1a;border-bottom:1px solid #ddd6ca">Usługa:</td>
         <td style="padding:10px 20px;font-family:'Georgia',serif;color:#3d3d3d;border-bottom:1px solid #ddd6ca">
           <span style="background:rgba(139,26,26,0.06);color:#8b1a1a;padding:3px 10px;font-family:'Courier New',monospace;font-size:12px">${escapeHtml(service)}</span>
         </td>
-      </tr>` : ""}
-      ${pages ? `<tr>
+      </tr>`
+          : ""
+      }
+      ${
+        pages
+          ? `<tr>
         <td style="padding:10px 20px;font-family:'Georgia',serif;font-weight:600;color:#1a1a1a;border-bottom:1px solid #ddd6ca">Objętość:</td>
         <td style="padding:10px 20px;font-family:'Georgia',serif;color:#3d3d3d;border-bottom:1px solid #ddd6ca">${escapeHtml(pages)}</td>
-      </tr>` : ""}
+      </tr>`
+          : ""
+      }
       <tr>
         <td style="padding:10px 20px;font-family:'Georgia',serif;font-weight:600;color:#1a1a1a;vertical-align:top;border-bottom:1px solid #ddd6ca">Wiadomość:</td>
         <td style="padding:10px 20px;font-family:'Georgia',serif;color:#3d3d3d;line-height:1.65;border-bottom:1px solid #ddd6ca">${escapeHtml(message).replace(/\n/g, "<br>")}</td>

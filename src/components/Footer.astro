@@ -6,7 +6,7 @@ const footerLinks = [
   { label: 'Proces', href: '/#proces' },
   { label: 'Realizacje', href: '/#realizacje' },
   { label: 'Dlaczego LaTeX', href: '/#dlaczego-latex' },
-  { label: 'Kontakt', href: '/#kontakt' },
+  { label: 'Kontakt', href: '/kontakt' },
 ];
 
 const serviceLinks = [
@@ -33,7 +33,10 @@ const serviceLinks = [
           w&nbsp;systemie LaTeX
         </p>
         <div class="footer__contact">
+          <span class="footer__owner">Karol Leszczyński</span>
+          <span class="footer__nip">NIP 9562203948</span>
           <a href="mailto:kontakt@sklad-tekstu.pl" class="footer__email">kontakt@sklad-tekstu.pl</a>
+          <a href="tel:+48509370772" class="footer__phone">tel. 509 370 772</a>
         </div>
       </div>
 
@@ -59,9 +62,12 @@ const serviceLinks = [
       <span class="footer__copyright">
         Złożono z&nbsp;typograficzną precyzją · © {currentYear} sklad-tekstu.pl
       </span>
-      <span class="footer__latex-sig">
+            <span class="footer__latex-sig">
+        <button type="button" class="footer__cookie-btn" onclick="openCookieSettings()">Ustawienia cookies</button>
+        <span aria-hidden="true">·</span>
         Powered by LaTeX · pdflatex v3.141592
       </span>
+
     </div>
   </div>
 </footer>
@@ -169,4 +175,51 @@ const serviceLinks = [
     color: var(--ink-faint);
     letter-spacing: 0.04em;
   }
+
+  .footer__cookie-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color var(--transition-fast);
+  }
+
+  .footer__cookie-btn:hover {
+    color: var(--accent);
+  }
+
+  .footer__contact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .footer__owner {
+    font-family: var(--font-serif);
+    font-size: var(--fs-sm);
+    color: var(--ink-muted);
+  }
+
+  .footer__nip {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  .footer__phone {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .footer__phone:hover { color: var(--accent-hover); }
 </style>

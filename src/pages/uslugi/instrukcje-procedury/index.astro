@@ -49,7 +49,7 @@ const serviceSchema = {
         {
           "@type": "Question",
           "name": "Ile kosztuje skład instrukcji obsługi?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od objętości, złożoności (schematy, tabele, ostrzeżenia, wielojęzyczność) i wymaganego terminu. Wycena jest bezpłatna — wyślij materiały, a w ciągu 24h otrzymasz szczegółową kalkulację." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Koszt zależy od objętości, złożoności (schematy, tabele, ostrzeżenia, wielojęzyczność) i wymaganego terminu. Wycena jest bezpłatna — wyślij materiały, a w ciągu 24 godz. otrzymasz szczegółową kalkulację." }
         },
         {
           "@type": "Question",
@@ -136,7 +136,7 @@ const industries = [
 // Process
 const processSteps = [
   { num: '01', title: 'Materiały i wymagania', desc: 'Wyślij treść instrukcji w dowolnym formacie, schematy, zdjęcia, logo i wymagania (normy, format, język, system numeracji dokumentów). Jeśli masz istniejącą dokumentację do przeprojektowania — też ją przyjmiemy.', time: '1 dzień' },
-  { num: '02', title: 'Wycena i analiza', desc: 'W ciągu 24h: wycena z rozbiciem na elementy + analiza struktury dokumentu (hierarchia rozdziałów, typy bloków, system ostrzeżeń, potrzebne schematy). Bezpłatnie.', time: '24 godz.' },
+  { num: '02', title: 'Wycena i analiza', desc: 'W ciągu 24 godz.: wycena z rozbiciem na elementy + analiza struktury dokumentu (hierarchia rozdziałów, typy bloków, system ostrzeżeń, potrzebne schematy). Bezpłatnie.', time: '24 godz.' },
   { num: '03', title: 'Szablon i makieta', desc: 'Projektujemy szablon: strona tytułowa z metadanymi, układ nagłówków, style ostrzeżeń, format kroków procedury, tabela historii zmian. Składamy próbny rozdział do akceptacji.', time: '2–4 dni' },
   { num: '04', title: 'Skład właściwy', desc: 'Składamy kompletny dokument: tekst, schematy, tabele, ostrzeżenia, cross-referencje, indeksy, glosariusz. Przesyłamy PDF z postępem — możesz sprawdzać na bieżąco.', time: '3 dni – 3 tyg.' },
   { num: '05', title: 'Weryfikacja i finalizacja', desc: 'Sprawdzasz gotowy PDF, zgłaszasz poprawki. Na końcu: PDF drukarski, PDF ekranowy z nawigacją, opcjonalnie pliki .tex + instrukcja edycji do samodzielnych aktualizacji w przyszłości.', time: '2–5 dni' }
@@ -509,7 +509,7 @@ const warningTypes = [
     <div class="container">
       <div class="cta__block reveal">
         <div class="cta__env" aria-hidden="true" set:html="\\begin{procedura}" />
-        <h2 id="cta-title">Wyślij materiały — wycenimy skład instrukcji w&nbsp;24h</h2>
+        <h2 id="cta-title">Wyślij materiały — wycenimy skład instrukcji w&nbsp;24 godz.</h2>
         <p>
           Niezależnie czy to instrukcja obsługi, procedura SOP, dokumentacja ISO czy podręcznik
           serwisowy — przygotujemy wycenę z&nbsp;rozbiciem na elementy i&nbsp;konkretnym terminem.
