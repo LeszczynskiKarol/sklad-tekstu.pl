@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Blog — sklad-tekstu.pl",
+  "description": "Artykuły o składzie tekstu LaTeX, typografii, narzędziach i najlepszych praktykach tworzenia profesjonalnych dokumentów.",
+  "url": "https://www.sklad-tekstu.pl/blog/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "sklad-tekstu.pl"
+  }
+};
+---
+
+<BaseLayout
+  title="Blog o składzie tekstu LaTeX — poradniki, narzędzia, typografia"
+  description="Artykuły o profesjonalnym składzie tekstu LaTeX. Poradniki, porównania narzędzi, wskazówki typograficzne i najlepsze praktyki tworzenia dokumentów."
+  keywords="blog latex, skład tekstu blog, typografia latex, poradniki latex"
+  schema={schema}
+>
+  <section class="blog-list">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav class="blog-list__breadcrumb" aria-label="Ścieżka">
+        <a href="/">Strona główna</a>
+        <span aria-hidden="true">/</span>
+        <span>Blog</span>
+      </nav>
+
+      <div class="reveal">
+        <SectionHeading
+          number="§Blog"
+          title=" "
+          subtitle="Artykuły o składzie tekstu, typografii LaTeX i profesjonalnym tworzeniu dokumentów."
+        />
+      </div>
+
+      {posts.length === 0 ? (
+        <p class="blog-list__empty">Wkrótce pojawią się tu artykuły. Zaglądaj regularnie!</p>
+      ) : (
+        <div class="blog-list__posts">
+          {posts.map((post, i) => (
+            <a href={`/blog/${post.id}/`} class="blog-card reveal">
+              <div class="blog-card__number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</div>
+              <div class="blog-card__content">
+                <div class="blog-card__meta">
+                  <span class="blog-card__category">{post.data.category}</span>
+                  <time class="blog-card__date" datetime={post.data.date.toISOString()}>
+                    {formatDate(post.data.date)}
+                  </time>
+                </div>
+                <h2 class="blog-card__title">{post.data.title}</h2>
+                <p class="blog-card__desc">{post.data.description}</p>
+                <span class="blog-card__read">Czytaj artykuł →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-list {
+    padding: var(--space-12) 0 var(--space-20);
+  }
+
+  .blog-list__breadcrumb {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-10);
+    letter-spacing: 0.03em;
+  }
+
+  .blog-list__breadcrumb a {
+    color: var(--ink-faint);
+    transition: color var(--transition-fast);
+  }
+
+  .blog-list__breadcrumb a:hover {
+    color: var(--accent);
+  }
+
+  .blog-list__empty {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--ink-muted);
+    padding: var(--space-10) 0;
+  }
+
+  .blog-list__posts {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .blog-card {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: var(--space-6);
+    padding: var(--space-8) 0;
+    border-bottom: 0.5px solid var(--rule-light);
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .blog-card:first-child {
+    border-top: 1px solid var(--ink);
+  }
+
+  .blog-card:hover {
+    padding-left: var(--space-4);
+    background: var(--paper-warm);
+    margin: 0 calc(-1 * var(--space-4));
+    padding-right: var(--space-4);
+  }
+
+  @media (max-width: 640px) {
+    .blog-card {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+  }
+
+  .blog-card__number {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-light);
+    color: var(--rule);
+    line-height: 1;
+    padding-top: 0.2rem;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .blog-card__number {
+      font-size: var(--fs-xl);
+      text-align: left;
+    }
+  }
+
+  .blog-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .blog-card__category {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .blog-card__date {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+  }
+
+  .blog-card__title {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-tight);
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+    transition: color var(--transition-fast);
+  }
+
+  .blog-card:hover .blog-card__title {
+    color: var(--accent);
+  }
+
+  .blog-card__desc {
+    font-size: var(--fs-sm);
+    color: var(--ink-muted);
+    line-height: var(--lh-relaxed);
+    max-width: 580px;
+  }
+
+  .blog-card__read {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    margin-top: var(--space-3);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.3s ease;
+  }
+
+  .blog-card:hover .blog-card__read {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>

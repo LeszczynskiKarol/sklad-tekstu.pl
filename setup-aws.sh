@@ -74,7 +74,7 @@ aws s3api create-bucket \
 
 aws s3api put-bucket-cors \
   --bucket "$BUCKET_NAME" \
-  --cors-configuration '{"CORSRules":[{"AllowedOrigins":["https://sklad-tekstu.pl","http://localhost:4321"],"AllowedMethods":["PUT","GET"],"AllowedHeaders":["*"],"MaxAgeSeconds":3600}]}'
+  --cors-configuration '{"CORSRules":[{"AllowedOrigins":["https://sklad-tekstu.pl","https://www.sklad-tekstu.pl","http://localhost:4321"],"AllowedMethods":["PUT","GET"],"AllowedHeaders":["*"],"MaxAgeSeconds":3600}]}'
 echo "    CORS OK"
 
 aws s3api put-bucket-lifecycle-configuration \
@@ -225,7 +225,7 @@ else
   API_ID=$(aws apigatewayv2 create-api \
     --name "$API_NAME" \
     --protocol-type "HTTP" \
-    --cors-configuration '{"AllowOrigins":["https://sklad-tekstu.pl","http://localhost:4321"],"AllowMethods":["POST","OPTIONS"],"AllowHeaders":["Content-Type"],"MaxAge":3600}' \
+    --cors-configuration '{"AllowOrigins":["https://www.sklad-tekstu.pl","https://sklad-tekstu.pl","http://localhost:4321"],"AllowMethods":["POST","OPTIONS"],"AllowHeaders":["Content-Type"],"MaxAge":3600}' \
     --region "$REGION" \
     --query "ApiId" --output text)
   echo "    Utworzono API: $API_ID"
