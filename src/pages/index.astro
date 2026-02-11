@@ -177,53 +177,60 @@ const advantages = [
 // Showcase items
 const showcaseItems = [
   {
-    type: 'Podręcznik akademicki',
-    title: 'Analiza Matematyczna',
-    subtitle: 'Wydanie III, poprawione',
-    formula: '∫₀^∞ e^{−x²} dx = √π / 2',
-    page: '42'
+    type: 'Ebook',
+    title: 'Jak napisać pracę magisterską',
+    subtitle: 'poradnik dla studentów',    
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/jak-napisac-prace-magisterska-preview.pdf',
+    pages: '250'
   },
   {
-    type: 'Katalog produktowy',
-    title: 'Katalog silników elektrycznych',
-    subtitle: 'Seria PRO 2025',
-    placeholder: '[ specyfikacja techniczna ]',
-    page: '18'
+    type: 'Ebook',
+    title: 'Jak napisać pracę licencjacką',
+    subtitle: 'poradnik dla studentów',    
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/jak-napisac-prac%C4%99-licencjacka-ebook.pdf',
+    pages: '250'
   },
   {
-    type: 'Praca doktorska',
-    title: 'Wpływ mikrostruktury na właściwości...',
-    subtitle: 'Rozprawa doktorska',
-    formula: 'σ = Eε + ηε̇',
-    page: '87'
+    type: 'Ebook',
+    title: 'Jak tworzyć treści z AI',
+    subtitle: 'poradnik dla specjalistów od content marketingu i copywritingu',        
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/ebook_ai_preview.pdf',
+    pages: '45'
   },
   {
-    type: 'Arkusz egzaminacyjny',
-    title: 'Egzamin z fizyki',
-    subtitle: 'Sesja letnia 2025',
-    formula: 'F = G·m₁m₂ / r²',
-    page: '3'
-  },
-  {
-    type: 'Instrukcja techniczna',
-    title: 'Procedura kalibracji systemu',
-    subtitle: 'Rev. 4.2',
-    placeholder: '[ schemat blokowy ]',
-    page: '12'
-  },
-  {
-    type: 'Raport badawczy',
-    title: 'Efektywność energetyczna budynków',
-    subtitle: 'Raport końcowy',
-    formula: 'Q = U · A · ΔT',
-    page: '31'
+    type: 'Podręcznik',
+    title: 'Opiekun medyczny',
+    subtitle: 'podręcznik do nauki dla przyszłych opiekunów medycznych',    
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/om_preview.pdf',
+    pages: '206'
   },
   {
     type: 'Zeszyt ćwiczeń',
-    title: 'Ćwiczenia z algebry liniowej',
-    subtitle: 'Semestr zimowy',
-    formula: 'det(A) = Σ sgn(σ)·∏aᵢσ(ᵢ)',
-    page: '24'
+    title: 'Opiekun medyczny',
+    subtitle: 'zeszyt ćwiczeń do nauki dla przyszłych opiekunów medycznych',    
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/om_zeszyt_preview.pdf',
+    pages: '198'
+  },
+  {
+    type: 'Instrukcja obsługi',
+    title: 'Stoły anatomiczne',
+    subtitle: 'Instrukcja obsługi medycznych stołów anatomicznych',
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/stoly_instrukcja_preview.pdf',    
+    pages: '55'
+  },
+  {
+    type: 'Katalog produktowy',
+    title: 'Aplikacje medyczne VR',
+    subtitle: 'Katalog produktowy interaktywnej aplikacji medycznej VR',
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/gogle_vr_preview.pdf',    
+    pages: '71'
+  },
+  {
+    type: 'Zeszyt ćwiczeń',
+    title: 'Technik sterylizacji medycznej',
+    subtitle: 'podręcznik do nauki dla przyszłych techników sterylizacji medycznej',    
+    pdf: 'https://praca-magisterska-ebooks.s3.eu-central-1.amazonaws.com/sterylizacja_preview.pdf',
+    pages: '150'
   }
 ];
 
@@ -366,7 +373,7 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════
+ <!-- ════════════════════════════════════════════════
        §3 REALIZACJE (showcase)
        ════════════════════════════════════════════════ -->
   <section class="showcase" id="realizacje" aria-labelledby="realizacje-title">
@@ -374,41 +381,79 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       <div class="reveal">
         <SectionHeading
           number="§3"
-          title="Przykłady realizacji"
-          subtitle="Każdy typ dokumentu wymaga innego podejścia do składu. Oto rodzaje publikacji, które tworzymy w systemie LaTeX."
+          title="Najnowsze realizacje"
+          subtitle="Kliknij kartę, aby otworzyć interaktywny podgląd dokumentu. Każdy PDF możesz przewijać i powiększać — zobacz jakość składu na własne oczy."
           inverted
         />
       </div>
     </div>
-    <div class="showcase__scroll">
-      {showcaseItems.map((item) => (
-        <article class="showcase__card">
-          <div class="showcase__page">
-            <div class="showcase__page-type">{item.type}</div>
-            <h4 class="showcase__page-title">
-              {item.title}
-              <small>{item.subtitle}</small>
-            </h4>
-            <div class="showcase__page-body">
-              <div class="showcase__fake-line"></div>
-              <div class="showcase__fake-line"></div>
-              <div class="showcase__fake-line short"></div>
-              {item.formula && (
-                <div class="showcase__formula">{item.formula}</div>
-              )}
-              {item.placeholder && (
-                <div class="showcase__placeholder">{item.placeholder}</div>
-              )}
-              <div class="showcase__fake-line"></div>
-              <div class="showcase__fake-line"></div>
-              <div class="showcase__fake-line short"></div>
+    <div class="container-wide">
+      <div class="showcase__grid">
+        {showcaseItems.map((item, i) => (
+          <article class="showcase__card" data-pdf-index={i}>
+            <div class="showcase__page">
+              <div class="showcase__page-type">{item.type}</div>
+              <h4 class="showcase__page-title">
+                {item.title}
+                <small>{item.subtitle}</small>
+              </h4>
+              <div class="showcase__page-body">
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>                
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line"></div>
+                <div class="showcase__fake-line short"></div>
+              </div>
+              <div class="showcase__page-footer">
+                <span class="showcase__page-num">{item.pages} str.</span>
+                <span class="showcase__page-cta">Podgląd PDF →</span>
+              </div>
             </div>
-            <div class="showcase__page-num">{item.page}</div>
-          </div>
-        </article>
-      ))}
+          </article>
+        ))}
+      </div>
     </div>
   </section>
+
+  <!-- PDF Viewer Modal -->
+  <div id="pdf-modal" class="pdf-modal" hidden>
+    <div class="pdf-modal__backdrop"></div>
+    <div class="pdf-modal__container">
+      <div class="pdf-modal__header">
+        <div class="pdf-modal__info">
+          <span id="pdf-modal-type" class="pdf-modal__type"></span>
+          <h3 id="pdf-modal-title" class="pdf-modal__title"></h3>
+          <span id="pdf-modal-subtitle" class="pdf-modal__subtitle"></span>
+        </div>
+        <div class="pdf-modal__controls">
+          <button id="pdf-prev" class="pdf-modal__nav" type="button" aria-label="Poprzedni projekt">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <span id="pdf-counter" class="pdf-modal__counter"></span>
+          <button id="pdf-next" class="pdf-modal__nav" type="button" aria-label="Następny projekt">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          <button id="pdf-close" class="pdf-modal__close" type="button" aria-label="Zamknij">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+      <div class="pdf-modal__viewer">
+        <iframe id="pdf-iframe" class="pdf-modal__iframe" title="Podgląd dokumentu PDF"></iframe>
+        <div id="pdf-loading" class="pdf-modal__loading">
+          <span class="pdf-modal__spinner"></span>
+          <span>Ładowanie dokumentu…</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ════════════════════════════════════════════════
        §4 DLACZEGO LATEX
@@ -525,7 +570,78 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       </article>
     </div>
   </section>
+<script define:vars={{ showcaseItems }}>
+    (function() {
+      var modal = document.getElementById('pdf-modal');
+      var iframe = document.getElementById('pdf-iframe');
+      var loading = document.getElementById('pdf-loading');
+      var titleEl = document.getElementById('pdf-modal-title');
+      var typeEl = document.getElementById('pdf-modal-type');
+      var subtitleEl = document.getElementById('pdf-modal-subtitle');
+      var counterEl = document.getElementById('pdf-counter');
+      var currentIndex = 0;
+      var items = showcaseItems;
 
+      function openPdf(index) {
+        currentIndex = index;
+        var item = items[index];
+
+        typeEl.textContent = item.type;
+        titleEl.textContent = item.title;
+        subtitleEl.textContent = item.subtitle;
+        counterEl.textContent = (index + 1) + ' / ' + items.length;
+
+        loading.style.display = 'flex';
+        iframe.style.opacity = '0';
+        iframe.src = item.pdf;
+
+        modal.removeAttribute('hidden');
+        modal.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }
+
+      iframe.addEventListener('load', function() {
+        loading.style.display = 'none';
+        iframe.style.opacity = '1';
+      });
+
+      function closePdf() {
+        modal.classList.remove('visible');
+        document.body.style.overflow = '';
+        setTimeout(function() {
+          modal.setAttribute('hidden', '');
+          iframe.src = '';
+        }, 300);
+      }
+
+      function navigate(dir) {
+        var next = currentIndex + dir;
+        if (next < 0) next = items.length - 1;
+        if (next >= items.length) next = 0;
+        openPdf(next);
+      }
+
+      // Event listeners
+      document.querySelectorAll('[data-pdf-index]').forEach(function(card) {
+        card.addEventListener('click', function() {
+          openPdf(parseInt(card.dataset.pdfIndex));
+        });
+      });
+
+      document.getElementById('pdf-close').addEventListener('click', closePdf);
+      document.getElementById('pdf-prev').addEventListener('click', function() { navigate(-1); });
+      document.getElementById('pdf-next').addEventListener('click', function() { navigate(1); });
+
+      document.querySelector('.pdf-modal__backdrop').addEventListener('click', closePdf);
+
+      document.addEventListener('keydown', function(e) {
+        if (modal.hasAttribute('hidden')) return;
+        if (e.key === 'Escape') closePdf();
+        if (e.key === 'ArrowLeft') navigate(-1);
+        if (e.key === 'ArrowRight') navigate(1);
+      });
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -920,33 +1036,37 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  .showcase__scroll {
-    display: flex;
+  .showcase__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--space-6);
-    padding: var(--space-6) 0;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    position: relative;
   }
 
-  .showcase__scroll::-webkit-scrollbar { display: none; }
+  @media (max-width: 1024px) {
+    .showcase__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .showcase__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .showcase__grid {
+      grid-template-columns: 1fr;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+  }
 
   .showcase__card {
-    flex: 0 0 260px;
-    scroll-snap-align: start;
     background: white;
-    border-radius: var(--radius-sm);
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     transition: transform 0.4s ease;
+    cursor: pointer;
   }
 
-  .showcase__card:first-child { margin-left: var(--gutter); }
-  .showcase__card:last-child { margin-right: var(--gutter); }
-
   .showcase__card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-6px) scale(1.02);
   }
 
   .showcase__page {
@@ -1022,15 +1142,200 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
     color: var(--ink-faint);
   }
 
+  .showcase__page-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 0.5px solid var(--rule-light);
+  }
+
   .showcase__page-num {
-    position: absolute;
-    bottom: var(--space-3);
-    left: 50%;
-    transform: translateX(-50%);
     font-family: var(--font-serif);
     font-size: 0.65rem;
     color: var(--ink-faint);
   }
+
+  .showcase__page-cta {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.3s ease;
+  }
+
+  .showcase__card:hover .showcase__page-cta {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ══════════════════════════════════════════════════
+     PDF MODAL
+     ══════════════════════════════════════════════════ */
+  .pdf-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .pdf-modal[hidden] { display: none; }
+
+  .pdf-modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .pdf-modal__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(4px);
+  }
+
+  .pdf-modal__container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-4);
+  }
+
+  @media (max-width: 768px) {
+    .pdf-modal__container {
+      padding: var(--space-2);
+    }
+  }
+
+  .pdf-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    flex-shrink: 0;
+  }
+
+  .pdf-modal__type {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .pdf-modal__title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: var(--fw-semibold);
+    color: var(--ink);
+    margin: 2px 0;
+    line-height: 1.2;
+  }
+
+  .pdf-modal__subtitle {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+
+  .pdf-modal__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .pdf-modal__nav,
+  .pdf-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--paper-warm);
+    border: 0.5px solid var(--rule-light);
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pdf-modal__nav:hover,
+  .pdf-modal__close:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .pdf-modal__counter {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--ink-faint);
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .pdf-modal__close {
+    margin-left: var(--space-2);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .pdf-modal__close:hover {
+    background: var(--accent);
+  }
+
+  .pdf-modal__viewer {
+    flex: 1;
+    position: relative;
+    background: #525659;
+    min-height: 0;
+  }
+
+  .pdf-modal__iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .pdf-modal__loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--rule);
+    letter-spacing: 0.05em;
+  }
+
+  .pdf-modal__spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--rule);
+    border-top-color: var(--paper);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
 
   /* ══════════════════════════════════════════════════
      §4 WHY LATEX
