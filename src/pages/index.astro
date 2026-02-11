@@ -2,6 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch 3 newest blog posts
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const formatDate = (d: Date) =>
+  d.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
 
 // Schema.org
 const homeSchema = {
@@ -483,7 +492,52 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
   </section>
 
   <!-- ════════════════════════════════════════════════
-       §5 KONTAKT / CTA
+       §5 BLOG — Najnowsze artykuły
+       ════════════════════════════════════════════════ -->
+  {posts.length > 0 && (
+    <section class="blog-section" id="blog" aria-labelledby="blog-title">
+      <div class="container">
+        <div class="reveal">
+          <SectionHeading
+            number="§5"
+            title="Z&nbsp;naszego bloga"
+            subtitle="Artykuły o składzie tekstu, typografii LaTeX i profesjonalnym tworzeniu dokumentów. Praktyczna wiedza, którą stosujemy w codziennej pracy."
+          />
+        </div>
+
+        <div class="blog-section__posts">
+          {posts.map((post, i) => (
+            <a href={`/blog/${post.id}/`} class="blog-section__card reveal">
+              <div class="blog-section__card-number" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <div class="blog-section__card-content">
+                <div class="blog-section__card-meta">
+                  <span class="blog-section__card-category">{post.data.category}</span>
+                  <time class="blog-section__card-date" datetime={post.data.date.toISOString()}>
+                    {formatDate(post.data.date)}
+                  </time>
+                </div>
+                <h3 class="blog-section__card-title">{post.data.title}</h3>
+                <p class="blog-section__card-desc">{post.data.description}</p>
+                <span class="blog-section__card-read">Czytaj artykuł →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="blog-section__more reveal">
+          <a href="/blog/" class="blog-section__more-link">
+            Wszystkie artykuły
+            <span class="blog-section__more-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ════════════════════════════════════════════════
+       §6 KONTAKT / CTA
        ════════════════════════════════════════════════ -->
   <section class="cta" id="kontakt" aria-labelledby="kontakt-title">
     <div class="container">
@@ -1401,7 +1455,157 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
   }
 
   /* ══════════════════════════════════════════════════
-     §5 CTA
+     §5 BLOG SECTION
+     ══════════════════════════════════════════════════ */
+  .blog-section {
+    padding: var(--space-20) 0;
+    background: var(--paper-warm);
+    border-top: 0.5px solid var(--rule);
+    border-bottom: 0.5px solid var(--rule);
+  }
+
+  .blog-section__posts {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .blog-section__card {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: var(--space-6);
+    padding: var(--space-8) 0;
+    border-bottom: 0.5px solid var(--rule-light);
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .blog-section__card:first-child {
+    border-top: 1px solid var(--ink);
+  }
+
+  .blog-section__card:hover {
+    padding-left: var(--space-4);
+    background: var(--paper);
+    margin: 0 calc(-1 * var(--space-4));
+    padding-right: var(--space-4);
+  }
+
+  @media (max-width: 640px) {
+    .blog-section__card {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+  }
+
+  .blog-section__card-number {
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-light);
+    color: var(--rule);
+    line-height: 1;
+    padding-top: 0.2rem;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .blog-section__card-number {
+      font-size: var(--fs-xl);
+      text-align: left;
+    }
+  }
+
+  .blog-section__card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .blog-section__card-category {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .blog-section__card-date {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+  }
+
+  .blog-section__card-title {
+    font-family: var(--font-display);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-tight);
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+    transition: color var(--transition-fast);
+  }
+
+  .blog-section__card:hover .blog-section__card-title {
+    color: var(--accent);
+  }
+
+  .blog-section__card-desc {
+    font-size: var(--fs-sm);
+    color: var(--ink-muted);
+    line-height: var(--lh-relaxed);
+    max-width: 580px;
+  }
+
+  .blog-section__card-read {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    margin-top: var(--space-3);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.3s ease;
+  }
+
+  .blog-section__card:hover .blog-section__card-read {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .blog-section__more {
+    margin-top: var(--space-10);
+    text-align: center;
+  }
+
+  .blog-section__more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-serif);
+    font-size: var(--fs-base);
+    color: var(--ink-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: all var(--transition-fast);
+  }
+
+  .blog-section__more-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .blog-section__more-arrow {
+    transition: transform var(--transition-fast);
+  }
+
+  .blog-section__more-link:hover .blog-section__more-arrow {
+    transform: translateX(4px);
+  }
+
+  /* ══════════════════════════════════════════════════
+     §6 CTA
      ══════════════════════════════════════════════════ */
   .cta {
     padding: var(--space-20) 0;
