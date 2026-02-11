@@ -67,8 +67,8 @@ Cel: Klient szuka rozwiązania dla konkretnego typu dokumentu — trafia na Twó
         12. **Skład podręcznika akademickiego w LaTeX — od manuskryptu do druku**
             Proces tworzenia podręcznika: struktura rozdziałów, indeksy, spisy treści, bibliografie, ilustracje. Dlaczego LaTeX jest standardem wydawnictw naukowych.
 
-13. **Praca doktorska w LaTeX — jak spełnić wymagania uczelni**
-    Wymagania formatowe polskich uczelni. Szablony LaTeX. Automatyczne spisy, bibliografia BibLaTeX, cross-referencje. Dlaczego doktoranci wybierają LaTeX.
+        13. **Praca doktorska w LaTeX — jak spełnić wymagania uczelni**
+            Wymagania formatowe polskich uczelni. Szablony LaTeX. Automatyczne spisy, bibliografia BibLaTeX, cross-referencje. Dlaczego doktoranci wybierają LaTeX.
 
 14. **Zeszyty ćwiczeń i arkusze egzaminacyjne — automatyzacja z klasą exam.cls**
     Jak LaTeX automatyzuje tworzenie wariantów egzaminów. Numeracja zadań, klucze odpowiedzi, tabele punktacji. Oszczędność czasu nauczycieli i wydawnictw.
@@ -91,8 +91,9 @@ Cel: Klient szuka rozwiązania dla konkretnego typu dokumentu — trafia na Twó
 
 Cel: Treści eksperckie budujące autorytet. Trafiają do osób, które znają LaTeX lub szukają szczegółów.
 
-19. **PDF gotowy do drukarni — CMYK, spady, crop marks i osadzanie fontów**
-    Co musi zawierać PDF, żeby drukarnia go przyjęła bez problemów. Profile kolorów, trimbox, bleedbox. Jak LaTeX generuje pliki print-ready.
+        GOTOWE
+        19. **PDF gotowy do drukarni — CMYK, spady, crop marks i osadzanie fontów**
+            Co musi zawierać PDF, żeby drukarnia go przyjęła bez problemów. Profile kolorów, trimbox, bleedbox. Jak LaTeX generuje pliki print-ready.
 
 20. **BibLaTeX i zarządzanie bibliografią — APA, IEEE, Chicago i polskie normy**
     Automatyczne formatowanie bibliografii. Integracja z Mendeley/Zotero. Polskie normy bibliograficzne a standardy międzynarodowe.
@@ -159,6 +160,9 @@ Cel: Social proof — pokazanie konkretnych efektów pracy.
 
 35. **Case study: Podręcznik medyczny — 206 stron, 150 ilustracji, 3 tygodnie**
     Opis projektu od A do Z. Wyzwania, rozwiązania, efekt końcowy. Z linkiem do podglądu PDF.
+
+        35.1.**Case study: zeszyty ćwiczeń dla przyszłych masażystów**
+            projekt zeszytu cwiczen dla uczniów szkół policealnych na kierunku technik masażysta. Wklejam wynikowe pliki, strukturę projektu i korespondencję z klientem
 
 36. **Case study: Instrukcja obsługi stołów anatomicznych — wielojęzyczny skład techniczny**
     Projekt dwujęzyczny, specjalistyczna terminologia, cross-referencje, diagramy techniczne.
