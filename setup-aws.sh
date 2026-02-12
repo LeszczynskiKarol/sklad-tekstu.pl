@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash - setup.sh
 # ============================================================
 # SETUP: Infrastruktura AWS dla formularza kontaktowego
 # sklad-tekstu.pl

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash - update-lambdas.sh
 # Szybka aktualizacja kodu Lambda po zmianach
 # Użycie: ./update-lambdas.sh [presign|contact|all]
 

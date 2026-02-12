@@ -52,6 +52,66 @@ const homeSchema = {
   ]
 };
 
+const galleryItems = [
+  {
+    src: '/showcases/06_broszura_it.jpg',
+    title: 'Broszura usługowa',
+    category: 'Marketing',
+    desc: 'Oferta software house — dark hero, karty usług, tech badges',
+    tags: ['tikz', 'tcolorbox', 'raleway'],
+  },
+  {
+    src: '/showcases/07_broszura_spa.jpg',
+    title: 'Broszura SPA',
+    category: 'Marketing',
+    desc: 'Centrum wellness — elegancka paleta, ornamenty, karty zabiegów',
+    tags: ['pgfornament', 'lato', 'tikz'],
+  },
+  {
+    src: '/showcases/08_broszura_nieruchomosci.jpg',
+    title: 'Katalog dewelopera',
+    category: 'Marketing',
+    desc: 'Inwestycja mieszkaniowa — split layout, wizualizacja, cennik',
+    tags: ['tikz', 'sourcesanspro', 'pifont'],
+  },
+  {
+    src: '/showcases/01_podrecznik.jpg',
+    title: 'Podręcznik akademicki',
+    category: 'Edukacja',
+    desc: 'Rachunek różniczkowy — twierdzenia, dowody, wykresy TikZ',
+    tags: ['tcolorbox', 'amsmath', 'tikz'],
+  },
+  {
+    src: '/showcases/02_arkusz.jpg',
+    title: 'Arkusz egzaminacyjny',
+    category: 'Edukacja',
+    desc: 'Egzamin z fizyki — zadania, diagramy optyczne, warianty',
+    tags: ['exam', 'tikz', 'siunitx'],
+  },
+  {
+    src: '/showcases/03_raport.jpg',
+    title: 'Raport techniczny',
+    category: 'Technika',
+    desc: 'Analiza fotowoltaiki — wykresy pgfplots, tabele booktabs',
+    tags: ['pgfplots', 'booktabs', 'siunitx'],
+  },
+  {
+    src: '/showcases/04_katalog.jpg',
+    title: 'Katalog produktowy',
+    category: 'Technika',
+    desc: 'Stół medyczny — rysunek techniczny TikZ, specyfikacja',
+    tags: ['tikz', 'multicol', 'tcolorbox'],
+  },
+  {
+    src: '/showcases/05_artykul.jpg',
+    title: 'Artykuł naukowy',
+    category: 'Nauka',
+    desc: 'Optymalizacja hiperparametrów CNN — dwukolumnowy layout',
+    tags: ['twocolumn', 'pgfplots', 'natbib'],
+  },
+];
+
+
 // Services data — 9 items for 3×3 grid
 const services = [
   {
@@ -404,6 +464,16 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
         />
       </div>
     </div>
+   
+   <!-- Separator przed istniejącymi PDF-ami -->
+    <div class="container">
+      <div class="showcase__divider reveal">
+        <span class="showcase__divider-line"></span>
+        <span class="showcase__divider-text">Interaktywne podglądy PDF</span>
+        <span class="showcase__divider-line"></span>
+      </div>
+    </div>
+
     <div class="container-wide">
       <div class="showcase__grid">
         {showcaseItems.map((item, i) => (
@@ -437,6 +507,83 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
         ))}
       </div>
     </div>
+    
+
+     <!-- Galeria showcase — przykłady składu -->
+    <div class="container-wide">
+      <div class="showcase-gallery reveal">
+        <div class="showcase-gallery__header">
+          <p class="showcase-gallery__label">Przykłady składu</p>
+          <p class="showcase-gallery__sub">Kliknij miniaturę, aby powiększyć. Każdy dokument złożony w 100% w&nbsp;LaTeX — bez Photoshopa, bez InDesigna.</p>
+        </div>
+
+               <div class="showcase-gallery__grid">
+          {galleryItems.map((item, i) => (
+            <button
+              class="showcase-gallery__item"
+              data-gallery-index={i}
+              type="button"
+              aria-label={`Powiększ: ${item.title}`}
+            >
+              <div class="showcase-gallery__img-wrap">
+                <img
+                  src={item.src}
+                  alt={`${item.title} — ${item.desc}`}
+                  loading={i < 4 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  width="595"
+                  height="842"
+                />
+              </div>
+              <div class="showcase-gallery__meta">
+                <span class="showcase-gallery__category">{item.category}</span>
+                <h4 class="showcase-gallery__title">{item.title}</h4>
+                <p class="showcase-gallery__desc">{item.desc}</p>
+                <div class="showcase-gallery__tags">
+                  {item.tags.map((tag) => (
+                    <span class="showcase-gallery__tag">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Showcase gallery lightbox -->
+    <div id="gallery-lightbox" class="gallery-lightbox" hidden>
+      <div class="gallery-lightbox__backdrop"></div>
+      <div class="gallery-lightbox__content">
+        <button id="gallery-close" class="gallery-lightbox__close" type="button" aria-label="Zamknij">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button id="gallery-prev" class="gallery-lightbox__nav gallery-lightbox__nav--prev" type="button" aria-label="Poprzedni">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button id="gallery-next" class="gallery-lightbox__nav gallery-lightbox__nav--next" type="button" aria-label="Następny">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <img id="gallery-img" class="gallery-lightbox__img" src="" alt="" />
+        <div class="gallery-lightbox__info">
+          <span id="gallery-info-cat" class="gallery-lightbox__info-cat"></span>
+          <span id="gallery-info-title" class="gallery-lightbox__info-title"></span>
+          <span id="gallery-info-counter" class="gallery-lightbox__info-counter"></span>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- PDF Viewer Modal -->
@@ -471,6 +618,8 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       </div>
     </div>
   </div>
+
+ 
 
   <!-- ════════════════════════════════════════════════
        §4 DLACZEGO LATEX
@@ -704,6 +853,66 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       });
     })();
   </script>
+  <script define:vars={{ galleryItems }}>
+  (function() {
+    var lightbox = document.getElementById('gallery-lightbox');
+    var img = document.getElementById('gallery-img');
+    var catEl = document.getElementById('gallery-info-cat');
+    var titleEl = document.getElementById('gallery-info-title');
+    var counterEl = document.getElementById('gallery-info-counter');
+    var items = galleryItems;
+    var currentIdx = 0;
+
+    function openGallery(index) {
+      currentIdx = index;
+      var item = items[index];
+      img.src = item.src;
+      img.alt = item.title + ' — ' + item.desc;
+      catEl.textContent = item.category;
+      titleEl.textContent = item.title;
+      counterEl.textContent = (index + 1) + ' / ' + items.length;
+      lightbox.removeAttribute('hidden');
+      requestAnimationFrame(function() {
+        lightbox.classList.add('visible');
+      });
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeGallery() {
+      lightbox.classList.remove('visible');
+      document.body.style.overflow = '';
+      setTimeout(function() {
+        lightbox.setAttribute('hidden', '');
+        img.src = '';
+      }, 300);
+    }
+
+    function navigateGallery(dir) {
+      var next = currentIdx + dir;
+      if (next < 0) next = items.length - 1;
+      if (next >= items.length) next = 0;
+      openGallery(next);
+    }
+
+    document.querySelectorAll('[data-gallery-index]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        openGallery(parseInt(btn.dataset.galleryIndex));
+      });
+    });
+
+    document.getElementById('gallery-close').addEventListener('click', closeGallery);
+    document.getElementById('gallery-prev').addEventListener('click', function() { navigateGallery(-1); });
+    document.getElementById('gallery-next').addEventListener('click', function() { navigateGallery(1); });
+    document.querySelector('.gallery-lightbox__backdrop').addEventListener('click', closeGallery);
+
+    document.addEventListener('keydown', function(e) {
+      if (lightbox.hasAttribute('hidden')) return;
+      if (e.key === 'Escape') closeGallery();
+      if (e.key === 'ArrowLeft') navigateGallery(-1);
+      if (e.key === 'ArrowRight') navigateGallery(1);
+    });
+  })();
+</script>
 </BaseLayout>
 
 <style>
