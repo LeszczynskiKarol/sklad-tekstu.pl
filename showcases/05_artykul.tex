@@ -1,0 +1,164 @@
+\documentclass[11pt,twocolumn,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+% microtype removed
+\usepackage[margin=2cm, columnsep=0.7cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[numbers,sort&compress]{natbib}
+
+\definecolor{accent}{RGB}{139,26,26}
+\definecolor{blue1}{RGB}{44,82,130}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\textit{Zeszyty Naukowe Politechniki --- Informatyka, tom 47, nr 2 (2024)}}
+\fancyhead[R]{\footnotesize\thepage}
+\fancyfoot[C]{\footnotesize\texttt{sklad-tekstu.pl}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\setcounter{page}{143}
+
+\captionsetup{font=small, labelfont=bf, labelsep=period}
+
+\begin{document}
+
+\twocolumn[{%
+\begin{center}
+{\Large\bfseries Optymalizacja hiperparametrów sieci konwolucyjnych\\[2pt]
+w~zadaniu klasyfikacji obrazów medycznych}
+
+\vspace{8pt}
+
+{\normalsize Jan Kowalski\textsuperscript{1}\hspace{6pt} Anna Nowak\textsuperscript{1,2}\hspace{6pt} Piotr Wiśniewski\textsuperscript{2}}
+
+\vspace{4pt}
+
+{\small\textcolor{gray}{%
+\textsuperscript{1}Politechnika Warszawska, Wydział Elektroniki i~Technik Informacyjnych\\
+\textsuperscript{2}Instytut Biocybernetyki i~Inżynierii Biomedycznej PAN}}
+
+\vspace{10pt}
+
+\parbox{0.92\textwidth}{\small
+\textbf{Streszczenie.} W~pracy przedstawiono systematyczne porównanie metod optymalizacji hiperparametrów sieci konwolucyjnych (CNN) w~kontekście klasyfikacji binarnej obrazów histopatologicznych. Zbadano trzy strategie: przeszukiwanie siatki (grid search), przeszukiwanie losowe (random search) oraz optymalizację bayesowską z~procesem gaussowskim (GP-BO). Eksperymenty przeprowadzono na zbiorze BreastHist ($N = 7{,}909$ obrazów, rozdzielczość $512 \times 512$\,px). Optymalizacja bayesowska osiągnęła najwyższą dokładność klasyfikacji $\text{AUC} = 0{,}9847 \pm 0{,}0031$ przy $3{,}2\times$ mniejszej liczbie ewaluacji w~porównaniu z~grid search.
+
+\vspace{4pt}
+\textbf{Słowa kluczowe:} sieci konwolucyjne, optymalizacja hiperparametrów, optymalizacja bayesowska, obrazy medyczne, klasyfikacja histopatologiczna}
+
+\vspace{12pt}
+\noindent\rule{0.92\textwidth}{0.5pt}
+\vspace{8pt}
+\end{center}
+}]
+
+\section{Wprowadzenie}
+
+Głębokie sieci neuronowe, w~szczególności konwolucyjne (CNN), osiągają wyniki porównywalne z~diagnostami w~zadaniach klasyfikacji obrazów medycznych~\cite{litjens2017}. Wydajność tych modeli jest jednak silnie uzależniona od~wyboru hiperparametrów: szybkości uczenia~$\eta$, rozmiaru batcha~$B$, współczynnika regularyzacji~$\lambda$ oraz architektury sieci~\cite{bergstra2012}.
+
+Optymalizacja hiperparametrów stanowi problem minimalizacji czarnoskrzynkowej:
+\begin{equation}\label{eq:opt}
+  \boldsymbol{\theta}^* = \arg\min_{\boldsymbol{\theta} \in \Theta} \; \mathcal{L}\bigl(f(\mathbf{X}; \boldsymbol{\theta}), \mathbf{y}\bigr),
+\end{equation}
+gdzie $\boldsymbol{\theta}$ oznacza wektor hiperparametrów, $\Theta$ --- przestrzeń przeszukiwania, a~$\mathcal{L}$ --- funkcję straty walidacyjnej.
+
+\section{Metody}
+
+\subsection{Optymalizacja bayesowska (GP-BO)}
+
+Modelujemy funkcję celu~$\mathcal{L}(\boldsymbol{\theta})$ procesem gaussowskim:
+\begin{equation}\label{eq:gp}
+  \mathcal{L}(\boldsymbol{\theta}) \sim \mathcal{GP}\bigl(m(\boldsymbol{\theta}),\, k(\boldsymbol{\theta}, \boldsymbol{\theta}')\bigr),
+\end{equation}
+z~jądrem Matérn-5/2. Kolejny punkt ewaluacji wybieramy, maksymalizując funkcję akwizycji Expected Improvement~(EI):
+\begin{equation}
+  \text{EI}(\boldsymbol{\theta}) = \mathbb{E}\bigl[\max(0,\, \mathcal{L}^* - \mathcal{L}(\boldsymbol{\theta}))\bigr],
+\end{equation}
+gdzie $\mathcal{L}^*$ oznacza najlepszą dotychczasową wartość.
+
+\section{Wyniki}
+
+Tabela~\ref{tab:wyniki} przedstawia porównanie trzech metod optymalizacji na zbiorze testowym ($n = 1{,}582$).
+
+\begin{table}[H]
+\centering
+\caption{Porównanie metod optymalizacji.}
+\label{tab:wyniki}
+\footnotesize
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Metoda} & \textbf{AUC} & \textbf{F1} & \textbf{Ewaluacje} \\
+\midrule
+Grid search   & 0,9782 & 0,941 & 324 \\
+Random search & 0,9801 & 0,944 & 200 \\
+\textbf{GP-BO}         & \textbf{0,9847} & \textbf{0,952} & \textbf{102} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Na rysunku~\ref{fig:convergence} przedstawiono krzywe zbieżności badanych metod.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.95\columnwidth,
+  height=4.2cm,
+  xlabel={\footnotesize Liczba ewaluacji},
+  ylabel={\footnotesize Najlepsza AUC},
+  xmin=0, xmax=200,
+  ymin=0.94, ymax=0.99,
+  legend style={at={(0.98,0.02)}, anchor=south east, font=\tiny, draw=none, fill=white, fill opacity=0.8},
+  grid=major,
+  grid style={gray!15},
+  x tick label style={font=\tiny},
+  y tick label style={font=\tiny},
+  xlabel style={font=\footnotesize},
+  ylabel style={font=\footnotesize},
+  every axis plot/.append style={thick},
+]
+\addplot[accent, mark=none, smooth] coordinates {
+  (5,0.945) (15,0.958) (25,0.968) (40,0.975) (55,0.979)
+  (70,0.982) (85,0.984) (102,0.9847) (120,0.9847) (150,0.9847) (200,0.9847)
+};
+\addplot[blue1, mark=none, smooth, dashed] coordinates {
+  (10,0.942) (30,0.951) (50,0.960) (80,0.968) (100,0.973)
+  (130,0.977) (160,0.979) (200,0.9801)
+};
+\addplot[gray, mark=none, smooth, dotted] coordinates {
+  (20,0.948) (50,0.955) (80,0.962) (120,0.969) (160,0.974)
+  (200,0.9762) (250,0.9782)
+};
+\legend{GP-BO, Random, Grid}
+\end{axis}
+\end{tikzpicture}
+\caption{Zbieżność optymalizacji hiperparametrów.}
+\label{fig:convergence}
+\end{figure}
+
+\section{Wnioski}
+
+Optymalizacja bayesowska z~procesem gaussowskim (GP-BO) osiągnęła najwyższą dokładność klasyfikacji przy $3{,}2\times$ mniejszym koszcie obliczeniowym niż przeszukiwanie siatki. Wyniki potwierdzają zasadność stosowania metod surrogatowych w~optymalizacji modeli uczenia głębokiego, szczególnie gdy pojedyncza ewaluacja jest kosztowna obliczeniowo~\cite{snoek2012}.
+
+\vspace{8pt}
+\footnotesize
+\noindent\textbf{Podziękowania.} Obliczenia wykonano w~Centrum Informatycznym Świerk (CIŚ) przy użyciu klastra GPU NVIDIA A100.
+
+\vspace{4pt}
+\renewcommand{\refname}{\normalsize Literatura}
+\begin{thebibliography}{9}
+\bibitem{litjens2017} Litjens, G. i~in. (2017). A~survey on deep learning in medical image analysis. \textit{Medical Image Analysis}, 42, 60--88.
+\bibitem{bergstra2012} Bergstra, J., Bengio, Y. (2012). Random search for hyper-parameter optimization. \textit{JMLR}, 13, 281--305.
+\bibitem{snoek2012} Snoek, J. i~in. (2012). Practical Bayesian optimization of machine learning algorithms. \textit{NeurIPS}, 2951--2959.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,163 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+% microtype removed
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+\definecolor{accent}{RGB}{139,26,26}
+\definecolor{gray50}{gray}{0.5}
+\definecolor{lgray}{gray}{0.92}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textbf{Fizyka} — Arkusz egzaminacyjny nr~4}
+\fancyhead[R]{\small Poziom rozszerzony \textbullet\ Czas: 120 min}
+\fancyfoot[L]{\footnotesize Wariant A}
+\fancyfoot[C]{\thepage/4}
+\fancyfoot[R]{\footnotesize\texttt{sklad-tekstu.pl}}
+\renewcommand{\headrulewidth}{0.8pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\newcommand{\pkt}[1]{\hfill\textcolor{gray50}{\footnotesize(#1~pkt)}}
+\newcommand{\linia}{\vspace{2pt}\noindent\textcolor{lgray}{\rule{\linewidth}{0.4pt}}\vspace{6pt}}
+
+\setcounter{page}{1}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries ARKUSZ EGZAMINACYJNY Z~FIZYKI}\\[4pt]
+{\large Poziom rozszerzony --- Wariant A}\\[10pt]
+\begin{tabularx}{0.85\textwidth}{|X|X|X|}
+\hline
+\textbf{Imię i~nazwisko:} & \textbf{Klasa:} & \textbf{Data:} \\[12pt]
+\hline
+\end{tabularx}
+\end{center}
+
+\vspace{4pt}
+\noindent\colorbox{lgray}{\parbox{\dimexpr\linewidth-2\fboxsep}{%
+\small\textbf{Instrukcja:} Arkusz zawiera 12 zadań. Na rozwiązanie masz 120 minut. 
+Zadania zamknięte (1--6): zaznacz jedną poprawną odpowiedź.
+Zadania otwarte (7--12): przedstaw pełne rozwiązanie. Maksymalna liczba punktów: \textbf{50}.}}
+
+\vspace{12pt}
+
+\noindent{\large\bfseries Część I --- Zadania zamknięte}
+
+\vspace{8pt}
+
+\noindent\textbf{Zadanie 1.}\pkt{2}\\
+Ciało o~masie $m = \SI{2}{kg}$ porusza się po okręgu o~promieniu $r = \SI{0.5}{m}$ z~prędkością $v = \SI{3}{m/s}$. Wartość siły dośrodkowej działającej na to ciało wynosi:
+
+\begin{multicols}{4}
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=1.2em]
+\item $\SI{6}{N}$
+\item $\SI{12}{N}$
+\item $\SI{18}{N}$
+\item $\SI{36}{N}$
+\end{enumerate}
+\end{multicols}
+
+\linia
+
+\noindent\textbf{Zadanie 2.}\pkt{2}\\
+Elektron porusza się prostopadle do jednorodnego pola magnetycznego o~indukcji $B = \SI{0.1}{T}$ z~prędkością $v = 2 \times 10^6\;\mathrm{m/s}$. Promień okręgu, po~którym porusza się elektron, jest najbliższy wartości:
+
+\begin{multicols}{4}
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=1.2em]
+\item $\SI{0.011}{cm}$
+\item $\SI{0.11}{mm}$
+\item $\SI{0.11}{cm}$
+\item $\SI{1.1}{cm}$
+\end{enumerate}
+\end{multicols}
+
+\linia
+
+\noindent\textbf{Zadanie 3.}\pkt{3}\\
+Na rysunku przedstawiono układ dwóch soczewek. Soczewka $L_1$ ma ogniskową $f_1 = \SI{20}{cm}$, soczewka $L_2$ ma ogniskową $f_2 = \SI{-10}{cm}$. Odległość między soczewkami wynosi $d = \SI{15}{cm}$.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.7]
+  % Optical axis
+  \draw[->] (-4,0) -- (8,0) node[right] {\footnotesize oś optyczna};
+  % L1
+  \draw[thick, accent] (-1,-1.8) -- (-1,1.8);
+  \draw[accent, thick] (-1,1.8) -- (-1.25,1.5) (-1,1.8) -- (-0.75,1.5);
+  \draw[accent, thick] (-1,-1.8) -- (-1.25,-1.5) (-1,-1.8) -- (-0.75,-1.5);
+  \node[above, accent, font=\small\bfseries] at (-1,1.9) {$L_1$};
+  % L2
+  \draw[thick, blue!60!black] (3,-1.8) -- (3,1.8);
+  \draw[blue!60!black, thick] (3,1.8) -- (2.75,1.5) (3,1.8) -- (3.25,1.5);
+  \draw[blue!60!black, thick] (3,-1.8) -- (2.75,-1.5) (3,-1.8) -- (3.25,-1.5);
+  \node[above, blue!60!black, font=\small\bfseries] at (3,1.9) {$L_2$};
+  % Distance
+  \draw[<->, gray50] (-1,-2.3) -- (3,-2.3) node[midway, below, font=\footnotesize] {$d = \SI{15}{cm}$};
+  % Object
+  \draw[->, thick, green!40!black] (-3,0) -- (-3,1.2);
+  \node[left, font=\footnotesize, green!40!black] at (-3,0.6) {przedmiot};
+  % Focal points
+  \foreach \x in {-1,3} {
+    \fill[gray50] (\x,0) circle (1.5pt);
+  }
+  \node[below, font=\tiny, gray50] at (1,0) {$F_1$};
+  \fill[gray50] (1,0) circle (1pt);
+  \node[below, font=\tiny, gray50] at (2,0) {$F_2$};
+  \fill[gray50] (2,0) circle (1pt);
+\end{tikzpicture}
+\end{center}
+
+Wyznacz położenie i~powiększenie obrazu przedmiotu umieszczonego \SI{30}{cm} przed soczewką~$L_1$.
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=1.2em]
+\item obraz rzeczywisty, $p = 2\times$
+\item obraz pozorny, $p = 2\times$
+\item obraz rzeczywisty, $p = 0{,}5\times$
+\item obraz pozorny, $p = 0{,}5\times$
+\end{enumerate}
+\end{multicols}
+
+\linia
+
+\noindent{\large\bfseries Część II --- Zadania otwarte}
+
+\vspace{8pt}
+
+\noindent\textbf{Zadanie 7.}\pkt{5}\\
+Pocisk o~masie $m = \SI{10}{g}$ poruszający się poziomo z~prędkością $v_0 = \SI{400}{m/s}$ trafia w~klocek o~masie $M = \SI{2}{kg}$ stojący na gładkiej powierzchni i~zagłębia się w~nim. Wyznacz:
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=2em]
+\item prędkość klocka z~pociskiem bezpośrednio po zderzeniu,
+\item energię kinetyczną utraconą w~zderzeniu,
+\item jaką część energii początkowej stanowi energia utracona.
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\noindent\textit{Miejsce na rozwiązanie:}
+\vspace{4pt}
+
+\noindent\textcolor{lgray}{\dotfill}
+
+\noindent\textcolor{lgray}{\dotfill}
+
+\noindent\textcolor{lgray}{\dotfill}
+
+\noindent\textcolor{lgray}{\dotfill}
+
+\noindent\textcolor{lgray}{\dotfill}
+
+\end{document}

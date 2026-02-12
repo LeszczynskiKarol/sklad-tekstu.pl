@@ -1,0 +1,123 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+% microtype removed
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems,breakable}
+
+\definecolor{accent}{RGB}{139,26,26}
+\definecolor{thmbg}{RGB}{250,248,244}
+\definecolor{defbg}{RGB}{240,245,250}
+
+% Theorem styles
+\newtcbtheorem[number within=section]{twierdzenie}{Twierdzenie}{
+  colback=thmbg, colframe=accent, colbacktitle=accent,
+  fonttitle=\bfseries, arc=1pt, boxrule=0.5pt,
+  separator sign={\ ---},
+  description delimiters parenthesis
+}{tw}
+
+\newtcbtheorem[number within=section]{definicja}{Definicja}{
+  colback=defbg, colframe=accent!40!black, colbacktitle=accent!40!black,
+  fonttitle=\bfseries, arc=1pt, boxrule=0.5pt,
+  separator sign={\ ---},
+  description delimiters parenthesis
+}{def}
+
+% Page style
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textsc{Rozdział 3. Rachunek różniczkowy}}
+\fancyhead[R]{\small\textsc{Analiza Matematyczna}}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\footnotesize\texttt{sklad-tekstu.pl}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+\setcounter{section}{2}
+\setcounter{page}{87}
+
+\begin{document}
+
+\section{Rachunek różniczkowy funkcji jednej zmiennej}
+
+\begin{definicja}{Pochodna funkcji}{pochodna}
+Niech $f\colon (a,b) \to \mathbb{R}$ i~niech $x_0 \in (a,b)$. \textbf{Pochodną} funkcji~$f$ w~punkcie~$x_0$ nazywamy granicę
+\begin{equation}\label{eq:pochodna}
+  f'(x_0) = \lim_{h \to 0} \frac{f(x_0 + h) - f(x_0)}{h},
+\end{equation}
+o~ile granica ta istnieje i~jest skończona.
+\end{definicja}
+
+\begin{twierdzenie}{Reguła de l'H\^{o}pitala}{lhopital}
+Jeśli $f$ i~$g$ są różniczkowalne na przedziale $(a,b)$, $g'(x) \neq 0$ dla $x \in (a,b)$ oraz
+\[
+  \lim_{x \to a^+} f(x) = \lim_{x \to a^+} g(x) = 0,
+\]
+to zachodzi
+\begin{equation}\label{eq:lhopital}
+  \lim_{x \to a^+} \frac{f(x)}{g(x)} = \lim_{x \to a^+} \frac{f'(x)}{g'(x)},
+\end{equation}
+o~ile granica po prawej stronie istnieje (właściwa lub niewłaściwa).
+\end{twierdzenie}
+
+\begin{proof}
+Rozszerzamy $f$ i~$g$ na $[a,b)$, kładąc $f(a) = g(a) = 0$. Dla $x \in (a,b)$ stosujemy twierdzenie Cauchy'ego o~wartości średniej do $[a,x]$: istnieje $c \in (a,x)$ takie, że
+\[
+  \frac{f(x)}{g(x)} = \frac{f(x) - f(a)}{g(x) - g(a)} = \frac{f'(c)}{g'(c)}.
+\]
+Gdy $x \to a^+$, mamy $c \to a^+$ (gdyż $a < c < x$), zatem
+$\displaystyle\lim_{x \to a^+} \frac{f(x)}{g(x)} = \lim_{c \to a^+} \frac{f'(c)}{g'(c)}$.
+\end{proof}
+
+\vspace{0.3cm}
+
+\noindent\textbf{Przykład 3.1.} Oblicz $\displaystyle\lim_{x \to 0} \frac{\sin x - x}{x^3}$.
+
+\medskip\noindent\textit{Rozwiązanie.} Trzykrotnie stosujemy regułę de l'H\^{o}pitala:
+\[
+  \lim_{x \to 0} \frac{\sin x - x}{x^3} 
+  = \lim_{x \to 0} \frac{\cos x - 1}{3x^2}
+  = \lim_{x \to 0} \frac{-\sin x}{6x}
+  = \lim_{x \to 0} \frac{-\cos x}{6}
+  = -\frac{1}{6}.
+\]
+
+\vspace{0.2cm}
+
+\begin{minipage}[t]{0.48\textwidth}
+\noindent\textbf{Interpretacja geometryczna pochodnej.}
+Pochodna $f'(x_0)$ wyraża tangens kąta nachylenia stycznej do wykresu funkcji $f$ w~punkcie $(x_0, f(x_0))$. Na rysunku obok prosta styczna (czerwona) aproksymuje krzywą w~otoczeniu punktu $x_0$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85]
+\begin{axis}[
+  axis lines=center,
+  xlabel={$x$}, ylabel={$y$},
+  xmin=-0.5, xmax=4, ymin=-0.5, ymax=5,
+  xtick={1.5}, xticklabels={$x_0$},
+  ytick=\empty,
+  width=6.5cm, height=5.5cm,
+  every axis x label/.style={at={(ticklabel* cs:1)}, anchor=west},
+  every axis y label/.style={at={(ticklabel* cs:1)}, anchor=south},
+]
+\addplot[domain=0:3.8, smooth, thick, black] {0.3*x^2 + 0.5};
+\addplot[domain=0.3:3, accent, thick] {0.9*x - 0.28};
+\addplot[only marks, mark=*, mark size=2pt, accent] coordinates {(1.5, 1.175)};
+\node[above right, font=\footnotesize] at (axis cs:1.5, 1.175) {$(x_0, f(x_0))$};
+\node[right, font=\footnotesize, accent] at (axis cs:2.8, 2.24) {styczna};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+
+\end{document}

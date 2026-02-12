@@ -1,0 +1,235 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[margin=0pt]{geometry}
+\usepackage{raleway}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usetikzlibrary{calc,positioning,shapes.geometric,decorations.pathmorphing,patterns}
+\usepackage{pifont}
+\usepackage{setspace}
+\usepackage{graphicx}
+
+\pagestyle{empty}
+
+% === Colors ===
+\definecolor{navy}{RGB}{15,23,42}
+\definecolor{darkblue}{RGB}{30,41,59}
+\definecolor{midblue}{RGB}{51,65,85}
+\definecolor{accent1}{RGB}{59,130,246}   % blue
+\definecolor{accent2}{RGB}{168,85,247}   % purple
+\definecolor{accent3}{RGB}{236,72,153}   % pink
+\definecolor{accent4}{RGB}{34,197,94}    % green
+\definecolor{accent5}{RGB}{251,146,60}   % orange
+\definecolor{lightgray}{RGB}{241,245,249}
+\definecolor{txtgray}{RGB}{100,116,139}
+\definecolor{txtlight}{RGB}{148,163,184}
+\definecolor{white}{RGB}{255,255,255}
+
+\newcommand{\imark}{\textcolor{accent1}{\ding{51}}}
+
+\begin{document}
+
+% =============================================
+% HERO SECTION — full dark background
+% =============================================
+\begin{tikzpicture}[remember picture, overlay]
+  % Dark gradient background
+  \fill[navy] (current page.north west) rectangle (current page.south east);
+  % Decorative circles
+  \fill[accent1, opacity=0.06] (current page.north east) ++(-4cm,-3cm) circle (8cm);
+  \fill[accent2, opacity=0.05] (current page.north west) ++(3cm,-12cm) circle (6cm);
+  \fill[accent3, opacity=0.04] (current page.south east) ++(-6cm,8cm) circle (5cm);
+  % Grid pattern overlay
+  \foreach \x in {0,1,...,20} {
+    \draw[white, opacity=0.015] (\x,-30) -- (\x,0);
+  }
+  \foreach \y in {0,-1,...,-30} {
+    \draw[white, opacity=0.015] (0,\y) -- (21,\y);
+  }
+  % Accent line at top
+  \fill[accent1] (current page.north west) rectangle ([yshift=-3pt]current page.north east);
+\end{tikzpicture}
+
+% --- Top bar / logo ---
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=north west, inner sep=0pt] at ([xshift=2cm, yshift=-1.5cm]current page.north west) {
+    \begin{minipage}{8cm}
+      {\fontsize{11}{11}\selectfont\textcolor{white}{\textbf{NOVA}}\textcolor{accent1}{\textbf{TECH}}}
+      \hspace{6pt}{\fontsize{6.5}{6.5}\selectfont\textcolor{txtlight}{SOFTWARE HOUSE}}
+    \end{minipage}
+  };
+  \node[anchor=north east, inner sep=0pt] at ([xshift=-2cm, yshift=-1.5cm]current page.north east) {
+    {\fontsize{6.5}{6.5}\selectfont\textcolor{txtlight}{www.novatech.pl\hspace{12pt}+48 500 100 200}}
+  };
+\end{tikzpicture}
+
+\vspace*{3cm}
+
+% --- Hero content ---
+\begin{minipage}[t]{0.9\textwidth}
+\hspace*{2cm}
+\begin{minipage}[t]{16cm}
+  {\fontsize{8}{10}\selectfont\textcolor{accent1}{\textbf{OFERTA US{\L}UG 2025}}}
+
+  \vspace{0.5cm}
+
+  {\fontsize{32}{36}\selectfont\textcolor{white}{\textbf{Tworzymy oprogramowanie,}}}\\[4pt]
+  {\fontsize{32}{36}\selectfont\textcolor{white}{\textbf{kt\'ore }}\textcolor{accent1}{\textbf{zmienia biznes}}}
+
+  \vspace{0.6cm}
+
+  {\fontsize{11}{16}\selectfont\textcolor{txtlight}{%
+  Od konsultingu technologicznego, przez projektowanie UX,\\
+  po pe{\l}n\k{a} realizacj\k{e} produkt\'ow cyfrowych. 8 lat do\'swiadczenia,\\
+  ponad 120 wdro\.ze\'n, zesp\'o{\l} 45 specjalist\'ow.}}
+
+  \vspace{0.8cm}
+
+  % Stats row
+  \begin{tikzpicture}
+    \node[anchor=west] at (0,0) {
+      \begin{minipage}{3.5cm}
+        {\fontsize{28}{28}\selectfont\textcolor{accent1}{\textbf{120+}}}\\[2pt]
+        {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{ZREALIZOWANYCH PROJEKT\'OW}}
+      \end{minipage}
+    };
+    \draw[txtlight, opacity=0.3] (3.8,-0.6) -- (3.8,0.6);
+    \node[anchor=west] at (4.2,0) {
+      \begin{minipage}{3.5cm}
+        {\fontsize{28}{28}\selectfont\textcolor{accent2}{\textbf{45}}}\\[2pt]
+        {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{SPECJALIST\'OW W~ZESPOLE}}
+      \end{minipage}
+    };
+    \draw[txtlight, opacity=0.3] (8,-0.6) -- (8,0.6);
+    \node[anchor=west] at (8.4,0) {
+      \begin{minipage}{3.5cm}
+        {\fontsize{28}{28}\selectfont\textcolor{accent3}{\textbf{99\%}}}\\[2pt]
+        {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{KLIENT\'OW WRACA DO NAS}}
+      \end{minipage}
+    };
+  \end{tikzpicture}
+\end{minipage}
+\end{minipage}
+
+\vspace{1.4cm}
+
+% =============================================
+% SERVICE CARDS — colored top border
+% =============================================
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[lightgray] ([yshift=-14.5cm]current page.north west) rectangle (current page.south east);
+\end{tikzpicture}
+
+\hspace*{1.3cm}
+\begin{minipage}[t]{18.4cm}
+\begin{tikzpicture}
+
+  % Card 1
+  \node[anchor=north west] at (0,0) {
+    \begin{tikzpicture}
+      \fill[white, rounded corners=4pt] (0,0) rectangle (5.6,-6.5);
+      \fill[accent1, rounded corners=4pt] (0,0) rectangle (5.6,-0.25);
+      % Icon circle
+      \fill[accent1, opacity=0.1] (0.7,-1.2) circle (0.5);
+      \node at (0.7,-1.2) {\fontsize{14}{14}\selectfont\textcolor{accent1}{\ding{98}}};
+      \node[anchor=north west, text width=4.6cm] at (0.5,-2.0) {
+        {\fontsize{12}{14}\selectfont\textcolor{navy}{\textbf{Aplikacje webowe}}}\\[6pt]
+        {\fontsize{8}{12}\selectfont\textcolor{txtgray}{Responsywne aplikacje SPA i~PWA w~React, Next.js i~Vue. Skkalowalna architektura, API REST/GraphQL, integracje z~systemami klienta.}}\\[8pt]
+        {\fontsize{7}{9}\selectfont
+        \textcolor{accent1}{\ding{51}} \textcolor{midblue}{React / Next.js}\\
+        \textcolor{accent1}{\ding{51}} \textcolor{midblue}{Node.js / Python}\\
+        \textcolor{accent1}{\ding{51}} \textcolor{midblue}{AWS / Azure / GCP}}
+      };
+    \end{tikzpicture}
+  };
+
+  % Card 2
+  \node[anchor=north west] at (6.2,0) {
+    \begin{tikzpicture}
+      \fill[white, rounded corners=4pt] (0,0) rectangle (5.6,-6.5);
+      \fill[accent2, rounded corners=4pt] (0,0) rectangle (5.6,-0.25);
+      \fill[accent2, opacity=0.1] (0.7,-1.2) circle (0.5);
+      \node at (0.7,-1.2) {\fontsize{14}{14}\selectfont\textcolor{accent2}{\ding{70}}};
+      \node[anchor=north west, text width=4.6cm] at (0.5,-2.0) {
+        {\fontsize{12}{14}\selectfont\textcolor{navy}{\textbf{Aplikacje mobilne}}}\\[6pt]
+        {\fontsize{8}{12}\selectfont\textcolor{txtgray}{Natywne i~cross-platformowe aplikacje na iOS i~Android. Flutter, React Native, Swift, Kotlin. Od MVP po pe{\l}ny produkt z~publikacj\k{a} w~sklepach.}}\\[8pt]
+        {\fontsize{7}{9}\selectfont
+        \textcolor{accent2}{\ding{51}} \textcolor{midblue}{Flutter / React Native}\\
+        \textcolor{accent2}{\ding{51}} \textcolor{midblue}{iOS (Swift) / Android}\\
+        \textcolor{accent2}{\ding{51}} \textcolor{midblue}{CI/CD \& App Store}}
+      };
+    \end{tikzpicture}
+  };
+
+  % Card 3
+  \node[anchor=north west] at (12.4,0) {
+    \begin{tikzpicture}
+      \fill[white, rounded corners=4pt] (0,0) rectangle (5.6,-6.5);
+      \fill[accent3, rounded corners=4pt] (0,0) rectangle (5.6,-0.25);
+      \fill[accent3, opacity=0.1] (0.7,-1.2) circle (0.5);
+      \node at (0.7,-1.2) {\fontsize{14}{14}\selectfont\textcolor{accent3}{\ding{169}}};
+      \node[anchor=north west, text width=4.6cm] at (0.5,-2.0) {
+        {\fontsize{12}{14}\selectfont\textcolor{navy}{\textbf{UX/UI Design}}}\\[6pt]
+        {\fontsize{8}{12}\selectfont\textcolor{txtgray}{Projektowanie interfejs\'ow u\.zytkownika: badania UX, prototypy Figma, design systemy, testy u\.zyteczno\'sci. Zwi\k{e}kszamy konwersj\k{e} i~retencj\k{e}.}}\\[8pt]
+        {\fontsize{7}{9}\selectfont
+        \textcolor{accent3}{\ding{51}} \textcolor{midblue}{Audyt UX / Badania}\\
+        \textcolor{accent3}{\ding{51}} \textcolor{midblue}{Prototypy / Figma}\\
+        \textcolor{accent3}{\ding{51}} \textcolor{midblue}{Design System}}
+      };
+    \end{tikzpicture}
+  };
+
+\end{tikzpicture}
+\end{minipage}
+
+\vspace{0.6cm}
+
+% =============================================
+% BOTTOM — technologies + CTA
+% =============================================
+\hspace*{1.3cm}
+\begin{minipage}[t]{18.4cm}
+\begin{tikzpicture}
+
+  % Tech stack bar
+  \fill[white, rounded corners=4pt] (0,0) rectangle (18,-2.4);
+
+  \node[anchor=west] at (0.6,-0.5) {\fontsize{8}{8}\selectfont\textcolor{navy}{\textbf{TECHNOLOGIE, KT\'ORYM UFAMY}}};
+
+  % Tech badges
+  \foreach \x/\name in {0.6/React, 2.3/Next.js, 4.1/TypeScript, 6.2/Node.js, 8.2/Python, 9.9/AWS, 11.2/Docker, 12.8/PostgreSQL, 14.8/Redis, 16.2/Figma} {
+    \fill[lightgray, rounded corners=3pt] (\x,-1.1) rectangle (\x+1.4,-1.7);
+    \node[anchor=west] at (\x+0.12,-1.4) {\fontsize{6.5}{6.5}\selectfont\textcolor{midblue}{\name}};
+  }
+
+  % Contact bar
+  \fill[navy, rounded corners=4pt] (0,-2.9) rectangle (18,-4.8);
+  \fill[accent1, rounded corners=4pt] (0,-2.9) rectangle (18,-2.95);
+
+  \node[anchor=west] at (0.8,-3.55) {\fontsize{14}{14}\selectfont\textcolor{white}{\textbf{Porozmawiajmy o~Twoim projekcie}}};
+  \node[anchor=west] at (0.8,-4.2) {\fontsize{8}{8}\selectfont\textcolor{txtlight}{Bezp{\l}atna konsultacja i~wycena w~48 godzin. Napisz lub zadzwo\'n --- odpowiemy tego samego dnia.}};
+
+  % CTA button
+  \fill[accent1, rounded corners=4pt] (13.5,-3.3) rectangle (17.2,-4.3);
+  \node at (15.35,-3.8) {\fontsize{9}{9}\selectfont\textcolor{white}{\textbf{Zapytaj o~wycen\k{e} \ding{222}}}};
+
+\end{tikzpicture}
+\end{minipage}
+
+\vspace{0.4cm}
+
+% Footer
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=south, inner sep=0pt] at ([yshift=0.6cm]current page.south) {
+    {\fontsize{5.5}{5.5}\selectfont\textcolor{txtgray}{%
+    NovaTech Sp.\ z~o.o.\ \textbullet\ ul.\ Marszalkowska 27/4, 00-639 Warszawa \textbullet\ NIP: 521-000-00-01 \textbullet\ kontakt@novatech.pl%
+    \hspace{20pt}\textcolor{txtlight}{Sk{\l}ad: \textbf{sklad-tekstu.pl}}}}
+  };
+\end{tikzpicture}
+
+\end{document}

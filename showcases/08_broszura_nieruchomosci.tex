@@ -1,0 +1,239 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[margin=0pt]{geometry}
+\usepackage{sourcesanspro}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,patterns}
+\usepackage{pifont}
+
+\pagestyle{empty}
+
+% === Colors ===
+\definecolor{charcoal}{RGB}{38,38,38}
+\definecolor{darkchar}{RGB}{22,22,22}
+\definecolor{midchar}{RGB}{68,68,68}
+\definecolor{stone}{RGB}{245,242,237}
+\definecolor{warmstone}{RGB}{235,228,218}
+\definecolor{copper}{RGB}{184,115,51}
+\definecolor{copperlight}{RGB}{215,168,115}
+\definecolor{copperdk}{RGB}{148,88,35}
+\definecolor{offwhite}{RGB}{252,250,247}
+\definecolor{txtmed}{RGB}{120,115,108}
+\definecolor{txtlight}{RGB}{170,165,158}
+
+\begin{document}
+
+% =============================================
+% FULL-BLEED LAYOUT
+% =============================================
+\begin{tikzpicture}[remember picture, overlay]
+  % Background
+  \fill[offwhite] (current page.north west) rectangle (current page.south east);
+
+  % LEFT PANEL — dark sidebar
+  \fill[charcoal] (current page.north west) rectangle ([xshift=7.5cm]current page.south west);
+
+  % Copper accent strip
+  \fill[copper] ([xshift=7.5cm]current page.north west) rectangle ([xshift=7.65cm]current page.south west);
+
+  % Subtle pattern on sidebar
+  \foreach \y in {0,-1.5,...,-29} {
+    \draw[white, opacity=0.02] ([xshift=0cm, yshift=\y cm]current page.north west) -- ([xshift=7.5cm, yshift=\y cm]current page.north west);
+  }
+
+  % === LEFT PANEL CONTENT ===
+
+  % Logo
+  \node[anchor=north west] at ([xshift=1.5cm, yshift=-1.5cm]current page.north west) {
+    \begin{minipage}{5cm}
+      {\fontsize{18}{18}\selectfont\textcolor{white}{\textbf{MODERN}}}\\[-2pt]
+      {\fontsize{18}{18}\selectfont\textcolor{copper}{\textbf{ESTATE}}}\\[4pt]
+      {\fontsize{6}{6}\selectfont\textcolor{txtlight}{DEWELOPER \quad ARCHITEKTURA}}
+    \end{minipage}
+  };
+
+  % Divider
+  \draw[copper, opacity=0.4] ([xshift=1.5cm, yshift=-4cm]current page.north west) -- ([xshift=6.5cm, yshift=-4cm]current page.north west);
+
+  % Key features
+  \node[anchor=north west] at ([xshift=1.5cm, yshift=-4.6cm]current page.north west) {
+    \begin{minipage}{5cm}
+      {\fontsize{6.5}{6.5}\selectfont\textcolor{copper}{INWESTYCJA}}\\[10pt]
+      {\fontsize{22}{22}\selectfont\textcolor{white}{\textbf{Rezydencja}}}\\[2pt]
+      {\fontsize{22}{22}\selectfont\textcolor{white}{\textbf{Parkowa}}}\\[6pt]
+      {\fontsize{8.5}{13}\selectfont\textcolor{txtlight}{Kamer\'alne osiedle 24 apartament\'ow w~otoczeniu zieleni Parku Krakowskiego. Architektura {\l}\k{a}cz\k{a}ca modernizm z~naturalnym kamieniem.}}
+    \end{minipage}
+  };
+
+  % Stats blocks
+  \node[anchor=north west] at ([xshift=1.5cm, yshift=-9.5cm]current page.north west) {
+    \begin{minipage}{5cm}
+      % Stat 1
+      {\fontsize{28}{28}\selectfont\textcolor{copper}{\textbf{24}}}\\[-2pt]
+      {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{apartamenty}}\\[0pt]
+      {\fontsize{7}{7}\selectfont\textcolor{txtmed}{od 45 do 120 m\textsuperscript{2}}}\\[12pt]
+      % Stat 2
+      {\fontsize{28}{28}\selectfont\textcolor{copper}{\textbf{IV'26}}}\\[-2pt]
+      {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{planowane oddanie}}\\[0pt]
+      {\fontsize{7}{7}\selectfont\textcolor{txtmed}{stan deweloperski+}}\\[12pt]
+      % Stat 3
+      {\fontsize{28}{28}\selectfont\textcolor{copper}{\textbf{A+}}}\\[-2pt]
+      {\fontsize{7.5}{7.5}\selectfont\textcolor{txtlight}{klasa energetyczna}}\\[0pt]
+      {\fontsize{7}{7}\selectfont\textcolor{txtmed}{pompa ciep{\l}a + fotowoltaika}}
+    \end{minipage}
+  };
+
+  % Divider
+  \draw[copper, opacity=0.4] ([xshift=1.5cm, yshift=-17cm]current page.north west) -- ([xshift=6.5cm, yshift=-17cm]current page.north west);
+
+  % Contact info
+  \node[anchor=north west] at ([xshift=1.5cm, yshift=-17.5cm]current page.north west) {
+    \begin{minipage}{5cm}
+      {\fontsize{6.5}{6.5}\selectfont\textcolor{copper}{BIURO SPRZEDA\.ZY}}\\[10pt]
+      {\fontsize{8.5}{13}\selectfont\textcolor{txtlight}{%
+      ul.\ Parkowa 12\\
+      30-001 Krak\'ow\\[4pt]
+      +48 12 345 67 89\\
+      sprzedaz@modernestate.pl}}\\[12pt]
+      {\fontsize{7}{7}\selectfont\textcolor{txtmed}{Pn--Pt 9:00--18:00\\Sb 10:00--14:00}}
+    \end{minipage}
+  };
+
+  % Bottom of sidebar
+  \node[anchor=south west] at ([xshift=1.5cm, yshift=1cm]current page.south west) {
+    {\fontsize{5.5}{5.5}\selectfont\textcolor{txtmed}{Sk{\l}ad: \textbf{sklad-tekstu.pl}}}
+  };
+
+  % === RIGHT PANEL CONTENT ===
+
+  % Building visualization (TikZ architectural drawing)
+  \begin{scope}[shift={([xshift=10.5cm, yshift=-2cm]current page.north west)}]
+    % Sky gradient
+    \fill[stone] (0,0) rectangle (9.5,-6);
+    % Building facade
+    \fill[warmstone] (1,-1) rectangle (8.5,-5.8);
+    \draw[charcoal, opacity=0.15] (1,-1) rectangle (8.5,-5.8);
+    % Floor lines
+    \foreach \y in {-2.2,-3.4,-4.6} {
+      \draw[charcoal, opacity=0.08] (1,\y) -- (8.5,\y);
+    }
+    % Windows - 4 columns, 4 rows
+    \foreach \x in {1.6,3.2,4.8,6.4} {
+      \foreach \y in {-1.3,-2.5,-3.7,-4.9} {
+        \fill[stone] (\x,\y) rectangle (\x+1.1,\y+0.6);
+        \draw[charcoal, opacity=0.12] (\x,\y) rectangle (\x+1.1,\y+0.6);
+        % Window divider
+        \draw[charcoal, opacity=0.06] (\x+0.55,\y) -- (\x+0.55,\y+0.6);
+      }
+    }
+    % Balconies on right
+    \foreach \y in {-1.3,-2.5,-3.7} {
+      \fill[charcoal, opacity=0.06] (7.8,\y) rectangle (8.3,\y-0.08);
+    }
+    % Ground/entrance
+    \fill[charcoal, opacity=0.08] (1,-5.8) rectangle (8.5,-6);
+    % Entrance
+    \fill[copper, opacity=0.3] (4.2,-4.9) rectangle (5.3,-5.8);
+    % Trees
+    \fill[olive!40] (0.3,-4.3) ellipse (0.5 and 0.8);
+    \fill[olive!35] (9,-4.5) ellipse (0.4 and 0.7);
+    \fill[olive!30] (9.2,-4.8) ellipse (0.35 and 0.5);
+  \end{scope}
+
+  % Section: Standard
+  \node[anchor=north west] at ([xshift=8.5cm, yshift=-9cm]current page.north west) {
+    \begin{minipage}{11cm}
+      {\fontsize{6.5}{6.5}\selectfont\textcolor{copper}{STANDARD WYKO\'NCZENIA}}\\[10pt]
+      {\fontsize{16}{18}\selectfont\textcolor{charcoal}{\textbf{Przemylany do ostatniego detalu}}}
+    \end{minipage}
+  };
+
+  % Features grid — 2x3
+  \node[anchor=north west] at ([xshift=8.5cm, yshift=-11cm]current page.north west) {
+    \begin{tikzpicture}
+      % Row 1
+      \foreach \x/\title/\desc in {
+        0/{Pod{\l}ogi}/{D\k{a}b europejski w~jode{\l}k\k{e} lub p{\l}ytki wielkoformatowe Marazzi},
+        4/{Okna}/{Aluminiowe, trzyszybowe, Uw=0{,}8. Rolety zewn\k{e}trzne w~standardzie},
+        8/{Kuchnia}/{Zabudowa pod wymiar, blat kwarcowy, AGD Bosch w~cenie}%
+      } {
+        \fill[stone, rounded corners=3pt] (\x,0) rectangle (\x+3.5,-2.8);
+        \fill[copper] (\x+0.3,-0.3) circle (0.25);
+        \node[white] at (\x+0.3,-0.3) {\fontsize{8}{8}\selectfont\ding{51}};
+        \node[anchor=north west, text width=2.5cm] at (\x+0.9,-0.1) {
+          {\fontsize{9}{10}\selectfont\textcolor{charcoal}{\textbf{\title}}}\\[3pt]
+          {\fontsize{7}{10}\selectfont\textcolor{txtmed}{\desc}}
+        };
+      }
+      % Row 2
+      \foreach \x/\title/\desc in {
+        0/{{\L}azienka}/{Armatura Grohe, ceramika Villeroy \& Boch, deszczownica walk-in},
+        4/{Ogrzewanie}/{Pod{\l}og\'owka w~ca{\l}ym apartamencie, pompa ciep{\l}a powietrze-woda},
+        8/{Smart home}/{System KNX: o\'swietlenie, rolety, klimatyzacja. Aplikacja mobilna}%
+      } {
+        \fill[stone, rounded corners=3pt] (\x,-3.2) rectangle (\x+3.5,-6);
+        \fill[copper] (\x+0.3,-3.5) circle (0.25);
+        \node[white] at (\x+0.3,-3.5) {\fontsize{8}{8}\selectfont\ding{51}};
+        \node[anchor=north west, text width=2.5cm] at (\x+0.9,-3.3) {
+          {\fontsize{9}{10}\selectfont\textcolor{charcoal}{\textbf{\title}}}\\[3pt]
+          {\fontsize{7}{10}\selectfont\textcolor{txtmed}{\desc}}
+        };
+      }
+    \end{tikzpicture}
+  };
+
+  % Price section
+  \node[anchor=north west] at ([xshift=8.5cm, yshift=-18.5cm]current page.north west) {
+    \begin{minipage}{11cm}
+      {\fontsize{6.5}{6.5}\selectfont\textcolor{copper}{CENNIK}}\\[10pt]
+      \begin{tikzpicture}
+        % Price cards
+        \fill[stone, rounded corners=3pt] (0,0) rectangle (3.5,-2.5);
+        \node[anchor=north west] at (0.4,-0.3) {
+          \begin{minipage}{2.8cm}
+            {\fontsize{7}{7}\selectfont\textcolor{txtlight}{Apartament 2-pokojowy}}\\[4pt]
+            {\fontsize{7}{7}\selectfont\textcolor{txtmed}{45--55 m\textsuperscript{2}}}\\[4pt]
+            {\fontsize{16}{16}\selectfont\textcolor{charcoal}{\textbf{od 590 000 z{\l}}}}\\[2pt]
+            {\fontsize{7}{7}\selectfont\textcolor{copper}{od 12\,100 z{\l}/m\textsuperscript{2}}}
+          \end{minipage}
+        };
+        \fill[stone, rounded corners=3pt] (3.9,0) rectangle (7.4,-2.5);
+        \node[anchor=north west] at (4.3,-0.3) {
+          \begin{minipage}{2.8cm}
+            {\fontsize{7}{7}\selectfont\textcolor{txtlight}{Apartament 3-pokojowy}}\\[4pt]
+            {\fontsize{7}{7}\selectfont\textcolor{txtmed}{65--85 m\textsuperscript{2}}}\\[4pt]
+            {\fontsize{16}{16}\selectfont\textcolor{charcoal}{\textbf{od 815 000 z{\l}}}}\\[2pt]
+            {\fontsize{7}{7}\selectfont\textcolor{copper}{od 11\,800 z{\l}/m\textsuperscript{2}}}
+          \end{minipage}
+        };
+        \fill[charcoal, rounded corners=3pt] (7.8,0) rectangle (11.3,-2.5);
+        \node[anchor=north west] at (8.2,-0.3) {
+          \begin{minipage}{2.8cm}
+            {\fontsize{7}{7}\selectfont\textcolor{txtlight}{Penthouse z~tarasem}}\\[4pt]
+            {\fontsize{7}{7}\selectfont\textcolor{copperlight}{100--120 m\textsuperscript{2}}}\\[4pt]
+            {\fontsize{14}{14}\selectfont\textcolor{white}{\textbf{od 1\,490\,000 z{\l}}}}\\[2pt]
+            {\fontsize{7}{7}\selectfont\textcolor{copper}{od 13\,500 z{\l}/m\textsuperscript{2}}}
+          \end{minipage}
+        };
+      \end{tikzpicture}
+    \end{minipage}
+  };
+
+  % CTA bar at bottom right
+  \fill[copper] ([xshift=7.65cm, yshift=2.5cm]current page.south west) rectangle (current page.south east);
+  \node[anchor=center] at ([xshift=14cm, yshift=1.25cm]current page.south west) {
+    {\fontsize{11}{11}\selectfont\textcolor{white}{\textbf{Um\'ow si\k{e} na prezentacj\k{e} apartamentu \ding{222}}}}
+  };
+
+  % Fine print
+  \node[anchor=south east] at ([xshift=-1cm, yshift=2.8cm]current page.south east) {
+    {\fontsize{5}{5}\selectfont\textcolor{txtlight}{Wizualizacje maj\k{a} charakter pogl\k{a}dowy. Ceny brutto. Stan na 01.2025.}}
+  };
+
+\end{tikzpicture}
+
+\end{document}

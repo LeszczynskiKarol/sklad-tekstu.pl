@@ -1,0 +1,148 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[margin=1.8cm, top=2.2cm, bottom=2cm]{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usetikzlibrary{calc}
+
+\definecolor{accent}{RGB}{139,26,26}
+\definecolor{darkbg}{RGB}{35,35,40}
+\definecolor{lightbg}{RGB}{248,247,243}
+\definecolor{midgray}{gray}{0.45}
+\definecolor{ltgray}{gray}{0.88}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\textcolor{accent}{\textbf{MEDTECH PRO}} \textcolor{midgray}{|} \textcolor{midgray}{\textsc{Katalog produktowy 2025}}}
+\fancyhead[R]{\footnotesize\textcolor{midgray}{Seria sto{\l}\'ow diagnostycznych}}
+\fancyfoot[L]{\footnotesize\textcolor{midgray}{www.medtechpro.pl}}
+\fancyfoot[C]{\footnotesize\textcolor{midgray}{\thepage\,/\,48}}
+\fancyfoot[R]{\footnotesize\texttt{sklad-tekstu.pl}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+\setcounter{page}{18}
+
+\newcommand{\spec}[2]{{\footnotesize\textcolor{midgray}{#1}}\\[1pt]{\small\textbf{#2}}\\[6pt]}
+\newcommand{\divline}{\vspace{2pt}\noindent\textcolor{ltgray}{\rule{\linewidth}{0.4pt}}\vspace{6pt}}
+
+\begin{document}
+
+\noindent{\footnotesize\textcolor{accent}{\textbf{SERIA DX}}\hspace{8pt}\textcolor{midgray}{Sto{\l}y diagnostyczne}}
+
+\vspace{4pt}
+
+{\LARGE\bfseries St\'o{\l} diagnostyczny DX-4500 Pro}
+
+\vspace{2pt}
+{\small\textcolor{midgray}{Elektryczny st\'o{\l} medyczny z~regulacj\k{a} wysoko\'sci, pozycj\k{a} Trendelenburga i~pami\k{e}ci\k{a} pozycji.}}
+
+\vspace{10pt}
+
+% ===== Product illustration =====
+\begin{center}
+\begin{tikzpicture}
+  \fill[lightbg, rounded corners=3pt] (0,0) rectangle (14,4.2);
+  % Base
+  \fill[darkbg!12] (5.5,0.5) rectangle (8.5,1.0);
+  \fill[darkbg!18, rounded corners=1pt] (4.8,1.0) rectangle (9.2,1.2);
+  % Lift column
+  \fill[darkbg!15] (6.6,1.2) rectangle (7.4,2.0);
+  % Frame
+  \fill[darkbg!10, rounded corners=2pt] (1.5,2.0) rectangle (12.5,2.3);
+  % Mattress sections
+  \fill[accent!12, rounded corners=3pt] (1.6,2.3) rectangle (6.8,2.85);
+  \draw[accent!35, rounded corners=3pt] (1.6,2.3) rectangle (6.8,2.85);
+  \fill[accent!8, rounded corners=3pt] (7.0,2.3) rectangle (12.4,2.85);
+  \draw[accent!30, rounded corners=3pt] (7.0,2.3) rectangle (12.4,2.85);
+  % Wheels
+  \fill[darkbg!25] (3,0.2) circle (0.2);
+  \fill[darkbg!25] (11,0.2) circle (0.2);
+  % Dimension arrows
+  \draw[<->, midgray] (1.5,3.4) -- (12.5,3.4) node[midway, above, font=\footnotesize] {2000\,mm};
+  \draw[<->, midgray] (13.2,0.2) -- (13.2,2.85) node[midway, right, font=\footnotesize] {540--940\,mm};
+  % Labels
+  \node[font=\tiny\sffamily, accent] at (4.2,2.58) {sekcja plecowa};
+  \node[font=\tiny\sffamily, accent] at (9.7,2.58) {sekcja no\.zna};
+  \node[font=\tiny\sffamily, midgray] at (7,1.6) {kolumna};
+\end{tikzpicture}
+\end{center}
+
+\vspace{4pt}
+
+% ===== Two-column specs =====
+\begin{multicols}{2}
+
+\noindent{\small\textbf{\textcolor{accent}{Parametry techniczne}}}
+\divline
+
+\spec{Wymiary blatu (d{\l}. $\times$ szer.)}{2000 $\times$ 650\,mm}
+\spec{Regulacja wysoko\'sci}{540 -- 940\,mm (elektrycznie)}
+\spec{No\'sno\'s\'c maksymalna}{250\,kg}
+\spec{K\k{a}t Trendelenburga}{$-18^{\circ}$ do $+18^{\circ}$}
+\spec{K\k{a}t sekcji plecowej}{$0^{\circ}$ do $+75^{\circ}$}
+\spec{Masa sto{\l}u}{115\,kg}
+\spec{Zasilanie}{230\,V\,/\,50\,Hz}
+
+\divline
+
+\noindent{\small\textbf{\textcolor{accent}{Wyposa\.zenie standardowe}}}
+\divline
+
+\begin{itemize}[leftmargin=1.2em, itemsep=2pt, parsep=0pt, topsep=0pt]
+  \item[\textcolor{accent}{\textbullet}] Pilot r\k{e}czny z~6~przyciskami
+  \item[\textcolor{accent}{\textbullet}] Panel no\.zny bezprzewodowy
+  \item[\textcolor{accent}{\textbullet}] 4 pami\k{e}ci pozycji (preset)
+  \item[\textcolor{accent}{\textbullet}] Tapicerka antybakteryjna (klasa M1)
+  \item[\textcolor{accent}{\textbullet}] Rolki z~centraln\k{a} blokad\k{a}
+  \item[\textcolor{accent}{\textbullet}] Uchwyt na papier jednorazowy
+\end{itemize}
+
+\columnbreak
+
+\noindent{\small\textbf{\textcolor{accent}{Wyposa\.zenie opcjonalne}}}
+\divline
+
+\begin{itemize}[leftmargin=1.2em, itemsep=2pt, parsep=0pt, topsep=0pt]
+  \item[\textcolor{midgray}{\textbullet}] Pod{\l}okietniki regulowane (+\,380\,z{\l})
+  \item[\textcolor{midgray}{\textbullet}] Zag{\l}\'owek wielopozycyjny (+\,520\,z{\l})
+  \item[\textcolor{midgray}{\textbullet}] Szyna boczna do akcesorii (+\,290\,z{\l})
+  \item[\textcolor{midgray}{\textbullet}] Akumulator awaryjny (+\,1200\,z{\l})
+  \item[\textcolor{midgray}{\textbullet}] Tapicerka premium --- 12 kolor\'ow (+\,450\,z{\l})
+\end{itemize}
+
+\divline
+
+\noindent{\small\textbf{\textcolor{accent}{Certyfikaty i~normy}}}
+\divline
+
+\begin{itemize}[leftmargin=1.2em, itemsep=2pt, parsep=0pt, topsep=0pt]
+  \item[$\textcolor{accent}{\checkmark}$] CE (Dyrektywa 93/42/EWG)
+  \item[$\textcolor{accent}{\checkmark}$] ISO 13485:2016
+  \item[$\textcolor{accent}{\checkmark}$] PN-EN 60601-1 (bezpiecze\'nstwo)
+  \item[$\textcolor{accent}{\checkmark}$] PN-EN 60601-1-2 (EMC)
+  \item[$\textcolor{accent}{\checkmark}$] Klasa wyrobu med.: I (regu{\l}a~1)
+\end{itemize}
+
+\divline
+
+\noindent{\small\textbf{\textcolor{accent}{Cena katalogowa}}}\\[4pt]
+{\Large\bfseries\textcolor{accent}{14\,900\,z{\l}}}\hspace{4pt}{\footnotesize\textcolor{midgray}{netto}}\\[2pt]
+{\footnotesize\textcolor{midgray}{Gwarancja: 36 miesi\k{e}cy \textbullet\ Dostawa: 5--10 dni rob.}}
+
+\end{multicols}
+
+\vspace{4pt}
+
+\noindent\colorbox{lightbg}{\parbox{\dimexpr\linewidth-2\fboxsep}{\footnotesize
+\textbf{Zam\'owienia i~konfiguracja:} tel.\ +48\,123\,456\,789 \textbullet\ email: zamowienia@medtechpro.pl \textbullet\ Indywidualny dob\'or tapicerki i~akcesorii.
+Ceny nie zawieraj\k{a} koszt\'ow transportu i~monta\.zu. Zastrzegamy prawo do zmian technicznych.}}
+
+\end{document}

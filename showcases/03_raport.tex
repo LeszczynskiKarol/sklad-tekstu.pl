@@ -1,0 +1,120 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+% microtype removed
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{float}
+
+\definecolor{accent}{RGB}{139,26,26}
+\definecolor{blue1}{RGB}{44,82,130}
+\definecolor{green1}{RGB}{56,118,29}
+\definecolor{orange1}{RGB}{204,102,0}
+\definecolor{gray80}{gray}{0.2}
+\definecolor{gray50}{gray}{0.5}
+
+\sisetup{
+  output-decimal-marker={,},
+  group-separator={\,},
+  group-minimum-digits=4
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textsc{Raport techniczny RT-2024/037}}
+\fancyhead[R]{\small\textsc{Analiza wydajności systemów PV}}
+\fancyfoot[L]{\footnotesize Wersja 2.1 --- Styczeń 2025}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\footnotesize\texttt{sklad-tekstu.pl}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+\setcounter{section}{3}
+\setcounter{page}{24}
+\setcounter{table}{5}
+\setcounter{figure}{8}
+
+\begin{document}
+
+\section{Analiza porównawcza wydajności instalacji}
+
+\subsection{Produkcja energii w~cyklu rocznym}
+
+Na rysunku~\ref{fig:produkcja} przedstawiono miesięczną produkcję energii elektrycznej trzech analizowanych instalacji fotowoltaicznych w~roku 2024. Instalacja~A (monokrystaliczna, \SI{10}{kWp}) osiągnęła najwyższą roczną produkcję \SI{11248}{kWh}, co~odpowiada współczynnikowi wydajności $PR = \num{0.842}$. Instalacja~B (polikrystaliczna, \SI{10}{kWp}) wygenerowała \SI{10115}{kWh} ($PR = \num{0.757}$), natomiast instalacja~C (cienkowarstwowa CdTe, \SI{10}{kWp}) --- \SI{9876}{kWh} ($PR = \num{0.739}$).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.92\textwidth,
+  height=6.2cm,
+  ybar,
+  bar width=6pt,
+  enlarge x limits=0.06,
+  ylabel={\footnotesize Produkcja [kWh]},
+  xlabel={\footnotesize Miesiąc},
+  symbolic x coords={Sty,Lut,Mar,Kwi,Maj,Cze,Lip,Sie,Wrz,Paź,Lis,Gru},
+  xtick=data,
+  x tick label style={font=\tiny, rotate=0},
+  y tick label style={font=\tiny},
+  ylabel style={font=\footnotesize},
+  xlabel style={font=\footnotesize},
+  ymin=0, ymax=1700,
+  legend style={at={(0.5,-0.22)}, anchor=north, legend columns=3, font=\footnotesize, draw=none},
+  every axis plot/.append style={fill opacity=0.85},
+  grid=major,
+  grid style={gray!20},
+  major tick length=2pt,
+]
+\addplot[fill=accent, draw=accent!80!black] coordinates {
+  (Sty,320) (Lut,450) (Mar,780) (Kwi,1100) (Maj,1350) (Cze,1480)
+  (Lip,1520) (Sie,1380) (Wrz,1050) (Paź,680) (Lis,380) (Gru,258)
+};
+\addplot[fill=blue1, draw=blue1!80!black] coordinates {
+  (Sty,280) (Lut,395) (Mar,690) (Kwi,985) (Maj,1210) (Cze,1340)
+  (Lip,1365) (Sie,1240) (Wrz,940) (Paź,610) (Lis,340) (Gru,220)
+};
+\addplot[fill=green1, draw=green1!80!black] coordinates {
+  (Sty,290) (Lut,385) (Mar,665) (Kwi,960) (Maj,1175) (Cze,1305)
+  (Lip,1330) (Sie,1205) (Wrz,910) (Paź,595) (Lis,335) (Gru,221)
+};
+\legend{Instalacja A (mono-Si), Instalacja B (poli-Si), Instalacja C (CdTe)}
+\end{axis}
+\end{tikzpicture}
+\caption{Miesięczna produkcja energii elektrycznej analizowanych instalacji PV w~2024~r.}
+\label{fig:produkcja}
+\end{figure}
+
+\subsection{Parametry techniczne i~wskaźniki ekonomiczne}
+
+Tabela~\ref{tab:parametry} zawiera zestawienie kluczowych parametrów technicznych i~ekonomicznych badanych instalacji. Wartość LCOE (Levelized Cost of~Energy) obliczono przy założeniu 25-letniego okresu eksploatacji i~stopy dyskontowej $r = \SI{5}{\%}$.
+
+\begin{table}[H]
+\centering
+\caption{Porównanie parametrów technicznych i~ekonomicznych instalacji PV.}
+\label{tab:parametry}
+\footnotesize
+\begin{tabular}{@{}l S[table-format=2.1] S[table-format=5.0] S[table-format=1.3] S[table-format=3.1] S[table-format=1.2]@{}}
+\toprule
+\textbf{Parametr} & {\textbf{Moc [kWp]}} & {\textbf{Produkcja [kWh/rok]}} & {\textbf{PR [--]}} & {\textbf{LCOE [zł/kWh]}} & {\textbf{IRR [\%]}} \\
+\midrule
+Instalacja A (mono-Si)  & 10.0 & 11248 & 0.842 & 0.31 & 12.4 \\
+Instalacja B (poli-Si)  & 10.0 & 10115 & 0.757 & 0.35 & 10.8 \\
+Instalacja C (CdTe)     & 10.0 &  9876 & 0.739 & 0.38 &  9.6 \\
+\midrule
+\textit{Średnia}        & 10.0 & 10413 & 0.779 & 0.35 & 10.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Instalacja~A wyróżnia się najniższym kosztem jednostkowym produkcji energii (LCOE~$= \SI{0.31}{zł/kWh}$) oraz najwyższą wewnętrzną stopą zwrotu ($\text{IRR} = \SI{12.4}{\%}$), co potwierdza przewagę technologii monokrystalicznej w~warunkach klimatycznych centralnej Polski. Szczegółową analizę degradacji modułów w~funkcji czasu eksploatacji przedstawiono w~rozdziale~5.
+
+\end{document}

@@ -1,0 +1,168 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[margin=0pt]{geometry}
+\usepackage{lato}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning}
+\usepackage{pifont}
+\usepackage{pgfornament}
+
+\pagestyle{empty}
+
+\definecolor{cream}{RGB}{255,251,241}
+\definecolor{warmwhite}{RGB}{253,249,239}
+\definecolor{gold}{RGB}{180,137,59}
+\definecolor{golddark}{RGB}{148,109,39}
+\definecolor{goldlight}{RGB}{222,197,132}
+\definecolor{olive}{RGB}{85,95,65}
+\definecolor{olivelight}{RGB}{142,152,121}
+\definecolor{sage}{RGB}{194,199,179}
+\definecolor{peach}{RGB}{245,222,196}
+\definecolor{deepgreen}{RGB}{45,60,40}
+\definecolor{browndark}{RGB}{62,44,32}
+\definecolor{txtbody}{RGB}{82,72,62}
+\definecolor{txtlight}{RGB}{148,163,144}
+
+\begin{document}
+
+\begin{tikzpicture}[remember picture, overlay]
+  % Cream background
+  \fill[cream] (current page.north west) rectangle (current page.south east);
+  % Top band
+  \fill[deepgreen] (current page.north west) rectangle ([yshift=-11.8cm]current page.north east);
+  % Gold line
+  \fill[gold] ([yshift=-11.8cm]current page.north west) rectangle ([yshift=-11.92cm]current page.north east);
+  % Corner ornaments
+  \node[opacity=0.1] at ([xshift=2.5cm, yshift=-2.2cm]current page.north west) {\pgfornament[width=3cm, color=goldlight]{63}};
+  \node[opacity=0.1, rotate=180] at ([xshift=-2.5cm, yshift=-9.5cm]current page.north east) {\pgfornament[width=3cm, color=goldlight]{63}};
+  % Bottom bar
+  \fill[deepgreen] ([yshift=2.8cm]current page.south west) rectangle (current page.south east);
+  \fill[gold] ([yshift=2.8cm]current page.south west) rectangle ([yshift=2.68cm]current page.south east);
+\end{tikzpicture}
+
+\vspace*{1.5cm}
+
+% === HERO ===
+\begin{center}
+  \textcolor{gold}{\pgfornament[width=3.5cm]{88}}
+
+  \vspace{0.35cm}
+
+  {\fontsize{42}{44}\selectfont\textcolor{cream}{\textbf{Harmonia}}}\\[4pt]
+  {\fontsize{14}{16}\selectfont\textcolor{goldlight}{Centrum Odnowy Biologicznej}}
+
+  \vspace{0.4cm}
+
+  {\fontsize{9}{14}\selectfont\textcolor{sage}{%
+  Odkryj przestrze\'n stworzon\k{a} z~my\'sl\k{a} o~Twoim odpoczynku.\\
+  Zabiegi inspirowane tradycjami Dalekiego Wschodu,\\
+  naturalne kosmetyki i~profesjonalny zesp\'o{\l} terapeut\'ow.}}
+
+  \vspace{0.5cm}
+
+  \begin{tikzpicture}
+    \draw[goldlight, opacity=0.4] (-2.5,0) -- (-0.4,0);
+    \node[gold] at (0,0) {\ding{167}};
+    \draw[goldlight, opacity=0.4] (0.4,0) -- (2.5,0);
+  \end{tikzpicture}
+
+  \vspace{0.35cm}
+
+  % Category pills
+  \begin{tikzpicture}
+    \foreach \x/\icon/\txt in {0/\ding{95}/Masa\.ze, 3.4/\ding{96}/Sauna, 6.8/\ding{167}/Aromaterapia, 10.2/\ding{93}/Joga} {
+      \fill[deepgreen!80, opacity=0.5, rounded corners=2pt] (\x,-0.5) rectangle (\x+2.8,0.5);
+      \draw[goldlight, opacity=0.25, rounded corners=2pt] (\x,-0.5) rectangle (\x+2.8,0.5);
+      \node at (\x+1.4,0.1) {\fontsize{11}{11}\selectfont\textcolor{gold}{\icon}};
+      \node at (\x+1.4,-0.25) {\fontsize{7}{7}\selectfont\textcolor{sage}{\txt}};
+    }
+  \end{tikzpicture}
+\end{center}
+
+\vspace{0.8cm}
+
+% === SECTION HEADER ===
+\begin{center}
+  {\fontsize{6.5}{6.5}\selectfont\textcolor{gold}{NASZE ZABIEGI}}\\[6pt]
+  {\fontsize{17}{19}\selectfont\textcolor{browndark}{\textbf{Rytua{\l}y dla cia{\l}a i~duszy}}}\\[6pt]
+  \textcolor{goldlight}{\pgfornament[width=2.2cm]{75}}
+\end{center}
+
+\vspace{0.5cm}
+
+% === SERVICE CARDS ===
+\hspace*{1.2cm}
+\begin{tikzpicture}
+
+  % Card 1
+  \fill[warmwhite, rounded corners=4pt] (0,0) rectangle (5.5,-6.5);
+  \draw[goldlight, opacity=0.4, rounded corners=4pt] (0,0) rectangle (5.5,-6.5);
+  \fill[gold] (0,0) rectangle (5.5,-0.06);
+  \fill[peach] (2.75,-1) circle (0.55);
+  \draw[gold, opacity=0.3] (2.75,-1) circle (0.55);
+  \node at (2.75,-1) {\fontsize{14}{14}\selectfont\textcolor{golddark}{\ding{95}}};
+  \node[anchor=north, text width=4.5cm, align=center] at (2.75,-1.85) {
+    {\fontsize{12}{13}\selectfont\textcolor{browndark}{\textbf{Masa\.z tajski}}}\\[5pt]
+    {\fontsize{7.5}{11}\selectfont\textcolor{txtbody}{Tradycyjny masa\.z ca{\l}ego cia{\l}a {\l}\k{a}cz\k{a}cy akupresur\k{e}, rozci\k{a}ganie i~techniki relaksacyjne. G{\l}\k{e}bokie odpr\k{e}\.zenie mi\k{e}\'sni i~przyw\'rocenie r\'ownowagi energetycznej cia{\l}a.}}\\[8pt]
+    {\fontsize{8.5}{8.5}\selectfont\textcolor{gold}{\textbf{90 min \textbullet\ od 280 z{\l}}}}
+  };
+
+  % Card 2
+  \fill[warmwhite, rounded corners=4pt] (6,0) rectangle (11.5,-6.5);
+  \draw[goldlight, opacity=0.4, rounded corners=4pt] (6,0) rectangle (11.5,-6.5);
+  \fill[gold] (6,0) rectangle (11.5,-0.06);
+  \fill[peach] (8.75,-1) circle (0.55);
+  \draw[gold, opacity=0.3] (8.75,-1) circle (0.55);
+  \node at (8.75,-1) {\fontsize{14}{14}\selectfont\textcolor{golddark}{\ding{96}}};
+  \node[anchor=north, text width=4.5cm, align=center] at (8.75,-1.85) {
+    {\fontsize{12}{13}\selectfont\textcolor{browndark}{\textbf{Rytua{\l} hammam}}}\\[5pt]
+    {\fontsize{7.5}{11}\selectfont\textcolor{txtbody}{Rytua{\l} oczyszczaj\k{a}cy inspirowany tradycj\k{a} {\l}a\'zni tureckich. Peeling cia{\l}a czarnym myd{\l}em, masa\.z pian\k{a} i~g{\l}\k{e}bokie nawil\.zenie. Sk\'ora g{\l}adka i~od\.zywiona.}}\\[8pt]
+    {\fontsize{8.5}{8.5}\selectfont\textcolor{gold}{\textbf{120 min \textbullet\ od 350 z{\l}}}}
+  };
+
+  % Card 3
+  \fill[warmwhite, rounded corners=4pt] (12,0) rectangle (17.5,-6.5);
+  \draw[goldlight, opacity=0.4, rounded corners=4pt] (12,0) rectangle (17.5,-6.5);
+  \fill[gold] (12,0) rectangle (17.5,-0.06);
+  \fill[peach] (14.75,-1) circle (0.55);
+  \draw[gold, opacity=0.3] (14.75,-1) circle (0.55);
+  \node at (14.75,-1) {\fontsize{14}{14}\selectfont\textcolor{golddark}{\ding{167}}};
+  \node[anchor=north, text width=4.5cm, align=center] at (14.75,-1.85) {
+    {\fontsize{12}{13}\selectfont\textcolor{browndark}{\textbf{Aromaterapia}}}\\[5pt]
+    {\fontsize{7.5}{11}\selectfont\textcolor{txtbody}{Holistyczny rytua{\l} z~u\.zyciem naturalnych olejk\'ow eterycznych: lawenda, ylang-ylang, eukaliptus. Masa\.z, inhalacja i~aromatyczna k\k{a}piel.}}\\[8pt]
+    {\fontsize{8.5}{8.5}\selectfont\textcolor{gold}{\textbf{75 min \textbullet\ od 220 z{\l}}}}
+  };
+
+\end{tikzpicture}
+
+\vspace{0.6cm}
+
+% === Gift card banner ===
+\begin{center}
+\begin{tikzpicture}
+  \fill[deepgreen, rounded corners=4pt] (0,0) rectangle (17.5,-2);
+  \fill[gold, rounded corners=4pt] (0,0) rectangle (17.5,-0.05);
+  \node[anchor=west] at (1,-0.7) {\fontsize{13}{13}\selectfont\textcolor{cream}{\textbf{Karta podarunkowa}}};
+  \node[anchor=west] at (1,-1.35) {\fontsize{8}{8}\selectfont\textcolor{sage}{Elegancki prezent w~kopercie z~logo. Kwota i~zabiegi do wyboru. Wa\.zna 12 miesi\k{e}cy.}};
+  \fill[gold, rounded corners=3pt] (13.3,-0.5) rectangle (16.8,-1.5);
+  \node at (15.05,-1) {\fontsize{9}{9}\selectfont\textcolor{deepgreen}{\textbf{Kup kart\k{e} \ding{222}}}};
+\end{tikzpicture}
+\end{center}
+
+% === FOOTER ===
+\begin{tikzpicture}[remember picture, overlay]
+  \node[anchor=center] at ([yshift=1.5cm]current page.south) {
+    {\fontsize{10}{10}\selectfont\textcolor{cream}{\textbf{Zarezerwuj wizyt\k{e}}}}
+    \hspace{1cm}
+    {\fontsize{8}{8}\selectfont\textcolor{sage}{tel.\ +48 600 100 300 \hspace{5pt}\textcolor{goldlight}{\textbullet}\hspace{5pt} recepcja@harmonia-spa.pl \hspace{5pt}\textcolor{goldlight}{\textbullet}\hspace{5pt} ul.\ Ogrodowa 15, Krak\'ow}}
+  };
+  \node[anchor=south east] at ([xshift=-1.2cm, yshift=0.3cm]current page.south east) {
+    {\fontsize{5.5}{5.5}\selectfont\textcolor{olivelight}{Sk{\l}ad: \textbf{sklad-tekstu.pl}}}
+  };
+\end{tikzpicture}
+
+\end{document}
