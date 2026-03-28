@@ -1,0 +1,41 @@
+name: Deploy sklad-tekstu.pl
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - run: aws s3 sync dist/ s3://www.sklad-tekstu.pl --delete
+      - run: aws cloudfront create-invalidation --distribution-id EZH7ALPCBUX72 --paths "/*"
+      - run: curl -s "https://www.google.com/ping?sitemap=https://www.sklad-tekstu.pl/sitemap-index.xml" > /dev/null
+
+      - name: Notify Google Indexing
+        continue-on-error: true
+        run: |
+          aws lambda invoke \
+            --function-name google-indexing-notifier \
+            --payload '{"siteUrl":"https://www.sklad-tekstu.pl"}' \
+            --cli-binary-format raw-in-base64-out \
+            --region eu-central-1 \
+            /tmp/indexing-result.json
+          cat /tmp/indexing-result.json
