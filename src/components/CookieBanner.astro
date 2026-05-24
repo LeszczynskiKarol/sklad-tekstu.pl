@@ -303,6 +303,10 @@
       updateGoogleConsent(consent);
       loadGoogleScripts(consent);
     } else {
+      // Consent Mode v2: load GTM immediately with all categories denied.
+      // GTM honors the gtag('consent','default',...) set above and sends
+      // cookieless pings until the user grants consent via the banner.
+      loadGoogleScripts({ analytics: false, marketing: false });
       showBanner();
     }
 
