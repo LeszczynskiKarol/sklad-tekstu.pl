@@ -23,6 +23,9 @@ const {
 
 const siteName = 'sklad-tekstu.pl';
 const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+
+const siteOrigin = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.sklad-tekstu.pl';
+const absoluteOgImage = ogImage?.startsWith('http') ? ogImage : `${siteOrigin}${ogImage}`;
 ---
 
 <title>{fullTitle}</title>
@@ -42,13 +45,13 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 <meta property="og:url" content={canonical} />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content="pl_PL" />
-{ogImage && <meta property="og:image" content={ogImage} />}
+{ogImage && <meta property="og:image" content={absoluteOgImage} />}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
-{ogImage && <meta name="twitter:image" content={ogImage} />}
+{ogImage && <meta name="twitter:image" content={absoluteOgImage} />}
 
 <!-- Schema.org -->
 {schema && (
