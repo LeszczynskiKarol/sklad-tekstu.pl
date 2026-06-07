@@ -48,6 +48,10 @@ Praca doktorska ma ścisłą hierarchię części, a każda z nich niesie okreś
 8. Wykazy tabel i rycin
 9. Aneksy
 
+![Strona tytułowa rozprawy doktorskiej złożona w LaTeX-u — nazwa uczelni i wydziału wersalikami, autor, tytuł pracy, podtytuł, „Rozprawa doktorska", promotor i promotor pomocniczy, miejsce i rok](/blog/sklad-pracy-doktorskiej/01-strona-tytulowa.jpg)
+
+*Strona tytułowa złożona w LaTeX-u — pełny układ wymagany przez uczelnię, krój Times, wyśrodkowana kompozycja.*
+
 Tytuły rozdziałów piszemy w wersalikach (SMALL CAPS lub PEŁNE WERSALIKI zależnie od regulaminu), bez kropki na końcu. Tytuły podrozdziałów — normalny zapis, bez kropki. Każdy nowy rozdział główny zaczyna się od nowej strony — to wymóg formalny, nie estetyczny.
 
 Akapity numerowane cyframi arabskimi zarezerwowane są wyłącznie dla struktury rozdziałów i podrozdziałów. Wyliczenia w tekście oznacza się kropką (pierwszy stopień) lub pauzą (drugi stopień).
@@ -83,6 +87,37 @@ Dwa narzędzia dominują w polskiej akademii: Microsoft Word i LaTeX. Wybór nar
 Porównanie obu podejść omawiam szczegółowo w artykule [LaTeX vs Word — kiedy edytor tekstu to za mało](/blog/latex-vs-word/). Dla prac doktorskich z rozbudowanymi wzorami matematycznymi LaTeX jest de facto standardem.
 
 Ci, którzy wybierają LaTeX, często stają przed pytaniem o środowisko pracy — szczegóły instalacji i konfiguracji opisuję w [przewodniku po instalacji lokalnej](/blog/konfiguracja-instalacja-latex/).
+
+### Od kodu do strony — konkretny przykład
+
+Nie chodzi o teorię. Poniższy fragment definiuje stronę pracy doktorskiej dokładnie według wymagań opisanych wyżej: margines oprawny 3,5 cm i lustrzane marginesy zewnętrzne, interlinię 1,5, eliminację sierot i wdów oraz tabelę z tytułem nad spodem i źródłem pod spodem rozmiarem 10 pkt.
+
+```latex
+\documentclass[12pt,a4paper,twoside]{report}
+\usepackage[inner=3.5cm,outer=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}\onehalfspacing        % interlinia 1,5
+\usepackage{booktabs}
+\clubpenalty=10000 \widowpenalty=10000        % bez sierot, wdów i bękartów
+% ...
+\begin{table}
+  \caption{Statystyki opisowe zmiennych modelu}   % TYTUŁ NAD tabelą
+  \begin{tabular}{lrrrr}
+    \toprule
+    Zmienna & Średnia & Odch. std. & Min. & Maks. \\
+    \midrule
+    Produktywność pracy & 187,4 & 64,2 & 41,8 & 512,9 \\
+    % ...
+    \bottomrule
+  \end{tabular}
+  {\footnotesize\itshape Źródło: opracowanie własne.}  % ŹRÓDŁO POD, 10 pkt
+\end{table}
+```
+
+A oto efekt — realna strona rozdziału, którą ten kod wygenerował (skompilowana w `pdflatex`):
+
+![Strona treści pracy doktorskiej złożona w LaTeX-u — rozdział 3, tekst justowany z interlinią 1,5, Tabela 3.2 z tytułem nad i źródłem pod spodem, Rysunek 3.4 z wykresem, numeracja strony w stopce](/blog/sklad-pracy-doktorskiej/02-strona-tresci.jpg)
+
+*Strona rozdziału złożona w LaTeX-u powyższym kodem — Times 12 pkt, interlinia 1,5, margines oprawny po lewej, Tabela 3.2 i Rysunek 3.4 ponumerowane w obrębie rozdziału, źródła pod elementami. Spis treści, numeracja i odwołania zaktualizowałyby się automatycznie po każdej zmianie.*
 
 ---
 
