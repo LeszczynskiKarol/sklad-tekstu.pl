@@ -21,33 +21,37 @@ const homeSchema = {
       "@id": "https://www.sklad-tekstu.pl/#organization",
       "name": "sklad-tekstu.pl",
       "url": "https://www.sklad-tekstu.pl",
-      "description": "Profesjonalny skład tekstu i dokumentów w systemie LaTeX. Podręczniki, prace naukowe, katalogi, broszury, raporty, instrukcje, ćwiczenia.",
+      "description": "Profesjonalny skład i łamanie tekstu oraz przygotowanie do druku (DTP). Książki, prace naukowe, podręczniki, katalogi, broszury, raporty i instrukcje — z typografią klasy wydawniczej.",
       "email": "kontakt@sklad-tekstu.pl",
       "areaServed": ["PL", "EU"],
       "serviceType": [
-        "Skład tekstu LaTeX",
-        "Łamanie tekstu LaTeX",
+        "Skład tekstu",
+        "Łamanie tekstu",
+        "Skład książek",
+        "Przygotowanie do druku (DTP)",
         "Skład publikacji naukowych",
+        "Skład prac doktorskich i magisterskich",
         "Tworzenie podręczników",
-        "Skład dokumentacji technicznej"
+        "Skład dokumentacji technicznej",
+        "Skład tekstu LaTeX"
       ],
-      "knowsAbout": ["LaTeX", "TeX", "Typografia", "Skład tekstu", "Publikacje naukowe", "DTP", "pdflatex", "XeLaTeX", "LuaLaTeX"]
+      "knowsAbout": ["Skład tekstu", "Łamanie tekstu", "Skład książek", "Przygotowanie do druku", "DTP", "Typografia", "Publikacje naukowe", "LaTeX", "TeX", "pdflatex", "XeLaTeX", "LuaLaTeX"]
     },
     {
       "@type": "WebSite",
       "@id": "https://www.sklad-tekstu.pl/#website",
       "url": "https://www.sklad-tekstu.pl",
-      "name": "sklad-tekstu.pl — Profesjonalny skład tekstu LaTeX",
+      "name": "sklad-tekstu.pl — Profesjonalny skład i łamanie tekstu",
       "publisher": { "@id": "https://www.sklad-tekstu.pl/#organization" }
     },
     {
       "@type": "WebPage",
       "@id": "https://www.sklad-tekstu.pl/#webpage",
       "url": "https://www.sklad-tekstu.pl",
-      "name": "Skład tekstu LaTeX — Profesjonalny skład dokumentów i publikacji",
+      "name": "Skład i łamanie tekstu — przygotowanie książek i publikacji do druku",
       "isPartOf": { "@id": "https://www.sklad-tekstu.pl/#website" },
       "about": { "@id": "https://www.sklad-tekstu.pl/#organization" },
-      "description": "Profesjonalny skład tekstu LaTeX. Tworzymy podręczniki, prace naukowe, katalogi, broszury, raporty i instrukcje z perfekcyjną typografią."
+      "description": "Profesjonalny skład i łamanie tekstu oraz przygotowanie do druku. Książki, prace naukowe, podręczniki, katalogi, broszury, raporty i instrukcje z typografią klasy wydawniczej."
     }
   ]
 };
@@ -319,9 +323,9 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
 ---
 
 <BaseLayout
-  title="Skład tekstu LaTeX — łamanie dokumentów i publikacji"
-  description="Profesjonalny skład tekstu LaTeX. Tworzymy podręczniki, prace naukowe, katalogi, broszury, raporty i instrukcje. Łamanie tekstu LaTeX na najwyższym poziomie typograficznym."
-  keywords="skład tekstu latex, skład dokumentów latex, łamanie tekstu latex, publikacje latex, skład publikacji, typografia latex, skład podręczników, prace naukowe latex, DTP latex"
+  title="Skład tekstu i łamanie do druku — książki, prace, publikacje"
+  description="Profesjonalny skład i łamanie tekstu — książki, prace naukowe, podręczniki, katalogi i dokumenty techniczne. Przygotowanie plików do druku (DTP) z typografią klasy wydawniczej."
+  keywords="skład tekstu, łamanie tekstu, skład książki, skład do druku, przygotowanie do druku, DTP, skład pracy doktorskiej, skład publikacji, skład prac naukowych, skład podręcznika, skład tekstu latex"
   schema={homeSchema}
 >
 
@@ -337,13 +341,13 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       <div class="hero__rule-top" aria-hidden="true"></div>
 
       <h1 id="hero-title" class="hero__title">
-        Profesjonalny <span class="hero__highlight">skład tekstu</span><br>
-        w&nbsp;systemie LaTeX
+        Profesjonalny <span class="hero__highlight">skład i&nbsp;łamanie tekstu</span><br>
+        do&nbsp;druku i&nbsp;publikacji
       </h1>
 
       <p class="hero__subtitle">
-        Skład tekstów naukowych, podręczników, katalogów i&nbsp;dokumentów<br>
-        technicznych z&nbsp;perfekcyjną typografią
+        Składamy książki, prace naukowe, podręczniki, katalogi i&nbsp;dokumenty<br>
+        techniczne — z&nbsp;perfekcyjną typografią i&nbsp;przygotowaniem do&nbsp;druku
       </p>
 
       <p class="hero__meta" set:html="\\documentclass{perfection} &middot; wersja 2026 &middot; sklad-tekstu.pl" />
@@ -729,15 +733,16 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
   <section class="seo-content" aria-label="Informacje o usłudze składu tekstu LaTeX">
     <div class="container">
       <article class="seo-content__article">
-        <h2>Skład tekstu LaTeX — profesjonalne łamanie tekstu i&nbsp;publikacje</h2>
+        <h2>Skład i&nbsp;łamanie tekstu — od&nbsp;książki do&nbsp;gotowego pliku do&nbsp;druku</h2>
 
         <p>
-          Szukasz profesjonalnej usługi <strong>składu tekstu LaTeX</strong>? Trafiłeś w&nbsp;odpowiednie miejsce.
-          Specjalizujemy się w&nbsp;<strong>składzie dokumentów LaTeX</strong> i&nbsp;<strong>łamaniu tekstu</strong>
-          na najwyższym poziomie typograficznym. Wykonujemy <strong>skład tekstów</strong> naukowych, technicznych
-          i&nbsp;edukacyjnych — od prac naukowych i&nbsp;podręczników akademickich, przez katalogi produktowe
-          i&nbsp;dokumentację techniczną, po broszury i&nbsp;materiały marketingowe. Każdą publikację tworzymy
-          z&nbsp;precyzją godną najlepszych wydawnictw.
+          Szukasz profesjonalnego <strong>składu tekstu</strong>, <strong>łamania tekstu</strong> lub
+          <strong>przygotowania publikacji do druku</strong>? Trafiłeś w&nbsp;odpowiednie miejsce.
+          Składamy <strong>książki</strong>, <strong>prace naukowe</strong> (doktorskie, magisterskie,
+          licencjackie), podręczniki akademickie, katalogi produktowe, dokumentację techniczną, broszury
+          i&nbsp;materiały marketingowe — od&nbsp;surowego manuskryptu po&nbsp;gotowy plik
+          <strong>do druku</strong>. Każdą publikację składamy z&nbsp;precyzją godną najlepszych wydawnictw,
+          wykorzystując profesjonalny system składu LaTeX.
         </p>
 
         <h3>Czym jest skład tekstu LaTeX?</h3>
@@ -775,6 +780,17 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
           treści, bibliografie i&nbsp;indeksy, niezrównaną jakość składu wzorów matematycznych, chemicznych 
           i&nbsp;fizycznych, PDF gotowy do druku offsetowego (CMYK, spady, crop marks) oraz pliki źródłowe .tex 
           do dalszej samodzielnej edycji. To standard, jakiego oczekują recenzenci, wydawcy i&nbsp;drukarnie.
+        </p>
+
+        <h3>Skład do druku i&nbsp;przygotowanie plików (DTP)</h3>
+
+        <p>
+          <strong>Przygotowanie do druku</strong> to coś więcej niż ładny PDF. Dostarczamy pliki, które
+          drukarnia przyjmie bez poprawek: profile kolorów <strong>CMYK</strong>, spady (bleed), znaczniki
+          cięcia (crop marks) i&nbsp;osadzone fonty wektorowe. Niezależnie od&nbsp;tego, czy potrzebujesz
+          <strong>składu książki do druku</strong>, broszury, katalogu czy plakatu — przygotujemy plik
+          zgodny z&nbsp;wymaganiami druku offsetowego i&nbsp;cyfrowego. Na życzenie przygotujemy też wersję
+          ekranową (RGB, hiperłącza, zakładki) oraz e-book do&nbsp;dystrybucji cyfrowej.
         </p>
 
         <h3>Jak rozpocząć współpracę?</h3>
