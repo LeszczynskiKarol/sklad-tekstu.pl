@@ -3,6 +3,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ServiceCard from '../components/ServiceCard.astro';
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+import s01 from '../assets/showcases/01_podrecznik.jpg';
+import s02 from '../assets/showcases/02_arkusz.jpg';
+import s03 from '../assets/showcases/03_raport.jpg';
+import s04 from '../assets/showcases/04_katalog.jpg';
+import s05 from '../assets/showcases/05_artykul.jpg';
+import s06 from '../assets/showcases/06_broszura_it.jpg';
+import s07 from '../assets/showcases/07_broszura_spa.jpg';
+import s08 from '../assets/showcases/08_broszura_nieruchomosci.jpg';
 
 // Fetch 3 newest blog posts
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -58,62 +67,85 @@ const homeSchema = {
 
 const galleryItems = [
   {
-    src: '/showcases/06_broszura_it.jpg',
+    src: s06,
     title: 'Broszura usługowa',
     category: 'Marketing',
     desc: 'Oferta software house — dark hero, karty usług, tech badges',
     tags: ['tikz', 'tcolorbox', 'raleway'],
   },
   {
-    src: '/showcases/07_broszura_spa.jpg',
+    src: s07,
     title: 'Broszura SPA',
     category: 'Marketing',
     desc: 'Centrum wellness — elegancka paleta, ornamenty, karty zabiegów',
     tags: ['pgfornament', 'lato', 'tikz'],
   },
   {
-    src: '/showcases/08_broszura_nieruchomosci.jpg',
+    src: s08,
     title: 'Katalog dewelopera',
     category: 'Marketing',
     desc: 'Inwestycja mieszkaniowa — split layout, wizualizacja, cennik',
     tags: ['tikz', 'sourcesanspro', 'pifont'],
   },
   {
-    src: '/showcases/01_podrecznik.jpg',
+    src: s01,
     title: 'Podręcznik akademicki',
     category: 'Edukacja',
     desc: 'Rachunek różniczkowy — twierdzenia, dowody, wykresy TikZ',
     tags: ['tcolorbox', 'amsmath', 'tikz'],
   },
   {
-    src: '/showcases/02_arkusz.jpg',
+    src: s02,
     title: 'Arkusz egzaminacyjny',
     category: 'Edukacja',
     desc: 'Egzamin z fizyki — zadania, diagramy optyczne, warianty',
     tags: ['exam', 'tikz', 'siunitx'],
   },
   {
-    src: '/showcases/03_raport.jpg',
+    src: s03,
     title: 'Raport techniczny',
     category: 'Technika',
     desc: 'Analiza fotowoltaiki — wykresy pgfplots, tabele booktabs',
     tags: ['pgfplots', 'booktabs', 'siunitx'],
   },
   {
-    src: '/showcases/04_katalog.jpg',
+    src: s04,
     title: 'Katalog produktowy',
     category: 'Technika',
     desc: 'Stół medyczny — rysunek techniczny TikZ, specyfikacja',
     tags: ['tikz', 'multicol', 'tcolorbox'],
   },
   {
-    src: '/showcases/05_artykul.jpg',
+    src: s05,
     title: 'Artykuł naukowy',
     category: 'Nauka',
     desc: 'Optymalizacja hiperparametrów CNN — dwukolumnowy layout',
     tags: ['twocolumn', 'pgfplots', 'natbib'],
   },
 ];
+
+// Build optimized WebP variants at build time (sharp). The showcase JPGs are
+// A4-portrait (595×842) and were shipped raw (~0.5 MB each); we emit a small
+// grid thumbnail (+ 2× for retina) and a larger image for the lightbox zoom.
+const ASPECT = 842 / 595;
+const gallery = await Promise.all(
+  galleryItems.map(async (item) => {
+    const [thumb, thumb2x, full] = await Promise.all([
+      getImage({ src: item.src, width: 420, height: Math.round(420 * ASPECT), format: 'webp', quality: 72 }),
+      getImage({ src: item.src, width: 840, height: Math.round(840 * ASPECT), format: 'webp', quality: 62 }),
+      getImage({ src: item.src, width: 1240, height: Math.round(1240 * ASPECT), format: 'webp', quality: 80 }),
+    ]);
+    return { ...item, thumb, thumb2x, full };
+  })
+);
+
+// Slim payload for the lightbox script (only the full-size URL + captions).
+const galleryLightbox = gallery.map((g) => ({
+  src: g.full.src,
+  title: g.title,
+  category: g.category,
+  desc: g.desc,
+}));
 
 
 // Services data — 9 items for 3×3 grid
@@ -522,7 +554,7 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
         </div>
 
                <div class="showcase-gallery__grid">
-          {galleryItems.map((item, i) => (
+          {gallery.map((item, i) => (
             <button
               class="showcase-gallery__item"
               data-gallery-index={i}
@@ -531,12 +563,13 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
             >
               <div class="showcase-gallery__img-wrap">
                 <img
-                  src={item.src}
+                  src={item.thumb.src}
+                  srcset={`${item.thumb.src} 1x, ${item.thumb2x.src} 2x`}
                   alt={`${item.title} — ${item.desc}`}
-                  loading={i < 4 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   decoding="async"
-                  width="595"
-                  height="842"
+                  width={item.thumb.attributes.width}
+                  height={item.thumb.attributes.height}
                 />
               </div>
               <div class="showcase-gallery__meta">
@@ -876,7 +909,7 @@ const heroWatermark = `\\documentclass[12pt]{article}\n\\usepackage[T1]{fontenc}
       });
     })();
   </script>
-  <script define:vars={{ galleryItems }}>
+  <script define:vars={{ galleryItems: galleryLightbox }}>
   (function() {
     var lightbox = document.getElementById('gallery-lightbox');
     var img = document.getElementById('gallery-img');

@@ -3,8 +3,13 @@
    Aesthetic: Living LaTeX Document
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Fonts ─────────────────────────────────────────────────── */
-@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,300;1,8..60,400;1,8..60,500&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap");
+/* ── Fonts ─────────────────────────────────────────────────────
+   Self-hosted variable fonts via Fontsource. The @font-face rules are
+   bundled from BaseLayout.astro (the `@fontsource-variable/*` imports),
+   so there is no render-blocking round-trip to fonts.googleapis.com /
+   fonts.gstatic.com. One weight-axis variable file per family covers the
+   full 300–700 range plus italic; the browser only fetches the latin /
+   latin-ext subsets it needs. */
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
@@ -29,10 +34,10 @@
   --success: #2d6a4f;
   --white: #ffffff;
 
-  /* Typography */
-  --font-serif: "Crimson Pro", "Source Serif 4", Georgia, serif;
-  --font-display: "Source Serif 4", Georgia, serif;
-  --font-mono: "JetBrains Mono", "Courier New", monospace;
+  /* Typography (self-hosted variable families — see Fonts note above) */
+  --font-serif: "Crimson Pro Variable", "Source Serif 4 Variable", Georgia, serif;
+  --font-display: "Source Serif 4 Variable", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", "Courier New", monospace;
 
   --fs-xs: 0.7rem;
   --fs-sm: 0.82rem;
