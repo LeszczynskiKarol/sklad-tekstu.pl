@@ -48,7 +48,7 @@ Praca doktorska ma ścisłą hierarchię części, a każda z nich niesie okreś
 8. Wykazy tabel i rycin
 9. Aneksy
 
-![Strona tytułowa rozprawy doktorskiej złożona w LaTeX-u — nazwa uczelni i wydziału wersalikami, autor, tytuł pracy, podtytuł, „Rozprawa doktorska", promotor i promotor pomocniczy, miejsce i rok](/blog/sklad-pracy-doktorskiej/01-strona-tytulowa.jpg)
+![Strona tytułowa rozprawy doktorskiej złożona w LaTeX-u — nazwa uczelni i wydziału wersalikami, autor, tytuł pracy, podtytuł, „Rozprawa doktorska", promotor i promotor pomocniczy, miejsce i rok](/blog/sklad-pracy-doktorskiej/01-strona-tytulowa.webp)
 
 *Strona tytułowa złożona w LaTeX-u — pełny układ wymagany przez uczelnię, krój Times, wyśrodkowana kompozycja.*
 
@@ -115,7 +115,7 @@ Nie chodzi o teorię. Poniższy fragment definiuje stronę pracy doktorskiej dok
 
 A oto efekt — realna strona rozdziału, którą ten kod wygenerował (skompilowana w `pdflatex`):
 
-![Strona treści pracy doktorskiej złożona w LaTeX-u — rozdział 3, tekst justowany z interlinią 1,5, Tabela 3.2 z tytułem nad i źródłem pod spodem, Rysunek 3.4 z wykresem, numeracja strony w stopce](/blog/sklad-pracy-doktorskiej/02-strona-tresci.jpg)
+![Strona treści pracy doktorskiej złożona w LaTeX-u — rozdział 3, tekst justowany z interlinią 1,5, Tabela 3.2 z tytułem nad i źródłem pod spodem, Rysunek 3.4 z wykresem, numeracja strony w stopce](/blog/sklad-pracy-doktorskiej/02-strona-tresci.webp)
 
 *Strona rozdziału złożona w LaTeX-u powyższym kodem — Times 12 pkt, interlinia 1,5, margines oprawny po lewej, Tabela 3.2 i Rysunek 3.4 ponumerowane w obrębie rozdziału, źródła pod elementami. Spis treści, numeracja i odwołania zaktualizowałyby się automatycznie po każdej zmianie.*
 

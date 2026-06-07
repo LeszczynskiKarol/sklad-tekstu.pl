@@ -61,6 +61,10 @@ Weźmy jeden przykład: **optymalna długość wiersza**. Badania nad czytelnoś
 
 Podobnie jest z dziesiątkami innych detali: dzieleniem wyrazów, kerningiem, ligaturami, równomiernością szarości kolumny, składem wzorów matematycznych. Formatowanie ich nie rusza, bo edytor tekstu nimi nie zarządza. Dobrze ujmuje to znana wśród składaczy obserwacja: **w edytorze tekstu nie da się zrobić dobrego składu, a w profesjonalnym systemie składu trzeba się naprawdę postarać, żeby zrobić zły.** Narzędzie prowadzi Cię w stronę jakości — albo i nie.
 
+![Porównanie tego samego akapitu: po lewej sformatowany w edytorze biurowym — krój bezszeryfowy, proste cudzysłowy, rzeki bieli i nierówne odstępy między wyrazami; po prawej złożony w LaTeX-u — krój szeryfowy, polskie cudzysłowy, równa szarość kolumny z przenoszeniem wyrazów](/blog/sklad-a-formatowanie/01-formatowanie-vs-sklad.webp)
+
+*Ten sam akapit, dwa narzędzia. Po lewej formatowanie w edytorze: rzeki bieli, brak przenoszenia wyrazów, proste cudzysłowy. Po prawej skład w LaTeX-u: równe odstępy, dzielenie wyrazów, „polskie" cudzysłowy. Obie wersje wygenerowane realnie — to nie symulacja.*
+
 Jest jeszcze argument, o którym autorzy zapominają: dobieranie marginesów, fontów i odstępów **to nie jest praca autora**. Czas spędzony na „bawieniu się" formatowaniem w Wordzie nie zwiększa wartości tekstu — odciąga od tego, co naprawdę się liczy, czyli treści. Od typografii jest składacz, tak jak od korekty jest korektor.
 
 ---

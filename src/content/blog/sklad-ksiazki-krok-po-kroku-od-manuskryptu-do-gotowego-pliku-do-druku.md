@@ -21,6 +21,10 @@ Różnica jest fundamentalna, bo dotyczy celu. Formatowanie ma sprawić, że dok
 
 Dobry skład ma jedną paradoksalną cechę: **jest niewidoczny**. Czytelnik nie zauważa układu — skupia się na treści. Amatorskie łamanie działa odwrotnie. Zbyt ciasna interlinia, jednoliterowe spójniki wiszące na końcach wierszy, nierówne wcięcia akapitów — to wszystko podświadomie obniża odbieraną wartość publikacji i, co gorsza, autora.
 
+![Strona powieści złożona w LaTeX-u — żywa pagina z tytułem książki i numerem strony, inicjał na początku rozdziału, tekst justowany z przenoszeniem wyrazów, książkowe proporcje strony](/blog/sklad-ksiazki/01-strona-ksiazki.webp)
+
+*Strona powieści złożona realnie w LaTeX-u: inicjał otwierający rozdział, żywa pagina, justowanie z dzieleniem wyrazów, książkowe proporcje. Tak wygląda skład, którego czytelnik „nie zauważa".*
+
 ---
 
 ## Etap 1: przygotowanie manuskryptu
