@@ -3,6 +3,20 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SEO from '../components/SEO.astro';
 import CookieBanner from '../components/CookieBanner.astro';
+
+// Self-hosted variable fonts (Fontsource). Each `wght[-italic].css` ships a
+// single variable woff2 per subset covering the whole 300–700 range, bundled
+// and content-hashed into /_astro by Astro — no fonts.gstatic.com round-trip.
+import '@fontsource-variable/source-serif-4/wght.css';
+import '@fontsource-variable/source-serif-4/wght-italic.css';
+import '@fontsource-variable/crimson-pro/wght.css';
+import '@fontsource-variable/crimson-pro/wght-italic.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght-italic.css';
+// Preload the display family (hero H1 / LCP text) so it paints without waiting
+// for the CSS → font discovery chain. latin-ext = Polish diacritics.
+import displayFontUrl from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-ext-wght-normal.woff2?url';
+
 import '../styles/global.css';
 
 interface Props {
@@ -47,9 +61,16 @@ const {
     schema={schema}
   />
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Preload the LCP display font (self-hosted, same-origin) -->
+  <link
+    rel="preload"
+    href={displayFontUrl}
+    as="font"
+    type="font/woff2"
+    crossorigin
+  />
+
+  <!-- Preconnect (analytics only — fonts are now self-hosted) -->
   <link rel="preconnect" href="https://www.googletagmanager.com" />
   <link rel="preconnect" href="https://www.google-analytics.com" />
 </head>

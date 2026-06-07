@@ -125,7 +125,7 @@
   // Configuration for sklad-tekstu.pl
   // ═══════════════════════════════════════════
   var COOKIE_NAME = 'sklad_tekstu_consent';
-  var GA_ID = 'G-K7YQSP920Q';
+  // GA4 = G-K7YQSP920Q — fired from inside the GTM container, not loaded here.
   var GTM_ID = 'GTM-WF37N7DQ';
 
   // DOM
@@ -205,8 +205,13 @@
   }
 
   // ═══════════════════════════════════════════
-  // Load GTM + GA4
+  // Load GTM (which fires GA4 internally)
   // ═══════════════════════════════════════════
+  // GA4 (G-K7YQSP920Q) is configured as a tag *inside* the GTM container, so
+  // we deliberately do NOT load gtag.js separately here — doing both made GA4
+  // load twice (double pageviews) and shipped ~170 KB of redundant JS. GTM
+  // honors the Consent Mode v2 defaults/updates set above, sending cookieless
+  // pings until analytics consent is granted.
   function loadGoogleScripts(consent) {
     // GTM (always — respects consent mode)
     if (!document.getElementById('gtm-script')) {
@@ -218,22 +223,6 @@
         "'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);" +
         "})(window,document,'script','dataLayer','" + GTM_ID + "');";
       document.head.appendChild(s);
-    }
-
-    // GA4 only if analytics consented
-    if (consent.analytics && !document.getElementById('ga4-script')) {
-      var g = document.createElement('script');
-      g.id = 'ga4-script';
-      g.async = true;
-      g.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
-      document.head.appendChild(g);
-      g.onload = function() {
-        gtag('js', new Date());
-        gtag('config', GA_ID, {
-          'anonymize_ip': true,
-          'cookie_flags': 'SameSite=None;Secure'
-        });
-      };
     }
   }
 
@@ -295,19 +284,45 @@
   };
 
   // ═══════════════════════════════════════════
+  // Defer heavy third-party (GTM) off the critical path
+  // ═══════════════════════════════════════════
+  // GTM + the GA4 it loads is ~270 KB and was the last remaining "unused JS"
+  // on the page. We hold it back until the visitor engages (scroll/click/key/
+  // touch/move) or a short idle fallback fires — so it never competes with the
+  // first paint, while lingering readers are still measured. Consent Mode v2
+  // defaults/updates above are plain dataLayer pushes and stay synchronous.
+  function deferUntilEngaged(fn) {
+    var fired = false;
+    var events = ['scroll', 'pointerdown', 'keydown', 'touchstart', 'mousemove'];
+    function run() {
+      if (fired) return;
+      fired = true;
+      clearTimeout(timer);
+      for (var i = 0; i < events.length; i++) {
+        window.removeEventListener(events[i], run, { passive: true });
+      }
+      fn();
+    }
+    for (var i = 0; i < events.length; i++) {
+      window.addEventListener(events[i], run, { passive: true });
+    }
+    var timer = setTimeout(run, 4000);
+  }
+
+  // ═══════════════════════════════════════════
   // Init
   // ═══════════════════════════════════════════
   function init() {
     var consent = getConsent();
     if (consent) {
       updateGoogleConsent(consent);
-      loadGoogleScripts(consent);
+      deferUntilEngaged(function () { loadGoogleScripts(consent); });
     } else {
-      // Consent Mode v2: load GTM immediately with all categories denied.
-      // GTM honors the gtag('consent','default',...) set above and sends
-      // cookieless pings until the user grants consent via the banner.
-      loadGoogleScripts({ analytics: false, marketing: false });
+      // Consent Mode v2: GTM loads with all categories denied (cookieless
+      // pings) — deferred until engagement so it stays off the first paint.
+      // The banner still appears immediately; accept/reject fire GTM directly.
       showBanner();
+      deferUntilEngaged(function () { loadGoogleScripts({ analytics: false, marketing: false }); });
     }
 
     toggleBtn.addEventListener('click', toggleDetails);
