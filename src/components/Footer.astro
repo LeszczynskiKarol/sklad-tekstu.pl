@@ -62,7 +62,7 @@ const serviceLinks = [
 
     <div class="footer__bottom">
       <span class="footer__copyright">
-        Złożono z&nbsp;typograficzną precyzją · © {currentYear} sklad-tekstu.pl
+        Złożono z&nbsp;typograficzną precyzją · © {currentYear} sklad-tekstu.pl · Realizacja: <a href="https://www.torweb.pl/" class="footer__credit">TorWeb.pl</a>
       </span>
             <span class="footer__latex-sig">
         <button type="button" class="footer__cookie-btn" onclick="openCookieSettings()">Ustawienia cookies</button>
@@ -176,6 +176,17 @@ const serviceLinks = [
     font-size: 0.62rem;
     color: var(--ink-faint);
     letter-spacing: 0.04em;
+  }
+
+  .footer__credit {
+    color: var(--ink-faint);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color var(--transition-fast);
+  }
+
+  .footer__credit:hover {
+    color: var(--accent);
   }
 
   .footer__cookie-btn {
