@@ -1,0 +1,9 @@
+# Skład Tekstu
+
+> Profesjonalny skład i łamanie tekstu w systemie LaTeX: książki, monografie naukowe, poradniki i publikacje firmowe — do druku i dystrybucji cyfrowej.
+
+## Najważniejsze strony
+
+- [Strona główna](https://www.sklad-tekstu.pl/)
+- [Skład książek](https://www.sklad-tekstu.pl/uslugi/ksiazki/): powieści, poradniki, self-publishing
+- [Blog o składzie](https://www.sklad-tekstu.pl/blog/): zasady składu i typografii
