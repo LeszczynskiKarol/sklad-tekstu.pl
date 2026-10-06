@@ -131,6 +131,8 @@ Wspólny mianownik tych błędów jest jeden: oszczędność na etapie, który d
 
 ## Od czego zacząć
 
+Gdy masz dopiero temat, a nie maszynopis, roboczą wersję poradnika z gotowym składem przygotujesz w <a href="https://inkmagnet.com/pl/" rel="nofollow">InkMagnet</a>, generatorze książek, który prowadzimy. Taki szkic to wygodny materiał wyjściowy: łatwiej poprawiać gotowy tekst niż zaczynać od pustej strony, a potem i tak warto oddać go do redakcji i profesjonalnego składu.
+
 Jeśli masz gotowy maszynopis, zacznij od trzeźwej decyzji, co bierzesz na siebie, a co oddajesz w ręce specjalisty. Formalności — ISBN, konta na platformach, metadane, promocja — to Twój teren i poradzisz sobie z nimi sam. Rzemiosło, które czytelnik rozpozna od pierwszej strony — korekta, skład, okładka, plik do druku — to obszar, na którym amatorszczyzna kosztuje więcej niż honorarium specjalisty: kosztuje reputację tytułu.
 
 Self-publishing nie jest gorszą wersją „prawdziwego" wydania. Jest inną drogą — z większą wolnością i większą odpowiedzialnością. Książka wydana samodzielnie potrafi wyglądać i czytać się dokładnie tak jak ta z dużej oficyny, pod jednym warunkiem: że etapy, które wymagają warsztatu, powierzysz osobom, które ten warsztat mają. Resztą — wizją, tytułem, relacją z czytelnikami — zajmiesz się najlepiej Ty sam, bo to właśnie po to zdecydowałeś się wydać tę książkę po swojemu. Jeśli chcesz oddać sam [skład książki](/uslugi/ksiazki/) lub przygotowanie wersji [elektronicznej](/uslugi/ebooki/) w ręce specjalisty, to ten jeden etap, na którym warto.
